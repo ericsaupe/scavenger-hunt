@@ -1,0 +1,7 @@
+require: rubocop-rails
+
+inherit_from:
+- https://relaxed.ruby.style/rubocop.yml
+
+AllCops:
+  NewCops: enable
