@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+system! "rubocop"
+system! "rspec spec"

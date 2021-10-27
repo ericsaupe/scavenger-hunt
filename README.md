@@ -7,3 +7,6 @@
 
 ### Running
 - `bin/dev`
+
+## Testing
+- `bin/test`
