@@ -15,5 +15,6 @@ class TeamsController < ApplicationController
   def show
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
     @team = @hunt.teams.find(params[:id])
+    @submissions = @team.submissions
   end
 end

@@ -10,41 +10,55 @@
   ] %>
 
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
+<h2 class="font-sans my-4 text-center uppercase text-2xl font-bold text-gray-700 sm:text-2xl sm:tracking-tight lg:text-3xl"><%= @team.name %></h1>
 <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
 
-<% @hunt.categories.each_with_index do |category, i| %>
-  <div class="<%= tailwind_colors[i % tailwind_colors.size] %> mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg">
-    <div class="uppercase px-2 py-3 sm:px-3 grid grid-cols-2">
-      <h3 class="text-xl font-medium sm:col-span-1">
-        <%= category.name %>
-      </h3>
-      <p class="text-right max-w-2xl mt-1 text-md sm:col-span-1">
-        <%= pluralize( category.points, 'point' ) %> each
-      </p>
-    </div>
-    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-      <div class="flex flex-wrap overflow-hidden">
-        <% category.items.each do |item, i| %>
-          <div class="w-1/2 overflow-hidden">
-            <div class="flex flex-wrap overflow-hidden">
-              <div class="w-1/6 md:w-1/12 overflow-hidden">
-                <div class="mt-1.5 text-lg font-medium">
-                  <% if rand(0..10) > 5 %>
-                    <ion-icon name="checkbox"></ion-icon>
-                  <% else %>
-                    <ion-icon name="square-outline"></ion-icon>
-                  <% end %>
+<div class="grid grid-cols-1 md:grid-cols-2 md:px-2 md:py-3">
+  <% @hunt.categories.each_with_index do |category, i| %>
+    <div class="<%= tailwind_colors[i % tailwind_colors.size] %> mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg md:mx-1">
+      <div class="uppercase px-2 py-3 sm:px-3 grid grid-cols-2">
+        <h3 class="text-xl font-medium sm:col-span-1">
+          <%= category.name %>
+        </h3>
+        <p class="text-right max-w-2xl mt-1 text-md sm:col-span-1">
+          <%= pluralize( category.points, 'point' ) %> each
+        </p>
+      </div>
+      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div class="flex flex-wrap overflow-hidden">
+          <% category.items.each do |item, i| %>
+            <% submission = @submissions.find_by(item: item) || @team.submissions.new(item: item) %>
+            <div class="w-1/2 overflow-hidden">
+              <div class="flex flex-wrap overflow-hidden">
+                <div class="w-1/6 md:w-1/12 overflow-hidden">
+                  <div class="mt-1.5 text-lg font-medium">
+                    <% if submission.persisted? %>
+                      <ion-icon name="checkbox"></ion-icon>
+                    <% else %>
+                      <ion-icon name="square-outline"></ion-icon>
+                    <% end %>
+                  </div>
                 </div>
-              </div>
-              <div class="w-5/6 md:w-11/12 overflow-hidden">
-                <div class="mt-1 text-lg break-words">
-                  <%= item.name %>
+                <div class="w-5/6 md:w-11/12 overflow-hidden">
+                  <div class="mt-1 text-lg break-words">
+                    <% if submission.persisted? %>
+                      <%= item.name %>
+                    <% else %>
+                      <% object_id = submission.object_id.to_s %>
+                      <%= form_with model: submission, html: { id: object_id } do |form| %>
+                        <%= form.hidden_field :item_id %>
+                        <%= form.hidden_field :team_id %>
+                        <%= form.label :photo, item.name, for: "submission_#{object_id}", class: 'cursor-pointer' %>
+                        <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', onchange: 'this.form.submit()' %>
+                      <% end %>
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        <% end %>
+          <% end %>
+        </div>
       </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>

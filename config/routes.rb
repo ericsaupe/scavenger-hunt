@@ -6,4 +6,6 @@ Rails.application.routes.draw do
   resources :hunts, only: %i[show], param: :code, path: 'scavenger_hunts' do
     resources :teams, only: %i[create show]
   end
+
+  resources :submissions, only: %i[create]
 end
