@@ -1,45 +1,41 @@
-<%# Required to be on the page so the compiler will see it %>
-<% tailwind_colors = [
-  'bg-red-500',
-  'bg-yellow-500',
-  'bg-green-500',
-  'bg-blue-500',
-  'bg-indigo-500',
-  'bg-purple-500',
-  'bg-pink-500'
-  ] %>
+<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
+<p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
 
-<h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
+<%= form_with url: hunt_teams_path(@hunt.code), method: :post, class: 'm-4 space-y-4' do |form| %>
+  <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+    <div class="space-y-6 sm:space-y-5">
+      <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+        <%= form.label :team_id, 'Available Teams', class: 'uppercase block text-xl font-medium text-gray-700 sm:mt-px sm:pt-2' %>
+        <div class="mt-1 sm:mt-0 sm:col-span-2">
+          <% if @hunt.teams.empty? %>
+            <p class="text-lg text-gray-500">No teams are available. Start one new one below.</p>
+          <% else %>
+            <%= form.collection_select :team_id, @hunt.teams.all, :id, :name, { include_blank: 'Select a team' }, { class: 'max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md' } %>
+          <% end %>
+        </div>
+      </div>
 
-<% @hunt.categories.each_with_index do |category, i| %>
-  <div class="<%= tailwind_colors[i % tailwind_colors.size] %> mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg">
-    <div class="uppercase px-4 py-5 sm:px-6 grid grid-cols-2">
-      <h3 class="text-lg leading-6 font-medium sm:col-span-1">
-        <%= category.name %>
-      </h3>
-      <p class="text-right mt-1 max-w-2xl text-sm sm:col-span-1">
-        <%= pluralize( category.points, 'point' ) %> each
-      </p>
-    </div>
-    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-      <div class="flex flex-wrap overflow-hidden">
-        <% category.items.each do |item, i| %>
-          <div class="w-1/2 overflow-hidden">
-            <div class="flex flex-wrap overflow-hidden">
-              <div class="w-1/6 md:w-1/12 overflow-hidden">
-                <div class="mt-1.5 text-lg font-medium">
-                  <ion-icon name="square-outline"></ion-icon>
-                </div>
-              </div>
-              <div class="w-5/6 md:w-11/12 overflow-hidden">
-                <div class="mt-1 text-lg break-words">
-                  <%= item.name %>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% end %>
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center">
+          <span class="uppercase px-2 bg-white text-sm text-gray-500">
+            Or
+          </span>
+        </div>
+      </div>
+
+      <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+        <%= form.label :name, 'New Team Name', class: 'uppercase block text-xl font-medium text-gray-700 sm:mt-px sm:pt-2' %>
+        <div class="mt-1 sm:mt-0 sm:col-span-2">
+          <%= form.text_field :name, class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md' %>
+        </div>
       </div>
     </div>
+  </div>
+
+  <div class="flex justify-end">
+    <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
   </div>
 <% end %>
