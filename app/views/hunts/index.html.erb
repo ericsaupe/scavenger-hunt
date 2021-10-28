@@ -1,0 +1,25 @@
+<div class="bg-white">
+  <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 lg:flex lg:justify-between">
+    <div class="max-w-xl">
+      <h2 class="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Start Your Scavenger Hunt</h2>
+      <p class="mt-5 text-xl text-gray-500">Enter your Scavenger Hunt code to get started!</p>
+    </div>
+    <%= form_with url: root_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col' do |form| %>
+      <div class="min-w-0 w-full flex-1">
+        <%= form.label :code, 'Scavenger Hunt Code', class: 'block text-base font-medium text-gray-500' %>
+
+        <div class="mt-1.5 relative">
+          <%= form.text_field :code,
+            value: params[:code],
+            class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+            required: true,
+            oninput: 'this.value = this.value.toUpperCase()',
+            maxlength: 4 %>
+        </div>
+      </div>
+      <div class="mt-4 sm:mt-0 w-full">
+        <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+      </div>
+    <% end %>
+  </div>
+</div>
