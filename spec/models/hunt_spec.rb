@@ -14,4 +14,11 @@ RSpec.describe Hunt, type: :model do
     hunt.save!
     expect(hunt.code).not_to be_nil
   end
+
+  it 'does not replace code if one is present' do
+    hunt = Hunt.new(name: 'Test', code: 'TEST')
+    expect(hunt.code).to eq('TEST')
+    hunt.save!
+    expect(hunt.code).to eq('TEST')
+  end
 end

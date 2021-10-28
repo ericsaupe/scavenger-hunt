@@ -7,10 +7,14 @@ class Hunt < ApplicationRecord
 
   private
 
-  def generate_code
-    new_code = ('A'..'Z').to_a.sample(4).join
+  ##
+  # Generate a code to be used for better UX. If one is already set double check that it is unique
+  # and if it's not then generate a new one.
+  #
+  def generate_code(character_count: 4)
+    new_code = code || ('A'..'Z').to_a.sample(character_count).join
     while Hunt.find_by(code: new_code).present?
-      new_code = ('A'..'Z').to_a.sample(4).join
+      new_code = ('A'..'Z').to_a.sample(character_count).join
     end
     self.code = new_code
   end
