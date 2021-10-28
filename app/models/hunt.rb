@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Hunt < ApplicationRecord
+  has_many :categories, dependent: :destroy
   before_save :generate_code, if: :new_record?
 
   private
