@@ -3,6 +3,8 @@
 class Hunt < ApplicationRecord
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
+  has_many :teams, dependent: :destroy
+
   before_save :generate_code, if: :new_record?
 
   private

@@ -6,6 +6,7 @@ RSpec.describe Hunt, type: :model do
   context 'associations' do
     it { should have_many(:categories).class_name('Category') }
     it { should have_many(:items).class_name('Item') }
+    it { should have_many(:teams).class_name('Team') }
   end
 
   it 'sets code on create' do
