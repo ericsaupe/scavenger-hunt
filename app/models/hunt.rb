@@ -14,7 +14,7 @@ class Hunt < ApplicationRecord
   # and if it's not then generate a new one.
   #
   def generate_code(character_count: 4)
-    new_code = code || ('A'..'Z').to_a.sample(character_count).join
+    new_code = code&.upcase || ('A'..'Z').to_a.sample(character_count).join
     while Hunt.find_by(code: new_code).present?
       new_code = ('A'..'Z').to_a.sample(character_count).join
     end

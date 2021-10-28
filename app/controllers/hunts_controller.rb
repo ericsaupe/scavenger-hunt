@@ -6,9 +6,13 @@ class HuntsController < ApplicationController
 
     hunt = Hunt.find_by(code: params[:code].upcase)
     if hunt
-      redirect_to hunt_path(hunt)
+      redirect_to hunt_path(code: params[:code].upcase)
     else
       flash[:error] = 'A scavenger hunt was not found for that code, sorry!'
     end
+  end
+
+  def show
+    @hunt = Hunt.find_by!(code: params[:code].upcase)
   end
 end

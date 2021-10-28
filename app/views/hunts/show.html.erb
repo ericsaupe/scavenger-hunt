@@ -1,0 +1,45 @@
+<%# Required to be on the page so the compiler will see it %>
+<% tailwind_colors = [
+  'bg-red-500',
+  'bg-yellow-500',
+  'bg-green-500',
+  'bg-blue-500',
+  'bg-indigo-500',
+  'bg-purple-500',
+  'bg-pink-500'
+  ] %>
+
+<h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
+
+<% @hunt.categories.each_with_index do |category, i| %>
+  <div class="<%= tailwind_colors[i % tailwind_colors.size] %> mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg">
+    <div class="uppercase px-4 py-5 sm:px-6 grid grid-cols-2">
+      <h3 class="text-lg leading-6 font-medium sm:col-span-1">
+        <%= category.name %>
+      </h3>
+      <p class="text-right mt-1 max-w-2xl text-sm sm:col-span-1">
+        <%= pluralize( category.points, 'point' ) %> each
+      </p>
+    </div>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div class="flex flex-wrap overflow-hidden">
+        <% category.items.each do |item, i| %>
+          <div class="w-1/2 overflow-hidden">
+            <div class="flex flex-wrap overflow-hidden">
+              <div class="w-1/6 md:w-1/12 overflow-hidden">
+                <div class="mt-1.5 text-lg font-medium">
+                  <ion-icon name="square-outline"></ion-icon>
+                </div>
+              </div>
+              <div class="w-5/6 md:w-11/12 overflow-hidden">
+                <div class="mt-1 text-lg break-words">
+                  <%= item.name %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

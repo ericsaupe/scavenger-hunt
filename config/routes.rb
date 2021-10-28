@@ -3,5 +3,5 @@
 Rails.application.routes.draw do
   root "hunts#index"
 
-  resources :hunts, only: %i[show]
+  resources :hunts, only: %i[show], param: :code
 end

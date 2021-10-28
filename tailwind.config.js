@@ -1,3 +1,5 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   mode: 'jit',
   purge: [
@@ -8,4 +10,11 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
   ],
+  theme: {
+    fontFamily: {
+      'sans': ['Oswald', ...defaultTheme.fontFamily.sans],
+      'serif': ['Bitter', ...defaultTheme.fontFamily.serif],
+      'mono': [...defaultTheme.fontFamily.mono]
+    }
+  }
 }
