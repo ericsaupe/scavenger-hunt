@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_28_030110) do
+ActiveRecord::Schema.define(version: 2021_10_28_030509) do
 
   create_table "categories", force: :cascade do |t|
     t.integer "hunt_id", null: false
@@ -35,6 +35,16 @@ ActiveRecord::Schema.define(version: 2021_10_28_030110) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["category_id"], name: "index_items_on_category_id"
+  end
+
+  create_table "submissions", force: :cascade do |t|
+    t.integer "item_id", null: false
+    t.integer "team_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["item_id", "team_id"], name: "index_submissions_on_item_id_and_team_id"
+    t.index ["item_id"], name: "index_submissions_on_item_id"
+    t.index ["team_id"], name: "index_submissions_on_team_id"
   end
 
   create_table "teams", force: :cascade do |t|
