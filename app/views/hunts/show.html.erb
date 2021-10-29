@@ -1,5 +1,10 @@
-<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
-<p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
+<% description "Get ready to start #{@hunt.name}. Join a team or start your own and get going!" %>
+
+<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
+<div class="grid grid-cols-2">
+  <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
+  <p class="my-auto m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">Code: <%= @hunt.code.upcase %></p>
+</div>
 
 <%= form_with url: hunt_teams_path(@hunt.code), method: :post, class: 'm-4 space-y-4' do |form| %>
   <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
@@ -8,9 +13,9 @@
         <%= form.label :team_id, 'Available Teams', class: 'uppercase block text-xl font-medium text-gray-700 sm:mt-px sm:pt-2' %>
         <div class="mt-1 sm:mt-0 sm:col-span-2">
           <% if @hunt.teams.empty? %>
-            <p class="text-lg text-gray-500">No teams are available. Start one new one below.</p>
+            <p class="text-lg text-gray-500">No teams are available. Start a new one below.</p>
           <% else %>
-            <%= form.collection_select :team_id, @hunt.teams.all, :id, :name, { include_blank: 'Select a team' }, { class: 'max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md' } %>
+            <%= form.collection_select :team_id, @hunt.teams.all, :id, :name, { include_blank: 'Select a team' }, { class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md' } %>
           <% end %>
         </div>
       </div>
@@ -36,7 +41,7 @@
   </div>
 
   <div class="flex justify-end">
-    <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+    <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
   </div>
 <% end %>
 

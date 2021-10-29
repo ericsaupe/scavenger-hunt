@@ -1,3 +1,5 @@
+<% description "#{@team.name} is working hard to find everything on their scavenger hunt list: '#{@hunt.name}'." %>
+
 <%= turbo_stream_from "submissions_#{@team.id}" %>
 <%= turbo_stream_from @team %>
 
@@ -12,7 +14,7 @@
   'bg-pink-500'
   ] %>
 
-<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
+<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
 <h2 class="font-sans my-4 text-center uppercase text-2xl font-bold text-gray-700 sm:text-2xl sm:tracking-tight lg:text-3xl"><%= @team.name %></h1>
 <div class="grid grid-cols-2">
   <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-600">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
