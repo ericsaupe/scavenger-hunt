@@ -7,5 +7,5 @@ Rails.application.routes.draw do
     resources :teams, only: %i[create show]
   end
 
-  resources :submissions, only: %i[create]
+  resources :submissions, only: %i[update]
 end
