@@ -1,6 +1,6 @@
 <% animate = true if local_assigns[:animate].nil? %>
 
-<turbo-frame class="w-1/2 <%= "animate__animated animate__tada" if animate %>" id="<%= dom_id submission %>">
+<div class="w-1/2 <%= "animate__animated animate__tada" if animate %>" id="<%= dom_id submission %>">
   <div class="flex flex-wrap">
     <div class="w-1/6 md:w-1/12">
       <div class="mt-1.5 text-lg font-medium">
@@ -27,4 +27,4 @@
       </div>
     </div>
   </div>
-</turbo-frame>
+</div>

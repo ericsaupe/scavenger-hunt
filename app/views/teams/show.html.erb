@@ -1,4 +1,5 @@
 <%= turbo_stream_from "submissions_#{@team.id}" %>
+<%= turbo_stream_from @team %>
 
 <%# Required to be on the page so the compiler will see it %>
 <% tailwind_colors = [
@@ -13,7 +14,10 @@
 
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
 <h2 class="font-sans my-4 text-center uppercase text-2xl font-bold text-gray-700 sm:text-2xl sm:tracking-tight lg:text-3xl"><%= @team.name %></h1>
-<p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
+<div class="grid grid-cols-2">
+  <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-600">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
+  <p class="my-auto m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">Score: <%= render partial: 'score', locals: { team: @team } %></p>
+</div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 md:px-2 md:py-3">
   <% @hunt.categories.each_with_index do |category, i| %>
