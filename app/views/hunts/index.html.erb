@@ -1,25 +1,46 @@
-<div class="bg-white">
-  <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 lg:flex lg:justify-between">
-    <div class="max-w-xl">
-      <h2 class="uppercase text-center text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Start Your Scavenger Hunt</h2>
-      <p class="mt-5 text-xl text-gray-500">Enter your Scavenger Hunt code to get started!</p>
-    </div>
-    <%= form_with url: root_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col' do |form| %>
-      <div class="min-w-0 w-full flex-1">
-        <%= form.label :code, 'Scavenger Hunt Code', class: 'block text-base font-medium text-gray-500' %>
+<h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Start Your Photo Scavenger Hunt</h1>
+<p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your photo scavenger hunt by joining one that has already been created or start a new one!</p>
 
-        <div class="mt-1.5 relative">
-          <%= form.text_field :code,
-            value: params[:code],
-            class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-            required: true,
-            oninput: 'this.value = this.value.toUpperCase()',
-            maxlength: 4 %>
-        </div>
+<div class="space-y-8 sm:space-y-5">
+  <%= form_with url: root_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col' do |form| %>
+    <div class="min-w-0 w-full flex-1">
+      <%= form.label :code, 'Enter your Scavenger Hunt code to get started!', class: 'block text-base font-medium text-gray-500' %>
+
+      <div class="mt-1.5 relative">
+        <%= form.text_field :code,
+          value: params[:code],
+          class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+          required: true,
+          oninput: 'this.value = this.value.toUpperCase()',
+          maxlength: 5
+        %>
       </div>
-      <div class="mt-4 sm:mt-0 w-full">
-        <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
-      </div>
-    <% end %>
+    </div>
+    <div class="mt-4 sm:mt-0 w-full">
+      <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+    </div>
+  <% end %>
+
+  <div class="relative">
+    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+      <div class="w-full border-t border-gray-300"></div>
+    </div>
+    <div class="relative flex justify-center">
+      <span class="uppercase px-2 bg-white text-sm text-gray-500">
+        Or
+      </span>
+    </div>
   </div>
+
+  <%= form_with url: hunts_path, method: :post, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col' do |form| %>
+    <div class="min-w-0 w-full flex-1">
+      <%= form.label :template, 'Select a Scavenger Hunt to start your own!', class: 'block text-base font-medium text-gray-500' %>
+      <div class="mt-1.5 relative">
+        <%= form.select :template, Templater.supported_hunts, { include_blank: 'Select a scavenger hunt' }, { class: 'max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md' } %>
+      </div>
+    </div>
+    <div class="mt-4 sm:mt-0 w-full">
+      <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+    </div>
+  <% end %>
 </div>

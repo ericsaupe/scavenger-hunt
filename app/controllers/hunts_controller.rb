@@ -16,6 +16,11 @@ class HuntsController < ApplicationController
     @hunt = Hunt.find_by!(code: params[:code].upcase)
   end
 
+  def create
+    @hunt = Templater.create_hunt!(params[:template])
+    redirect_to hunt_path(code: @hunt.code.upcase)
+  end
+
   def results
     @hunt = Hunt.includes(items: { submissions: :photo_attachment }).find_by!(code: params[:hunt_code].upcase)
   end
