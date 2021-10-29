@@ -10,7 +10,7 @@ class SubmissionsController < ApplicationController
         render turbo_stream: turbo_stream.replace(:submissions, partial: "submissions/submission",
                                                                 locals: { submission: submission })
       end
-
+      format.js
       format.html do
         flash[:success] = "Checked #{submission.item.name} off the list!"
         redirect_to hunt_team_path(submission.team.hunt.code, submission.team)

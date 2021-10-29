@@ -27,10 +27,10 @@
         </p>
       </div>
       <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-        <div class="flex flex-wrap overflow-hidden">
+        <div class="flex flex-wrap">
           <% category.items.each do |item, i| %>
             <% submission = @submissions.find_by(item: item) || @team.submissions.new(item: item) %>
-            <%= render partial: 'submissions/submission', locals: { submission: submission } %>
+            <%= render partial: 'submissions/submission', locals: { submission: submission, animate: false } %>
           <% end %>
         </div>
       </div>
