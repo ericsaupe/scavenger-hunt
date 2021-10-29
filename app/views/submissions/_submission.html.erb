@@ -1,9 +1,13 @@
 <% animate = true if local_assigns[:animate].nil? %>
 
-<div class="w-1/2 <%= "animate__animated animate__tada" if animate %>" id="<%= dom_id submission %>">
+<div
+  id="<%= dom_id submission %>"
+  class="w-1/2 <%= "animate__animated animate__tada" if animate %>"
+  data-controller="submission"
+>
   <div class="flex flex-wrap">
     <div class="w-1/6 md:w-1/12">
-      <div class="mt-1.5 text-lg font-medium">
+      <div class="mt-1.5 text-lg font-medium" data-submission-target="icon">
         <% if submission.photo.attached? %>
           <ion-icon name="checkbox"></ion-icon>
         <% else %>
@@ -17,11 +21,11 @@
           <%= submission.item.name %>
         <% else %>
           <% object_id = submission.object_id.to_s %>
-          <%= form_with model: submission, html: { id: object_id } do |form| %>
+          <%= form_with model: submission, html: { id: object_id, data: { 'submission-target': 'form' } } do |form| %>
             <%= form.hidden_field :item_id %>
             <%= form.hidden_field :team_id %>
             <%= form.label :photo, submission.item.name, for: "submission_#{object_id}", class: 'cursor-pointer' %>
-            <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', onchange: 'this.form.requestSubmit()' %>
+            <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: "change->submission#submitForm" } %>
           <% end %>
         <% end %>
       </div>

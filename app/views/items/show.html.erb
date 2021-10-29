@@ -25,7 +25,11 @@
     <% @submissions.each_with_index do |submission, i| %>
       <div class="w-full rounded shadow-xl animate__animated animate__fadeIn <%= "animate__delay-#{i}s" %>">
         <div>
-          <%= image_tag(url_for(submission.photo)) %>
+          <% if submission.video? %>
+            <%= video_tag(url_for(submission.photo), controls: true) %>
+          <% else %>
+            <%= image_tag(url_for(submission.photo)) %>
+          <% end %>
         </div>
         <p class="text-lg text-gray-500 text-center my-4"><%= submission.team.name %></p>
       </div>
