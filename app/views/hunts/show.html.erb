@@ -4,7 +4,7 @@
 <%= form_with url: hunt_teams_path(@hunt.code), method: :post, class: 'm-4 space-y-4' do |form| %>
   <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
     <div class="space-y-6 sm:space-y-5">
-      <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+      <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
         <%= form.label :team_id, 'Available Teams', class: 'uppercase block text-xl font-medium text-gray-700 sm:mt-px sm:pt-2' %>
         <div class="mt-1 sm:mt-0 sm:col-span-2">
           <% if @hunt.teams.empty? %>
@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+      <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
         <%= form.label :name, 'New Team Name', class: 'uppercase block text-xl font-medium text-gray-700 sm:mt-px sm:pt-2' %>
         <div class="mt-1 sm:mt-0 sm:col-span-2">
           <%= form.text_field :name, class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md' %>
@@ -39,3 +39,7 @@
     <%= form.submit 'Let\'s Go!', class: 'block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
   </div>
 <% end %>
+
+<div class="flex justify-end">
+  <%= link_to 'View Results', hunt_results_path(@hunt.code), class: 'block w-full rounded-md border border-transparent px-5 py-3 mx-4 bg-green-700 text-base font-medium text-white shadow hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-green-600 sm:px-10 text-center' %>
+</div>
