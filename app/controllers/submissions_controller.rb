@@ -7,7 +7,7 @@ class SubmissionsController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(:submissions, partial: "submissions/submission",
+        render turbo_stream: turbo_stream.replace(:submissions, partial: 'submissions/submission',
                                                                 locals: { submission: submission })
       end
       format.js
