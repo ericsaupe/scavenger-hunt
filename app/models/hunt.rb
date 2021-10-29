@@ -7,9 +7,9 @@ class Hunt < ApplicationRecord
 
   before_save :generate_code, if: :new_record?
 
-  def start_a_new_team(_team_name)
+  def start_a_new_team(team_name)
     ActiveRecord::Base.transaction do
-      team = teams.create!(name: params[:name])
+      team = teams.create!(name: team_name)
       # rubocop:disable Rails/SkipsModelValidations
       # Yeah, probably not the best but it's nicer on the frontend and the
       # joint updates if all the records are created here.
@@ -26,7 +26,7 @@ class Hunt < ApplicationRecord
       )
       # rubocop:enable Rails/SkipsModelValidations
     end
-    teams.find_by!(name: params[:name])
+    teams.find_by!(name: team_name)
   end
 
   private
