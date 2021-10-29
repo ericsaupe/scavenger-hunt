@@ -7,6 +7,28 @@ class Hunt < ApplicationRecord
 
   before_save :generate_code, if: :new_record?
 
+  def start_a_new_team(_team_name)
+    ActiveRecord::Base.transaction do
+      team = teams.create!(name: params[:name])
+      # rubocop:disable Rails/SkipsModelValidations
+      # Yeah, probably not the best but it's nicer on the frontend and the
+      # joint updates if all the records are created here.
+      current_time = Time.current
+      Submission.upsert_all(
+        items.map do |item|
+          {
+            item_id: item.id,
+            team_id: team.id,
+            created_at: current_time,
+            updated_at: current_time
+          }
+        end
+      )
+      # rubocop:enable Rails/SkipsModelValidations
+    end
+    teams.find_by!(name: params[:name])
+  end
+
   private
 
   ##
