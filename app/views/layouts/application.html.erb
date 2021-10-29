@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <%= display_meta_tags site: 'Scavenger Hunt Party!' %>
+    <%= display_meta_tags(
+        site: 'Scavenger Hunt Party!',
+        og: {
+          image: image_url('logo.png')
+        }
+      )
+    %>
     <% keywords 'Photo Scavenger Hunt, Scavenger Hunt' %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
