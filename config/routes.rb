@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     resources :teams, only: %i[create show]
     resources :items, only: %i[show]
     get :results
+    get :print
   end
 
   resources :submissions, only: %i[update]

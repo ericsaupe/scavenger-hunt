@@ -24,4 +24,8 @@ class HuntsController < ApplicationController
   def results
     @hunt = Hunt.includes(items: { submissions: :photo_attachment }).find_by!(code: params[:hunt_code].upcase)
   end
+
+  def print
+    @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
+  end
 end

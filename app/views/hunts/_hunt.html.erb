@@ -1,0 +1,83 @@
+<%# Required to be on the page so the compiler will see it %>
+<% tailwind_colors = [
+  'bg-red-500',
+  'bg-yellow-500',
+  'bg-green-500',
+  'bg-blue-500',
+  'bg-indigo-500',
+  'bg-purple-500',
+  'bg-pink-500'
+  ] %>
+
+<% tailwind_print_border_colors = [
+  'print:border-red-500',
+  'print:border-yellow-500',
+  'print:border-green-500',
+  'print:border-blue-500',
+  'print:border-indigo-500',
+  'print:border-purple-500',
+  'print:border-pink-500'
+  ] %>
+
+<% tailwind_grid_rows = [
+  'grid-rows-1',
+  'grid-rows-2',
+  'grid-rows-3',
+  'grid-rows-4',
+  'grid-rows-5',
+  'grid-rows-6',
+]%>
+
+<% unless local_assigns[:results] %>
+  <div class="grid grid-cols-2 mb-4">
+    <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-600">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
+    <% if @team %>
+      <p class="print:hidden my-auto m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">Score: <%= render partial: 'score', locals: { team: @team } %></p>
+    <% end %>
+    <div class="<%= 'hidden' if !local_assigns[:print] %> print:block grid grid-cols-1">
+      <div class="flex justify-end m-4 h-24 qr-code">
+        <% qrcode = RQRCode::QRCode.new(hunt_url(@hunt.code.upcase)) %>
+        <svg>
+          <%= qrcode.as_svg(
+                fill: "fff",
+                color: "000",
+                shape_rendering: "crispEdges",
+                module_size: 11,
+                standalone: true,
+                use_path: true,
+                viewbox: true,
+                svg_attributes: { preserveAspectRatio: "xMaxYMin meet" }
+              ).html_safe %>
+        </svg>
+      </div>
+      <p class="my-auto m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">Code: <%= @hunt.code.upcase %></p>
+    </div>
+  </div>
+<% end %>
+
+<div class="grid grid-flow-row <%= @hunt.categories.size < 2 ? 'grid-cols-1' : 'grid-cols-2' %> md:px-2 md:py-3">
+  <% @hunt.categories.each_with_index do |category, i| %>
+    <div class="<%= tailwind_colors[i % tailwind_colors.size] %> <%= tailwind_print_border_colors[i % tailwind_print_border_colors.size] %> print:border-4 print:text-black print:bg-white mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg mx-2" style="page-break-before: auto; page-break-after: auto; page-break-inside: avoid;">
+      <div class="uppercase px-2 py-3 sm:px-3 grid grid-cols-2">
+        <h3 class="text-xl font-medium sm:col-span-1">
+          <%= category.name %>
+        </h3>
+        <p class="text-right max-w-2xl mt-1 text-md sm:col-span-1">
+          <%= pluralize( category.points, 'point' ) %> each
+        </p>
+      </div>
+      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div class="flex flex-wrap">
+          <% category.items.each do |item, i| %>
+            <% if local_assigns[:results] %>
+              <%= render partial: 'submissions/result_submission', locals: { item: item } %>
+            <% else %>
+              <% submission = @submissions&.find_by(item: item) || item.submissions.new %>
+              <%= render partial: 'submissions/submission', locals: { submission: submission, animate: false } %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
