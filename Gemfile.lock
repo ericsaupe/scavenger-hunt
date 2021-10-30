@@ -92,6 +92,7 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     childprocess (4.1.0)
+    chunky_png (1.4.0)
     concurrent-ruby (1.1.9)
     crass (1.0.6)
     cssbundling-rails (0.2.4)
@@ -188,6 +189,10 @@ GEM
     reline (0.2.7)
       io-console (~> 0.5)
     rexml (3.2.5)
+    rqrcode (2.1.0)
+      chunky_png (~> 1.0)
+      rqrcode_core (~> 1.0)
+    rqrcode_core (1.2.0)
     rspec-core (3.10.1)
       rspec-support (~> 3.10.0)
     rspec-expectations (3.10.1)
@@ -280,6 +285,7 @@ DEPENDENCIES
   puma (~> 5.0)
   rails (~> 7.0.0.alpha2)
   redis (~> 4.0)
+  rqrcode (~> 2.0)
   rspec-rails
   rubocop-rails
   selenium-webdriver

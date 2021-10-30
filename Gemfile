@@ -16,6 +16,7 @@ gem 'pg'
 gem 'puma', '~> 5.0'
 gem 'rails', '~> 7.0.0.alpha2'
 gem 'redis', '~> 4.0'
+gem 'rqrcode', '~> 2.0'
 gem 'stimulus-rails', '>= 0.4.0'
 gem 'turbo-rails', '>= 0.7.11'
 

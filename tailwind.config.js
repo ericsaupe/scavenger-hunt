@@ -11,6 +11,11 @@ module.exports = {
     require('@tailwindcss/forms'),
   ],
   theme: {
+    extend: {
+      screens: {
+        'print': {'raw': 'print'}
+      }
+    },
     fontFamily: {
       'sans': ['Oswald', ...defaultTheme.fontFamily.sans],
       'serif': ['Bitter', ...defaultTheme.fontFamily.serif],
