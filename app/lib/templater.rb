@@ -7,12 +7,58 @@ class Templater
 
   def self.supported_hunts
     [
-      'The Ultimate Christmas Light Scavenger Hunt Challenge'
-    ]
+      'The Ultimate Christmas Light Scavenger Hunt Challenge',
+      'Neighborhood Scavenger Hunt'
+    ].sort
   end
 end
 
 private
+
+def neighborhood_scavenger_hunt
+  Hunt.create!(name: 'Neighborhood Scavenger Hunt',
+               categories: [
+                 Category.new(
+                   name: 'Things in the Neighborhood',
+                   points: 1,
+                   items: [
+                     'Basketball Hoop',
+                     'A Truck',
+                     'A Blue Car',
+                     'For Sale Sign',
+                     'Bricks',
+                     'Someone Running',
+                     'A Phone',
+                     'A Brown House',
+                     'Red Clothing',
+                     'A FLying Bug',
+                     'A Bicycle',
+                     'Someone in Glasses',
+                     'A Mailbox',
+                     'A School',
+                     'Construction',
+                     'Recyclying Can',
+                     'Headphones',
+                     'Welcome Sign',
+                     'A Ball',
+                     'Someone Gardening',
+                     'A Streetlamp',
+                     'License Plate with K',
+                     'Dog on a Walk',
+                     'A Fence',
+                     'A Friend',
+                     'Blue Door',
+                     'Kids Playing',
+                     'A Family',
+                     'A Stroller',
+                     'A Yard Sign',
+                     'A Hose',
+                     'A Painted Rock',
+                     'Toys'
+                   ].map { |name| Item.new(name: name) }
+                 )
+               ])
+end
 
 def the_ultimate_christmas_light_scavenger_hunt_challenge
   Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',

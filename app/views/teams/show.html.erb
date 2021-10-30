@@ -14,6 +14,15 @@
   'bg-pink-500'
   ] %>
 
+<% tailwind_grid_rows = [
+  'grid-rows-1',
+  'grid-rows-2',
+  'grid-rows-3',
+  'grid-rows-4',
+  'grid-rows-5',
+  'grid-rows-6',
+]%>
+
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
 <h2 class="font-sans my-4 text-center uppercase text-2xl font-bold text-gray-700 sm:text-2xl sm:tracking-tight lg:text-3xl"><%= @team.name %></h1>
 <div class="grid grid-cols-2">
@@ -21,7 +30,8 @@
   <p class="my-auto m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">Score: <%= render partial: 'score', locals: { team: @team } %></p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 md:px-2 md:py-3">
+<% rows_count = (@hunt.categories.size/2.0).round %>
+<div class="grid grid-flow-col auto-cols-auto <%= "grid-rows-#{rows_count}" %> md:px-2 md:py-3">
   <% @hunt.categories.each_with_index do |category, i| %>
     <div class="<%= tailwind_colors[i % tailwind_colors.size] %> mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg md:mx-1">
       <div class="uppercase px-2 py-3 sm:px-3 grid grid-cols-2">
