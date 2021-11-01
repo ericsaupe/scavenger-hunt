@@ -2,7 +2,7 @@
 <nav class="bg-white shadow print:hidden" data-controller="nav">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid justify-items-center h-16">
-      <div class="flex justify-items-center">
+      <div class="hidden sm:flex justify-items-center">
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
           <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
           <%= link_to 'Home', root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(root_url) ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
