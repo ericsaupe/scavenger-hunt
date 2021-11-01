@@ -3,9 +3,9 @@
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
 <div class="grid grid-cols-2">
   <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
-  <div class="my-auto m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">
+  <div class="m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">
     <%= link_to hunt_print_path(@hunt.code.upcase), target: '_blank', class: 'text-black rounded-md border border-transparent px-4 py-1 mx-4 bg-gray-100 text-base font-medium text-white shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center' do %>
-      <ion-icon name="print-outline"></ion-icon>
+      <ion-icon name="print-outline"></ion-icon> Print List
     <% end %>
     Code: <%= @hunt.code.upcase %>
   </div>
