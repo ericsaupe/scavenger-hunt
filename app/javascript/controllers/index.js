@@ -8,3 +8,6 @@ application.register("flash", FlashController)
 
 import SubmissionController from "./submission_controller"
 application.register("submission", SubmissionController)
+
+import NavController from "./nav_controller"
+application.register("nav", NavController)
