@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Templater
-  SUPPORTED_HUNTS = [].freeze
+  # rubocop:disable Style/MutableConstant
+  SUPPORTED_HUNTS = []
+  # rubocop:enable Style/MutableConstant
 
   def self.load_hunts
     Dir.glob(Rails.root.join('app/templates/*.yml')) do |filename|
