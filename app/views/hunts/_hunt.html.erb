@@ -46,29 +46,35 @@
   </div>
 <% end %>
 
-<div class="grid grid-flow-row grid-cols-1 <%= @hunt.categories.size < 2 ? 'md:grid-cols-1 print:grid-cols-1' : 'md:grid-cols-2 print:grid-cols-2' %> md:px-2 md:py-3">
-  <% @hunt.categories.each_with_index do |category, i| %>
-    <div class="<%= tailwind_colors[i % tailwind_colors.size] %> <%= tailwind_print_border_colors[i % tailwind_print_border_colors.size] %> print:border-4 print:text-black print:bg-white mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg mx-2">
-      <div class="uppercase px-2 py-3 sm:px-3 grid grid-cols-2">
-        <h3 class="text-xl font-medium sm:col-span-1">
-          <%= category.name %>
-        </h3>
-        <p class="text-right max-w-2xl mt-1 text-md sm:col-span-1">
-          <%= pluralize( category.points, 'point' ) %> each
-        </p>
-      </div>
-      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-        <div class="flex flex-wrap">
-          <% category.items.each do |item, i| %>
-            <% if local_assigns[:results] %>
-              <%= render partial: 'submissions/result_submission', locals: { item: item } %>
-            <% else %>
-              <% submission = @submissions&.find_by(item: item) || item.submissions.new %>
-              <%= render partial: 'submissions/submission', locals: { submission: submission, animate: false } %>
+<div data-controller="hunt">
+  <div class="grid grid-flow-row grid-cols-1 <%= @hunt.categories.size < 2 ? 'md:grid-cols-1 print:grid-cols-1' : 'md:grid-cols-2 print:grid-cols-2' %> md:px-2 md:py-3">
+    <% @hunt.categories.each_with_index do |category, i| %>
+      <div class="<%= tailwind_colors[i % tailwind_colors.size] %> <%= tailwind_print_border_colors[i % tailwind_print_border_colors.size] %> print:border-4 print:text-black print:bg-white mb-4 text-gray-50 shadow overflow-hidden sm:rounded-lg mx-2">
+        <div class="uppercase px-2 py-3 sm:px-3 grid grid-cols-2">
+          <h3 class="text-xl font-medium sm:col-span-1">
+            <%= category.name %>
+          </h3>
+          <p class="text-right max-w-2xl mt-1 text-md sm:col-span-1">
+            <%= pluralize( category.points, 'point' ) %> each
+          </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <div class="flex flex-wrap">
+            <% category.items.each do |item, i| %>
+              <% if local_assigns[:results] %>
+                <%= render partial: 'submissions/result_submission', locals: { item: item } %>
+              <% else %>
+                <% submission = @submissions&.find_by(item: item) || item.submissions.new %>
+                <%= render partial: 'submissions/submission', locals: { submission: submission, animate: false } %>
+              <% end %>
             <% end %>
-          <% end %>
+          </div>
         </div>
       </div>
-    </div>
+    <% end %>
+  </div>
+
+  <% unless local_assigns[:results] %>
+    <%= render partial: 'submissions/modal' %>
   <% end %>
 </div>

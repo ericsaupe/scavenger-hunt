@@ -6,6 +6,9 @@ import { application } from "./application"
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
+import HuntController from "./hunt_controller"
+application.register("hunt", HuntController)
+
 import SubmissionController from "./submission_controller"
 application.register("submission", SubmissionController)
 
