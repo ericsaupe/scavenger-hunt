@@ -37,7 +37,7 @@
           <%= form.hidden_field :item_id %>
           <%= form.hidden_field :team_id %>
           <%= form.label :photo, submission.item.name, for: "submission_#{object_id}", class: 'cursor-pointer' %>
-          <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: "change->hunt#closeModal", 'submission-target': 'field' } %>
+          <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: "change->submission#submitForm change->hunt#closeModal", 'submission-target': 'field' } %>
         <% end %>
       </div>
     </div>

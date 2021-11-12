@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SubmissionsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:update]
+
   def update
     submission = Submission.find(params[:id])
     submission.update!(submission_params)
