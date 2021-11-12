@@ -19,7 +19,7 @@
       <div class="mt-1 text-lg break-words">
         <% object_id = submission.object_id.to_s %>
 
-        <% if submission.new_record? || submission.photo.attached? %>
+        <% if submission.photo.attached? %>
           <span
             data-action="click->hunt#openModal"
             data-title="<%= submission.item.name %>"
@@ -32,7 +32,7 @@
           </span>
         <% end %>
 
-        <% hidden_class = submission.new_record? || submission.photo.attached? ? 'hidden' : '' %>
+        <% hidden_class = submission.photo.attached? ? 'hidden' : '' %>
         <%= form_with model: submission, authenticity_token: false, html: { id: object_id, class: hidden_class, data: { 'submission-target': 'form' } } do |form| %>
           <%= form.hidden_field :item_id %>
           <%= form.hidden_field :team_id %>

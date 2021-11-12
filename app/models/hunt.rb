@@ -9,7 +9,7 @@ class Hunt < ApplicationRecord
 
   def start_a_new_team(team_name)
     ActiveRecord::Base.transaction do
-      team = teams.create!(name: team_name)
+      team = teams.find_or_create_by(name: team_name)
       # rubocop:disable Rails/SkipsModelValidations
       # Yeah, probably not the best but it's nicer on the frontend and the
       # joint updates if all the records are created here.
