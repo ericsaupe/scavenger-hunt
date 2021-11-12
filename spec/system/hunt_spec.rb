@@ -78,5 +78,11 @@ RSpec.describe 'Hunts', type: :system do
       end
       expect(page).to have_text("Score: #{points}")
     end
+
+    it 'prints' do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/print"
+      expect(page).to have_text("Code: #{hunt.code.upcase}")
+      expect(page).to have_css('.qr-code')
+    end
   end
 end
