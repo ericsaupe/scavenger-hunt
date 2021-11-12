@@ -1,0 +1,86 @@
+---
+  name: Canned Food Scavenger Hunt
+  categories:
+    - name: Canned Meat
+      points: 30
+      items:
+        - Tuna fish
+        - Chicken
+        - Salmon
+        - Canned ham
+        - Spam
+        - Other canned meat
+    - name: Canned Vegetables
+      points: 30
+      items:
+        - Whole kernel corn
+        - Cream style corn
+        - Green beans (any)
+        - Other canned beans
+        - Peas
+        - Carrots
+        - Sweet potatoes
+        - Potatoes
+        - Other vegetables
+    - name: Canned Fruit
+      points: 30
+      items:
+        - Pears
+        - Peaches
+        - Applesauce
+        - Fruit Cocktail
+        - Other canned fruits
+    - name: Pasta
+      points: 30
+      items:
+        - Macaroni and cheese
+        - Dried pasta (spaghetti, etc.)
+        - Ravioli, Spaghettios, etc.
+        - Other pasta items
+    - name: Beverages
+      points: 30
+      items:
+        - Kool Aid mix
+        - Fruit Juice
+        - Tea
+        - Lemonade
+        - Powdered Milk
+    - name: Breakfast Items
+      points: 30
+      items:
+        - Cereal
+        - Granola/Breakfast bar
+        - Oatmeal
+        - Poptarts
+        - Syrup
+    - name: Soup/Sauce
+      points: 30
+      items:
+        - Canned Soup
+        - Dried Soup Mix
+        - Gravy Jar/Can
+        - Gravy Dry Mix
+        - Spaghetti Sauce
+        - Salad Dressing
+        - Chili
+    - name: Dessert Items
+      points: 30
+      items:
+        - Cake mix
+        - Frosting
+        - Pudding (ready to eat)
+        - Jello (ready to eat)
+        - Pudding dry mix
+        - Jello dry mix
+    - name: Miscellaneous Items
+      points: 30
+      items:
+        - Peanut butter
+        - Jelly
+        - Rice
+        - Stuffing
+        - Mashed potatoes
+    - name: Other
+      points: 30
+      items:
+        - Any other non-perishable item not listed
