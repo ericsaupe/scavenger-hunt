@@ -14,8 +14,12 @@ FileUtils.chdir APP_ROOT do
   # Add necessary setup steps to this file.
 
   puts "== Installing dependencies =="
+  # Install ruby stuff
   system! "gem install bundler --conservative"
   system("bundle check") || system!("bundle install")
+  system! "gem install foreman --conservative"
+  # Install yarn stuff
+  system! "yarn install"
 
   # puts "\n== Copying sample files =="
   # unless File.exist?("config/database.yml")
