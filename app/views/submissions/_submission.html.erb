@@ -25,7 +25,7 @@
             <span
               data-action="click->hunt#openModal"
               data-title="<%= submission.item.name %>"
-              data-src="<%= url_for(submission.photo) %>"
+              data-src="<%= submission_attachment_url(submission) %>"
               data-video="<%= submission.video? %>"
               data-object="<%= object_id %>"
               class="cursor-pointer"
