@@ -30,7 +30,7 @@
           <% if submission.video? %>
             <%= video_tag(url_for(submission.photo), controls: true) %>
           <% else %>
-            <%= image_tag(url_for(submission.photo)) %>
+            <%= image_tag(url_for(submission.photo.variant(resize_to_fit: [1500, 1500]))) %>
           <% end %>
         </div>
         <p class="text-lg text-gray-500 text-center my-4"><%= submission.team.name %></p>
