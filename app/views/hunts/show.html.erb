@@ -15,7 +15,11 @@
   </div>
 </div>
 
-<%= form_with url: hunt_teams_path(@hunt.code), method: :post, class: 'm-4 space-y-4' do |form| %>
+<%= form_with url: hunt_teams_path(@hunt.code),
+  method: :post,
+  class: 'm-4 space-y-4',
+  data: { controller: 'past-hunts', 'past-hunts-code-value': @hunt.code, 'past-hunts-name-value': @hunt.name } do |form|
+%>
   <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
     <div class="space-y-6 sm:space-y-5">
       <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">

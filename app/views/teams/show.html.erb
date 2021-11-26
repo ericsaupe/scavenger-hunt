@@ -6,4 +6,11 @@
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
 <h2 class="font-sans my-4 text-center uppercase text-2xl font-bold text-gray-700 sm:text-2xl sm:tracking-tight lg:text-3xl print:hidden"><%= @team.name %></h2>
 
+<%= content_tag :div, nil, data: {
+  controller: 'past-hunts',
+  'past-hunts-code-value': @hunt.code,
+  'past-hunts-name-value': @hunt.name,
+  'past-hunts-team-value': @team.name
+} %>
+
 <%= render partial: 'hunts/hunt' %>

@@ -3,14 +3,17 @@
 
 import { application } from "./application"
 
-import FlashController from "./flash_controller"
+import FlashController from "./flash_controller.js"
 application.register("flash", FlashController)
 
-import HuntController from "./hunt_controller"
+import HuntController from "./hunt_controller.js"
 application.register("hunt", HuntController)
 
-import SubmissionController from "./submission_controller"
-application.register("submission", SubmissionController)
-
-import NavController from "./nav_controller"
+import NavController from "./nav_controller.js"
 application.register("nav", NavController)
+
+import PastHuntsController from "./past_hunts_controller.js"
+application.register("past-hunts", PastHuntsController)
+
+import SubmissionController from "./submission_controller.js"
+application.register("submission", SubmissionController)

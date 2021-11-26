@@ -84,5 +84,14 @@ RSpec.describe 'Hunts', type: :system do
       expect(page).to have_text("Code: #{hunt.code.upcase}")
       expect(page).to have_css('.qr-code')
     end
+
+    it 'remembers past hunts' do
+      visit "/scavenger_hunts/#{hunt.code.upcase}"
+      visit '/'
+      expect(page).to have_text('Rejoin a scavenger hunt')
+      select(hunt.name, from: 'Rejoin a scavenger hunt you participated in!')
+      click_on 'Rejoin the scavenger hunt'
+      expect(page).to have_text('Available Teams'.upcase)
+    end
   end
 end
