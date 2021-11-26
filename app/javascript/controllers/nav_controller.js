@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = [ "closedIcon", "openIcon", "menu" ]
 
   toggleMenu() {
-    console.log('menu')
     if (this.menuTarget.classList.contains('hidden')) {
       this.closedIconTarget.classList.remove('block')
       this.closedIconTarget.classList.add('hidden')

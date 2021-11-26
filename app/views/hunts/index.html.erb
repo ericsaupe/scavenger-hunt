@@ -21,6 +21,41 @@
     </div>
   <% end %>
 
+  <div class="hidden" data-controller="past-hunts" data-past-hunts-target="container">
+    <div class="relative">
+      <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-gray-300"></div>
+      </div>
+      <div class="relative flex justify-center">
+        <span class="uppercase px-2 bg-white text-sm text-gray-500">
+          Or
+        </span>
+      </div>
+    </div>
+
+    <%= form_with url: root_path,
+      method: :get,
+      class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form|
+    %>
+      <div class="min-w-0 w-full flex-1">
+        <%= form.label :code, 'Rejoin a scavenger hunt you participated in!', class: 'block text-base font-medium text-gray-500' %>
+        <div class="mt-1.5 relative">
+          <%= form.select :code,
+            [],
+            { include_blank: 'Select a scavenger hunt' },
+            {
+              class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md',
+              data: { 'past-hunts-target': 'list' }
+            }
+          %>
+        </div>
+      </div>
+      <div class="mt-4 sm:mt-0 w-full">
+        <%= form.submit 'Rejoin the scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+      </div>
+    <% end %>
+  </div>
+
   <div class="relative">
     <div class="absolute inset-0 flex items-center" aria-hidden="true">
       <div class="w-full border-t border-gray-300"></div>
