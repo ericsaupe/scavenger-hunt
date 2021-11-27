@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe Team, type: :model do
   context 'associations' do
-    it { should belong_to(:hunt).class_name('Hunt') }
-    it { should have_many(:submissions).class_name('Submission') }
-    it { should have_many(:items).class_name('Item') }
+    it { is_expected.to belong_to(:hunt).class_name('Hunt') }
+    it { is_expected.to have_many(:submissions).class_name('Submission') }
+    it { is_expected.to have_many(:items).class_name('Item') }
   end
 
-  context 'unique names' do
+  context 'with unique names' do
     let(:team) { create(:team) }
 
     it 'does not allow duplicate neams within the same hunt' do

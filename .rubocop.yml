@@ -1,10 +1,22 @@
-require: rubocop-rails
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
 
 inherit_from:
 - https://relaxed.ruby.style/rubocop.yml
 
 AllCops:
   NewCops: enable
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
 
 Style/StringLiterals:
   Enabled: true

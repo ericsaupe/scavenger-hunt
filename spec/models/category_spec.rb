@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe Category, type: :model do
   context 'associations' do
-    it { should belong_to(:hunt).class_name('Hunt') }
-    it { should have_many(:items).class_name('Item') }
+    it { is_expected.to belong_to(:hunt).class_name('Hunt') }
+    it { is_expected.to have_many(:items).class_name('Item') }
   end
 
   it 'validates points is greater than or equal to 0' do
-    category = Category.new(
+    category = described_class.new(
       hunt: Hunt.new(name: 'Test'),
       name: 'Test Category',
       points: 100

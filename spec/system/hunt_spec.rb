@@ -11,7 +11,7 @@ RSpec.describe 'Hunts', type: :system do
     expect(page).to have_text('Print List')
   end
 
-  context 'hunt started' do
+  context 'with a hunt started' do
     let(:hunt) { create(:hunt) }
     let(:team) { create(:team, hunt: hunt) }
 
@@ -85,7 +85,7 @@ RSpec.describe 'Hunts', type: :system do
       expect(page).to have_css('.qr-code')
     end
 
-    context 'remembering' do
+    context 'when remembering' do
       it 'remembers past hunts' do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
         visit '/'
