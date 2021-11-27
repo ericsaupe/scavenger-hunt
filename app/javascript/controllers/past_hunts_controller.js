@@ -13,7 +13,7 @@ export default class extends Controller {
       localStorage.pastHunts = JSON.stringify({})
     }
     let pastHunts = JSON.parse(localStorage.pastHunts)
-    if (this.hasListTarget) {
+    if (this.hasListTarget && Object.keys(pastHunts).length !== 0) {
       Object.keys(pastHunts).forEach(hunt => {
         let opt = document.createElement('option')
         opt.value = hunt

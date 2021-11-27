@@ -85,13 +85,28 @@ RSpec.describe 'Hunts', type: :system do
       expect(page).to have_css('.qr-code')
     end
 
-    it 'remembers past hunts' do
-      visit "/scavenger_hunts/#{hunt.code.upcase}"
-      visit '/'
-      expect(page).to have_text('Rejoin a scavenger hunt')
-      select(hunt.name, from: 'Rejoin a scavenger hunt you participated in!')
-      click_on 'Rejoin the scavenger hunt'
-      expect(page).to have_text('Available Teams'.upcase)
+    context 'remembering' do
+      it 'remembers past hunts' do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        visit '/'
+        expect(page).to have_text('Rejoin a scavenger hunt')
+        select(hunt.name, from: 'Rejoin a scavenger hunt you participated in!')
+        click_on 'Rejoin the scavenger hunt'
+        expect(page).to have_text('Available Teams'.upcase)
+
+        second_hunt = create(:hunt)
+        visit "/scavenger_hunts/#{second_hunt.code.upcase}"
+        visit '/'
+        expect(page).to have_text('Rejoin a scavenger hunt')
+        select(second_hunt.name, from: 'Rejoin a scavenger hunt you participated in!')
+        click_on 'Rejoin the scavenger hunt'
+        expect(page).to have_text('Available Teams'.upcase)
+      end
+
+      it 'only shows if there is something to remember' do
+        visit '/'
+        expect(page).not_to have_text('Rejoin a scavenger hunt')
+      end
     end
   end
 end
