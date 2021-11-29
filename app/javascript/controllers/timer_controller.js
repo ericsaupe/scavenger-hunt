@@ -12,12 +12,12 @@ export default class extends Controller {
   }
 
   startCountdown() {
-    const containerTarget = this.containerTarget
     const countdownTarget = this.countdownTarget
     const startsAt = this.startsAtValue
     const endsAt = this.endsAtValue
-
-    console.log(startsAt, endsAt)
+    const enableFieldsets = this.enableFieldsets.bind(this)
+    const disableFieldsets = this.disableFieldsets.bind(this)
+    const toggleBackgroundClasses = this.toggleBackgroundClasses.bind(this)
 
     // Update the count down every 1 second
     let x = setInterval(function() {
@@ -26,12 +26,12 @@ export default class extends Controller {
       let explanation
       if (startsAt && startsAt > Date.now()) {
         explanation = "Starts in "
-        containerTarget.classList.add("bg-blue-500")
-        containerTarget.classList.remove("bg-green-500", "bg-red-500")
+        toggleBackgroundClasses("bg-blue-500")
+        disableFieldsets()
       } else if (endsAt && endsAt > Date.now()) {
         explanation = "Ends in "
-        containerTarget.classList.add("bg-green-500")
-        containerTarget.classList.remove("bg-blue-500", "bg-red-500")
+        toggleBackgroundClasses("bg-green-500")
+        enableFieldsets()
       }
       // Get today's date and time
       let now = new Date().getTime()
@@ -43,13 +43,33 @@ export default class extends Controller {
       let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
       let seconds = Math.floor((distance % (1000 * 60)) / 1000)
       countdownTarget.innerHTML = `${explanation}${days}d ${hours}h ${minutes}m ${seconds}s`
-      // If the count down is finished, write some text
+      // If the count down is finished let's clean it all up
       if (distance < 0) {
         clearInterval(x)
         countdownTarget.innerHTML = "This scavenger hunt has ended. No more submissions will be accepted."
-        containerTarget.classList.add("bg-red-500")
-        containerTarget.classList.remove("bg-blue-500", "bg-green-500")
+        toggleBackgroundClasses("bg-red-500")
+        disableFieldsets()
       }
     }, 1000)
+  }
+
+  enableFieldsets() {
+    this.toggleFieldsets(false)
+  }
+
+  disableFieldsets() {
+    this.toggleFieldsets(true)
+  }
+
+  toggleFieldsets(disabled) {
+    document.querySelectorAll('fieldset.submission-fieldset').forEach(fieldset => {
+      fieldset.disabled = disabled
+    })
+  }
+
+  toggleBackgroundClasses(color) {
+    const colors = ["bg-blue-500", "bg-green-500", "bg-red-500"]
+    this.containerTarget.classList.add(color)
+    this.containerTarget.classList.remove(...colors.filter(item => item !== color))
   }
 }

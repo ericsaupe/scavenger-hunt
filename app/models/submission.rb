@@ -6,6 +6,8 @@ class Submission < ApplicationRecord
   belongs_to :item
   belongs_to :team, touch: true
 
+  delegate :hunt, to: :team
+
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
 
   scope :with_attached_photo, -> { joins(:photo_attachment).where.not(active_storage_attachments: { id: nil }) }
