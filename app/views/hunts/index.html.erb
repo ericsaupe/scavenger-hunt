@@ -1,5 +1,5 @@
 <h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Start Your Photo Scavenger Hunt</h1>
-<p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your photo scavenger hunt by joining one that has already been created or start a new one!</p>
+<p class="m-4 text-center text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your photo scavenger hunt by joining one that has already been created or start a new one!</p>
 
 <div class="mx-4 space-y-8 sm:space-y-5">
   <%= form_with url: root_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form| %>
@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <%= form_with url: hunts_path, method: :post, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form| %>
+  <%= form_with url: new_hunt_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form| %>
     <div class="min-w-0 w-full flex-1">
       <%= form.label :template, 'Select a scavenger hunt to start your own!', class: 'block text-base font-medium text-gray-500' %>
       <div class="mt-1.5 relative">
