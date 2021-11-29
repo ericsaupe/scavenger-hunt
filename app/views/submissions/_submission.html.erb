@@ -36,10 +36,12 @@
 
           <% hidden_class = submission.photo.attached? ? 'hidden' : '' %>
           <%= form_with model: submission, authenticity_token: false, html: { id: object_id, class: hidden_class, data: { 'submission-target': 'form' } } do |form| %>
-            <%= form.hidden_field :item_id %>
-            <%= form.hidden_field :team_id %>
-            <%= form.label :photo, submission.item.name, for: "submission_#{object_id}", class: 'cursor-pointer' %>
-            <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: "change->submission#submitForm change->hunt#closeModal", 'submission-target': 'field' } %>
+            <%= field_set_tag(nil, class: 'submission-fieldset', disabled: !submission.hunt.in_progress?) do %>
+              <%= form.hidden_field :item_id %>
+              <%= form.hidden_field :team_id %>
+              <%= form.label :photo, submission.item.name, for: "submission_#{object_id}", class: 'cursor-pointer' %>
+              <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: "change->submission#submitForm change->hunt#closeModal", 'submission-target': 'field' } %>
+            <% end %>
           <% end %>
         <% end %>
       </div>
