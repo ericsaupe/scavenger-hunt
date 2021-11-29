@@ -1,6 +1,9 @@
 <% description "Get ready to start #{@hunt.name}. Join a team or start your own and get going!" %>
 
+<%= render partial: 'timer', locals: { hunt: @hunt } %>
+
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
+
 <div class="grid grid-cols-2">
   <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
   <div class="grid grid-cols-1 m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">

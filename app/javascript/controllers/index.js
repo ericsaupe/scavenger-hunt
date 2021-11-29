@@ -20,3 +20,6 @@ application.register("past-hunts", PastHuntsController)
 
 import SubmissionController from "./submission_controller.js"
 application.register("submission", SubmissionController)
+
+import TimerController from "./timer_controller.js"
+application.register("timer", TimerController)
