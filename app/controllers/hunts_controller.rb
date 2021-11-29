@@ -16,8 +16,13 @@ class HuntsController < ApplicationController
     @hunt = Hunt.find_by!(code: params[:code].upcase)
   end
 
+  def new
+    @hunt = Hunt.new(name: params[:template])
+  end
+
   def create
-    @hunt = Templater.create_hunt!(params[:template])
+    @hunt = Templater.create_hunt!(hunt_params[:template])
+    @hunt.update(name: hunt_params[:name])
     redirect_to hunt_path(code: @hunt.code.upcase)
   end
 
@@ -27,5 +32,11 @@ class HuntsController < ApplicationController
 
   def print
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
+  end
+
+  private
+
+  def hunt_params
+    params.require(:hunt).permit(:template, :name, :starts_at, :ends_at)
   end
 end
