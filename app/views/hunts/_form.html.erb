@@ -1,6 +1,7 @@
 <%= form_with model: hunt, url: hunts_path, method: :post, class: 'space-y-8', data: { controller: 'form' } do |f| %>
   <div class="space-y-8 sm:space-y-5">
     <%= f.hidden_field :template, value: @hunt.name %>
+    <%= f.hidden_field :timezone, data: { 'form-target': 'timezone' } %>
     <div>
       <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
         <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
