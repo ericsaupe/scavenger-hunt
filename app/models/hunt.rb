@@ -41,6 +41,10 @@ class Hunt < ApplicationRecord
     ends_at && ends_at < Time.current
   end
 
+  def timer?
+    starts_at.present? || ends_at.present?
+  end
+
   private
 
   ##

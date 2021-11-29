@@ -28,34 +28,34 @@ RSpec.describe Hunt, type: :model do
 
     describe 'when true' do
       it 'has no dates set' do
-        expect(hunt).to be_active
+        expect(hunt).to be_in_progress
       end
 
       it 'starts in the past' do
         hunt.update(starts_at: Time.current - 1.day)
-        expect(hunt).to be_active
+        expect(hunt).to be_in_progress
       end
 
       it 'ends in the past' do
         hunt.update(ends_at: Time.current + 1.day)
-        expect(hunt).to be_active
+        expect(hunt).to be_in_progress
       end
 
       it 'is between the start and end' do
         hunt.update(starts_at: Time.current - 1.day, ends_at: Time.current + 1.day)
-        expect(hunt).to be_active
+        expect(hunt).to be_in_progress
       end
     end
 
     describe 'when false' do
       it 'starts in the future' do
         hunt.update(starts_at: Time.current + 1.day)
-        expect(hunt).not_to be_active
+        expect(hunt).not_to be_in_progress
       end
 
       it 'ends in the past' do
         hunt.update(ends_at: Time.current - 1.day)
-        expect(hunt).not_to be_active
+        expect(hunt).not_to be_in_progress
       end
     end
   end
