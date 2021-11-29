@@ -22,6 +22,12 @@ class HuntsController < ApplicationController
 
   def create
     clean_params = hunt_params
+    # timezones, man
+    if clean_params[:timezone].present?
+      timezone = clean_params.delete(:timezone)
+      clean_params[:starts_at] = clean_params[:starts_at].in_time_zone(timezone)
+      clean_params[:ends_at] = clean_params[:ends_at].in_time_zone(timezone)
+    end
     @hunt = Templater.create_hunt!(clean_params.delete(:template))
     @hunt.update(clean_params)
     redirect_to hunt_path(code: @hunt.code.upcase)
@@ -38,6 +44,6 @@ class HuntsController < ApplicationController
   private
 
   def hunt_params
-    params.require(:hunt).permit(:template, :name, :starts_at, :ends_at)
+    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at)
   end
 end

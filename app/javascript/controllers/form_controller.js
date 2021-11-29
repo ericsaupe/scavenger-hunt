@@ -2,6 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 import flatpickr from "flatpickr"
 
 export default class extends Controller {
+  static targets = [ "timezone" ]
+
   connect() {
     const config = {
       enableTime: true,
@@ -10,5 +12,9 @@ export default class extends Controller {
       dateFormat: "Y-m-d H:i",
     }
     flatpickr(".datetime", config)
+
+    if (this.hasTimezoneTarget) {
+      this.timezoneTarget.value = Intl.DateTimeFormat().resolvedOptions().timeZone
+    }
   }
 }
