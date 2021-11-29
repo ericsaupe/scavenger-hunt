@@ -21,8 +21,9 @@ class HuntsController < ApplicationController
   end
 
   def create
-    @hunt = Templater.create_hunt!(hunt_params[:template])
-    @hunt.update(name: hunt_params[:name])
+    clean_params = hunt_params
+    @hunt = Templater.create_hunt!(clean_params.delete(:template))
+    @hunt.update(clean_params)
     redirect_to hunt_path(code: @hunt.code.upcase)
   end
 
