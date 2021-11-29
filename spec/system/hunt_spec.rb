@@ -45,6 +45,15 @@ RSpec.describe 'Hunts', type: :system do
       expect(page).to have_css('ion-icon[name="checkbox"]')
     end
 
+    it 'does not cross off if hunt ended' do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      hunt.update(ends_at: 1.day.ago)
+      attach_file(Rails.root.join('spec/fixtures/test.jpg')) do
+        find(:label, text: hunt.items.first.name).click
+      end
+      expect(page).not_to have_css('ion-icon[name="checkbox"]')
+    end
+
     it 'changes the image' do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       attach_file(Rails.root.join('spec/fixtures/test.jpg')) do
@@ -111,6 +120,44 @@ RSpec.describe 'Hunts', type: :system do
       it 'only shows if there is something to remember' do
         visit '/'
         expect(page).not_to have_text('Rejoin a scavenger hunt')
+      end
+    end
+  end
+
+  context 'timers' do
+    let(:hunt) { create(:hunt) }
+    let(:team) { create(:team, hunt: hunt) }
+
+    describe 'when starting' do
+      before do
+        hunt.update(starts_at: 1.hour.from_now)
+      end
+
+      it 'shows the timer' do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).to have_text('Starts in')
+      end
+    end
+
+    describe 'when in progress' do
+      before do
+        hunt.update(ends_at: 1.hour.from_now)
+      end
+
+      it 'shows the timer' do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).to have_text('Ends in')
+      end
+    end
+
+    describe 'when ended' do
+      before do
+        hunt.update(ends_at: 1.hour.ago)
+      end
+
+      it 'shows the timer' do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).to have_text('This scavenger hunt has ended. No more submissions will be accepted.')
       end
     end
   end

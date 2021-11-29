@@ -1,6 +1,6 @@
 <% description "Get ready to start #{@hunt.name}. Join a team or start your own and get going!" %>
 
-<%= render partial: 'timer', locals: { hunt: @hunt } %>
+<%= render(partial: 'timer', locals: { hunt: @hunt }) if @hunt.timer? %>
 
 <h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
 

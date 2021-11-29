@@ -5,7 +5,13 @@ class SubmissionsController < ApplicationController
 
   def update
     submission = Submission.find(params[:id])
-    submission.update!(submission_params)
+
+    if submission.hunt.ended?
+      # If the hunt is ended, let's just touch it to get an updated object
+      submission.touch # rubocop:disable Rails/SkipsModelValidations
+    else
+      submission.update!(submission_params)
+    end
 
     respond_to do |format|
       format.turbo_stream do
