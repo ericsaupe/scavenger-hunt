@@ -7,6 +7,11 @@ RSpec.describe 'Hunts', type: :system do
     visit '/'
     select 'Neighborhood Scavenger Hunt', from: 'Select a scavenger hunt to start your own!'
     click_on 'Start my scavenger hunt!'
+    fill_in('Name', with: 'My Fun Scavenger Hunt')
+    find('input#hunt_starts_at', visible: false).execute_script("this.value = '2020-01-01 12:00'")
+    find('input#hunt_ends_at', visible: false).execute_script("this.value = '2020-02-01 12:00'")
+    click_on 'Get started!'
+    expect(page).to have_text('My Fun Scavenger Hunt'.upcase)
     expect(page).to have_text('Available Teams'.upcase)
     expect(page).to have_text('Print List')
   end

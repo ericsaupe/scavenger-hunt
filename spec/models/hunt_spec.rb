@@ -22,4 +22,41 @@ RSpec.describe Hunt, type: :model do
     hunt.save!
     expect(hunt.code).to eq('TEST')
   end
+
+  describe '#active?' do
+    let(:hunt) { create(:hunt) }
+
+    describe 'when true' do
+      it 'has no dates set' do
+        expect(hunt).to be_active
+      end
+
+      it 'starts in the past' do
+        hunt.update(starts_at: Time.current - 1.day)
+        expect(hunt).to be_active
+      end
+
+      it 'ends in the past' do
+        hunt.update(ends_at: Time.current + 1.day)
+        expect(hunt).to be_active
+      end
+
+      it 'is between the start and end' do
+        hunt.update(starts_at: Time.current - 1.day, ends_at: Time.current + 1.day)
+        expect(hunt).to be_active
+      end
+    end
+
+    describe 'when false' do
+      it 'starts in the future' do
+        hunt.update(starts_at: Time.current + 1.day)
+        expect(hunt).not_to be_active
+      end
+
+      it 'ends in the past' do
+        hunt.update(ends_at: Time.current - 1.day)
+        expect(hunt).not_to be_active
+      end
+    end
+  end
 end
