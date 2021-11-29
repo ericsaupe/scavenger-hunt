@@ -23,7 +23,7 @@ RSpec.describe Hunt, type: :model do
     expect(hunt.code).to eq('TEST')
   end
 
-  describe '#active?' do
+  describe '#in_progress?' do
     let(:hunt) { create(:hunt) }
 
     describe 'when true' do

@@ -29,13 +29,16 @@ class Hunt < ApplicationRecord
     teams.find_by!(name: team_name)
   end
 
-  def active?
-    return true if starts_at.nil? && ends_at.nil?
-    return true if starts_at      && ends_at.nil? && starts_at    < Time.current
-    return true if starts_at.nil? && ends_at      && Time.current < ends_at
-    return true if starts_at      && ends_at      && starts_at    < Time.current && Time.current < ends_at
+  def in_progress?
+    !ended? && !upcoming?
+  end
 
-    false
+  def upcoming?
+    starts_at && starts_at > Time.current
+  end
+
+  def ended?
+    ends_at && ends_at < Time.current
   end
 
   private
