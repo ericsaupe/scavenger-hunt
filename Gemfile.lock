@@ -146,7 +146,7 @@ GEM
     jbuilder (2.11.3)
       activesupport (>= 5.0.0)
     jmespath (1.4.0)
-    jsbundling-rails (0.1.9)
+    jsbundling-rails (0.2.1)
       railties (>= 6.0.0)
     loofah (2.12.0)
       crass (~> 1.0.2)
@@ -308,7 +308,7 @@ DEPENDENCIES
   honeybadger (~> 4.0)
   image_processing (~> 1.2)
   jbuilder (~> 2.7)
-  jsbundling-rails (~> 0.1.0)
+  jsbundling-rails (~> 0.2.1)
   meta-tags
   pg
   puma (~> 5.0)
