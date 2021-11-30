@@ -271,7 +271,7 @@ GEM
     stimulus-rails (0.7.3)
       rails (>= 6.0.0)
     thor (1.1.0)
-    turbo-rails (0.7.11)
+    turbo-rails (0.9.0)
       rails (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -321,7 +321,7 @@ DEPENDENCIES
   selenium-webdriver
   shoulda-matchers (~> 5.0)
   stimulus-rails (>= 0.4.0)
-  turbo-rails (= 0.7.11)
+  turbo-rails (= 0.9.0)
   web-console (>= 4.1.0)
   webdrivers
 
