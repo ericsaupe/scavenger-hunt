@@ -5,4 +5,5 @@ def system!(*args)
 end
 
 system! "rubocop"
+system! "erblint --lint-all"
 system! "rspec spec"

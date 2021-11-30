@@ -13,12 +13,11 @@
 
           <div class="mt-1.5 relative">
             <%= form.text_field :code,
-              value: params[:code],
-              class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-              required: true,
-              oninput: 'this.value = this.value.toUpperCase()',
-              maxlength: 5
-            %>
+                                value: params[:code],
+                                class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                                required: true,
+                                oninput: 'this.value = this.value.toUpperCase()',
+                                maxlength: 5 %>
           </div>
         </div>
         <div class="mt-4 sm:mt-0 w-full">
@@ -53,20 +52,18 @@
     </div>
     <div class="px-4 py-4 sm:px-6">
       <%= form_with url: root_path,
-        method: :get,
-        class: 'sm:flex md:flex-col space-y-4' do |form|
-      %>
+                    method: :get,
+                    class: 'sm:flex md:flex-col space-y-4' do |form| %>
         <div class="min-w-0 w-full flex-1">
           <%= form.label :code, 'Rejoin a scavenger hunt you participated in!', class: 'block text-base font-medium text-gray-500' %>
           <div class="mt-1.5 relative">
             <%= form.select :code,
-              [],
-              { include_blank: 'Select a scavenger hunt' },
-              {
-                class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md',
-                data: { 'past-hunts-target': 'list' }
-              }
-            %>
+                            [],
+                            { include_blank: 'Select a scavenger hunt' },
+                            {
+                              class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md',
+                              data: { 'past-hunts-target': 'list' }
+                            } %>
           </div>
         </div>
         <div class="mt-4 sm:mt-0 w-full">
@@ -76,4 +73,3 @@
     </div>
   </div>
 </div>
-
