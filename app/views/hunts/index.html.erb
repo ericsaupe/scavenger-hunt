@@ -1,81 +1,79 @@
 <h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Start Your Photo Scavenger Hunt</h1>
 <p class="m-4 text-center text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your photo scavenger hunt by joining one that has already been created or start a new one!</p>
 
-<div class="mx-4 space-y-8 sm:space-y-5">
-  <%= form_with url: root_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form| %>
-    <div class="min-w-0 w-full flex-1">
-      <%= form.label :code, 'Enter your scavenger hunt code to get started!', class: 'block text-base font-medium text-gray-500' %>
-
-      <div class="mt-1.5 relative">
-        <%= form.text_field :code,
-          value: params[:code],
-          class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-          required: true,
-          oninput: 'this.value = this.value.toUpperCase()',
-          maxlength: 5
-        %>
-      </div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+    <div class="px-4 py-5 sm:p-6">
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Join a Hunt</p>
     </div>
-    <div class="mt-4 sm:mt-0 w-full">
-      <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
-    </div>
-  <% end %>
+    <div class="px-4 py-4 sm:px-6">
+      <%= form_with url: root_path, method: :get, class: 'sm:flex md:flex-col space-y-4' do |form| %>
+        <div class="min-w-0 w-full flex-1">
+          <%= form.label :code, 'Enter your scavenger hunt code to get started!', class: 'block text-base font-medium text-gray-500' %>
 
-  <div class="hidden" data-controller="past-hunts" data-past-hunts-target="container">
-    <div class="relative">
-      <div class="absolute inset-0 flex items-center" aria-hidden="true">
-        <div class="w-full border-t border-gray-300"></div>
-      </div>
-      <div class="relative flex justify-center">
-        <span class="uppercase px-2 bg-white text-sm text-gray-500">
-          Or
-        </span>
-      </div>
-    </div>
-
-    <%= form_with url: root_path,
-      method: :get,
-      class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form|
-    %>
-      <div class="min-w-0 w-full flex-1">
-        <%= form.label :code, 'Rejoin a scavenger hunt you participated in!', class: 'block text-base font-medium text-gray-500' %>
-        <div class="mt-1.5 relative">
-          <%= form.select :code,
-            [],
-            { include_blank: 'Select a scavenger hunt' },
-            {
-              class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md',
-              data: { 'past-hunts-target': 'list' }
-            }
-          %>
+          <div class="mt-1.5 relative">
+            <%= form.text_field :code,
+              value: params[:code],
+              class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+              required: true,
+              oninput: 'this.value = this.value.toUpperCase()',
+              maxlength: 5
+            %>
+          </div>
         </div>
-      </div>
-      <div class="mt-4 sm:mt-0 w-full">
-        <%= form.submit 'Rejoin the scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="relative">
-    <div class="absolute inset-0 flex items-center" aria-hidden="true">
-      <div class="w-full border-t border-gray-300"></div>
-    </div>
-    <div class="relative flex justify-center">
-      <span class="uppercase px-2 bg-white text-sm text-gray-500">
-        Or
-      </span>
+        <div class="mt-4 sm:mt-0 w-full">
+          <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+        </div>
+      <% end %>
     </div>
   </div>
 
-  <%= form_with url: new_hunt_path, method: :get, class: 'mt-8 sm:mx-auto sm:max-w-lg sm:flex md:flex-col space-y-4' do |form| %>
-    <div class="min-w-0 w-full flex-1">
-      <%= form.label :template, 'Select a scavenger hunt to start your own!', class: 'block text-base font-medium text-gray-500' %>
-      <div class="mt-1.5 relative">
-        <%= form.select :template, Templater.supported_hunts, { include_blank: 'Select a scavenger hunt' }, { class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md' } %>
-      </div>
+  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+    <div class="px-4 py-5 sm:p-6">
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Start a Hunt</p>
     </div>
-    <div class="mt-4 sm:mt-0 w-full">
-      <%= form.submit 'Start my scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+    <div class="px-4 py-4 sm:px-6">
+      <%= form_with url: new_hunt_path, method: :get, class: 'sm:flex md:flex-col space-y-4' do |form| %>
+        <div class="min-w-0 w-full flex-1">
+          <%= form.label :template, 'Select a scavenger hunt to start your own!', class: 'block text-base font-medium text-gray-500' %>
+          <div class="mt-1.5 relative">
+            <%= form.select :template, Templater.supported_hunts, { include_blank: 'Select a scavenger hunt' }, { class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md' } %>
+          </div>
+        </div>
+        <div class="mt-4 sm:mt-0 w-full">
+          <%= form.submit 'Start my scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
+  </div>
+
+  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200" data-controller="past-hunts" data-past-hunts-target="container">
+    <div class="px-4 py-5 sm:p-6">
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Rejoin a Hunt</p>
+    </div>
+    <div class="px-4 py-4 sm:px-6">
+      <%= form_with url: root_path,
+        method: :get,
+        class: 'sm:flex md:flex-col space-y-4' do |form|
+      %>
+        <div class="min-w-0 w-full flex-1">
+          <%= form.label :code, 'Rejoin a scavenger hunt you participated in!', class: 'block text-base font-medium text-gray-500' %>
+          <div class="mt-1.5 relative">
+            <%= form.select :code,
+              [],
+              { include_blank: 'Select a scavenger hunt' },
+              {
+                class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md',
+                data: { 'past-hunts-target': 'list' }
+              }
+            %>
+          </div>
+        </div>
+        <div class="mt-4 sm:mt-0 w-full">
+          <%= form.submit 'Rejoin the scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
+

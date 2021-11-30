@@ -20,7 +20,6 @@ export default class extends Controller {
         opt.innerHTML = pastHunts[hunt]
         this.listTarget.appendChild(opt)
       })
-      this.containerTarget.classList.remove('hidden')
     } else {
       if (this.teamValue) {
         pastHunts[this.codeValue] = `${this.teamValue} - ${this.nameValue}`

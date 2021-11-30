@@ -116,11 +116,6 @@ RSpec.describe 'Hunts', type: :system do
         click_on 'Rejoin the scavenger hunt'
         expect(page).to have_text('Available Teams'.upcase)
       end
-
-      it 'only shows if there is something to remember' do
-        visit '/'
-        expect(page).not_to have_text('Rejoin a scavenger hunt')
-      end
     end
   end
 

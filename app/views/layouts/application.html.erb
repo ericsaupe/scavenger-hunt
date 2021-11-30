@@ -22,6 +22,8 @@
   <body class="mb-8">
     <%= render partial: 'shared/nav' %>
     <%= render partial: 'shared/flash' %>
-    <%= yield %>
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <%= yield %>
+    </div>
   </body>
 </html>
