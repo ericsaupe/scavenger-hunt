@@ -1,23 +1,23 @@
 <%# Required to be on the page so the compiler will see it %>
 <% tailwind_colors = [
-  'bg-red-500',
-  'bg-yellow-500',
-  'bg-green-500',
-  'bg-blue-500',
-  'bg-indigo-500',
-  'bg-purple-500',
-  'bg-pink-500'
-  ] %>
+     'bg-red-500',
+     'bg-yellow-500',
+     'bg-green-500',
+     'bg-blue-500',
+     'bg-indigo-500',
+     'bg-purple-500',
+     'bg-pink-500'
+   ] %>
 
 <% tailwind_print_border_colors = [
-  'print:border-red-500',
-  'print:border-yellow-500',
-  'print:border-green-500',
-  'print:border-blue-500',
-  'print:border-indigo-500',
-  'print:border-purple-500',
-  'print:border-pink-500'
-  ] %>
+     'print:border-red-500',
+     'print:border-yellow-500',
+     'print:border-green-500',
+     'print:border-blue-500',
+     'print:border-indigo-500',
+     'print:border-purple-500',
+     'print:border-pink-500'
+   ] %>
 
 <% unless local_assigns[:results] %>
   <div class="grid grid-cols-2 mb-4">
@@ -33,14 +33,14 @@
         <% qrcode = RQRCode::QRCode.new(hunt_url(@hunt.code.upcase)) %>
         <svg>
           <%= qrcode.as_svg(
-                fill: "fff",
-                color: "000",
-                shape_rendering: "crispEdges",
+                fill: 'fff',
+                color: '000',
+                shape_rendering: 'crispEdges',
                 module_size: 11,
                 standalone: true,
                 use_path: true,
                 viewbox: true,
-                svg_attributes: { preserveAspectRatio: "xMaxYMin meet" }
+                svg_attributes: { preserveAspectRatio: 'xMaxYMin meet' }
               ).html_safe %>
         </svg>
       </div>

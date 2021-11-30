@@ -8,7 +8,7 @@
   <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
   <div class="grid grid-cols-1 m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">
     <div>
-      <%= link_to hunt_print_path(@hunt.code.upcase), target: '_blank', class: 'text-black rounded-md border border-transparent px-4 py-1 mx-4 bg-gray-100 text-base font-medium text-white shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center' do %>
+      <%= link_to hunt_print_path(@hunt.code.upcase), target: '_blank', class: 'text-black rounded-md border border-transparent px-4 py-1 mx-4 bg-gray-100 text-base font-medium text-white shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center', rel: 'noopener' do %>
         <ion-icon name="print-outline"></ion-icon> Print List
       <% end %>
     </div>
@@ -19,10 +19,9 @@
 </div>
 
 <%= form_with url: hunt_teams_path(@hunt.code),
-  method: :post,
-  class: 'm-4 space-y-4',
-  data: { controller: 'past-hunts', 'past-hunts-code-value': @hunt.code, 'past-hunts-name-value': @hunt.name } do |form|
-%>
+              method: :post,
+              class: 'm-4 space-y-4',
+              data: { controller: 'past-hunts', 'past-hunts-code-value': @hunt.code, 'past-hunts-name-value': @hunt.name } do |form| %>
   <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
     <div class="space-y-6 sm:space-y-5">
       <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">

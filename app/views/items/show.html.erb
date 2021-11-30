@@ -22,7 +22,7 @@
       <%= image_tag 'nothing.png' %>
     </div>
   </div>
-<% else%>
+<% else %>
   <div class="container grid grid-flow-cols auto-cols-auto grid-cols-1 gap-2 mx-auto <%= 'md:grid-cols-2' if @submissions.count > 1 %>">
     <% @submissions.each_with_index do |submission, i| %>
       <div class="w-full rounded shadow-xl animate__animated animate__fadeIn <%= "animate__delay-#{i}s" %>">

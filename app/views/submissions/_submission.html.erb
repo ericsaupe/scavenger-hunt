@@ -2,9 +2,8 @@
 
 <div
   id="<%= dom_id submission %>"
-  class="w-1/2 <%= "animate__animated animate__tada" if animate %>"
-  data-controller="submission"
->
+  class="w-1/2 <%= 'animate__animated animate__tada' if animate %>"
+  data-controller="submission">
   <div class="flex flex-wrap">
     <div class="w-1/6 md:w-1/12">
       <div class="mt-1.5 text-lg font-medium" data-submission-target="icon">
@@ -28,8 +27,7 @@
               data-src="<%= submission_attachment_url(submission) %>"
               data-video="<%= submission.video? %>"
               data-object="<%= object_id %>"
-              class="cursor-pointer"
-            >
+              class="cursor-pointer">
               <%= submission.item.name %>
             </span>
           <% end %>
@@ -40,7 +38,7 @@
               <%= form.hidden_field :item_id %>
               <%= form.hidden_field :team_id %>
               <%= form.label :photo, submission.item.name, for: "submission_#{object_id}", class: 'cursor-pointer' %>
-              <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: "change->submission#submitForm change->hunt#closeModal", 'submission-target': 'field' } %>
+              <%= form.file_field :photo, id: "submission_#{object_id}", class: 'hidden', accept: 'image/*,video/*', data: { action: 'change->submission#submitForm change->hunt#closeModal', 'submission-target': 'field' } %>
             <% end %>
           <% end %>
         <% end %>
