@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ruby/debug
-  revision: 63b1e260aa0865553e10b27aa50f833ffb184ead
+  revision: ba49dac557a86c86fbe39b0e05313ae77377cdd0
   specs:
     debug (1.3.4)
       irb (>= 1.3.6)
