@@ -6,7 +6,7 @@
     <div class="px-4 py-5 sm:p-6 border-b border-gray-200">
       <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Start</p>
     </div>
-    <div class="px-4 py-4 sm:px-6 absolute inset-x-0 bottom-0">
+    <div class="px-4 py-4 sm:px-6 sm:absolute sm:inset-x-0 sm:bottom-0">
       <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
     </div>
   </div>
@@ -18,7 +18,7 @@
     <div class="px-4 py-4 sm:px-6">
       <%= form_with url: root_path, method: :get, class: 'sm:flex md:flex-col space-y-4' do |form| %>
         <div class="min-w-0 w-full flex-1">
-          <%= form.label :code, 'Enter your scavenger hunt code to get started!', class: 'block text-base font-medium text-gray-500' %>
+          <%= form.label :code, 'Enter your scavenger hunt code to join an already made scavenger hunt!', class: 'block text-base font-medium text-gray-500' %>
 
           <div class="mt-1.5 relative">
             <%= form.text_field :code,
