@@ -1,7 +1,7 @@
 ---
   name: The Ultimate Christmas Light Scavenger Hunt Challenge
   description: Find the lights and decorations to score points!
-  image_url: https://images.unsplash.com/photo-1543258103-a62bdc069871
+  image_path: templates/christmas.jpg
   categories:
     - name: Lights
       points: 1

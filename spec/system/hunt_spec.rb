@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Hunts', type: :system do
   it 'creates a new hunt' do
     visit '/'
-    select 'Neighborhood Scavenger Hunt', from: 'Select a scavenger hunt to start your own!'
-    click_on 'Start my scavenger hunt!'
+    click_on 'Browse our premade scavenger hunts to get started!'
+    click_link 'Start', match: :first
     fill_in('Name', with: 'My Fun Scavenger Hunt')
     find('input#hunt_starts_at', visible: false).execute_script("this.value = '2020-01-01 12:00'")
     find('input#hunt_ends_at', visible: false).execute_script("this.value = '2020-02-01 12:00'")
