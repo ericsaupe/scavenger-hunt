@@ -2,11 +2,11 @@
 <p class="m-4 text-center text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your photo scavenger hunt by starting one or join a hunt that has already been started!</p>
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
-    <div class="px-4 py-5 sm:p-6">
+  <div class="bg-white overflow-hidden shadow rounded-lg relative">
+    <div class="px-4 py-5 sm:p-6 border-b border-gray-200">
       <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Start</p>
     </div>
-    <div class="px-4 py-4 sm:px-6">
+    <div class="px-4 py-4 sm:px-6 absolute inset-x-0 bottom-0">
       <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
     </div>
   </div>
