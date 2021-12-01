@@ -1,5 +1,7 @@
 ---
   name: Disneyland Scavenger Hunt
+  description: Look around Disneyland for these special things!
+  image_url: https://images.unsplash.com/photo-1605443791607-80a259dd3c3c
   categories:
     - name: Things to Find
       points: 100

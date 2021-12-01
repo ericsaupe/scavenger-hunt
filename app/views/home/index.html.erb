@@ -1,0 +1,65 @@
+<h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Scavenger Hunt Party!</h1>
+<p class="m-4 text-center text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your photo scavenger hunt by starting one or join a hunt that has already been started!</p>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+    <div class="px-4 py-5 sm:p-6">
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Start</p>
+    </div>
+    <div class="px-4 py-4 sm:px-6">
+      <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+    </div>
+  </div>
+
+  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+    <div class="px-4 py-5 sm:p-6">
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Join</p>
+    </div>
+    <div class="px-4 py-4 sm:px-6">
+      <%= form_with url: root_path, method: :get, class: 'sm:flex md:flex-col space-y-4' do |form| %>
+        <div class="min-w-0 w-full flex-1">
+          <%= form.label :code, 'Enter your scavenger hunt code to get started!', class: 'block text-base font-medium text-gray-500' %>
+
+          <div class="mt-1.5 relative">
+            <%= form.text_field :code,
+                                value: params[:code],
+                                class: 'appearance-none block w-full bg-none bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2 text-base text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                                required: true,
+                                oninput: 'this.value = this.value.toUpperCase()',
+                                maxlength: 5 %>
+          </div>
+        </div>
+        <div class="mt-4 sm:mt-0 w-full">
+          <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200" data-controller="past-hunts" data-past-hunts-target="container">
+    <div class="px-4 py-5 sm:p-6">
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Rejoin</p>
+    </div>
+    <div class="px-4 py-4 sm:px-6">
+      <%= form_with url: root_path,
+                    method: :get,
+                    class: 'sm:flex md:flex-col space-y-4' do |form| %>
+        <div class="min-w-0 w-full flex-1">
+          <%= form.label :code, 'Rejoin a scavenger hunt you participated in!', class: 'block text-base font-medium text-gray-500' %>
+          <div class="mt-1.5 relative">
+            <%= form.select :code,
+                            [],
+                            { include_blank: 'Select a scavenger hunt' },
+                            {
+                              class: 'block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md',
+                              data: { 'past-hunts-target': 'list' }
+                            } %>
+          </div>
+        </div>
+        <div class="mt-4 sm:mt-0 w-full">
+          <%= form.submit 'Rejoin the scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-indigo-500 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

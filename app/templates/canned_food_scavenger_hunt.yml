@@ -1,5 +1,7 @@
 ---
   name: Canned Food Scavenger Hunt
+  description: Ready to do some good while having fun? Have fun while collecting some canned food!
+  image_url: https://images.unsplash.com/photo-1609607285694-e283bd2ea9a0
   categories:
     - name: Canned Meat
       points: 30

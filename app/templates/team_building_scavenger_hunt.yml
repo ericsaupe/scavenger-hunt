@@ -1,5 +1,7 @@
 ---
   name: Team Building Scavenger Hunt
+  description: Have fun with your team by completing this scavenger hunt!
+  image_url: https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca
   categories:
     - name: Things to Find
       points: 50

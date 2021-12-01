@@ -1,5 +1,7 @@
 ---
   name: Superhero Scavenger Hunt Event
+  description: Gather your friends and family to complete the Superhero Scavenger Hunt!
+  image_url: https://images.unsplash.com/photo-1531907700752-62799b2a3e84
   categories:
     - name: Challenges
       points: 10
