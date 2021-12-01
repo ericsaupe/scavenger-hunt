@@ -2,14 +2,8 @@
 
 class HuntsController < ApplicationController
   def index
-    return unless params[:code]
-
-    hunt = Hunt.find_by(code: params[:code].upcase)
-    if hunt
-      redirect_to hunt_path(code: params[:code].upcase)
-    else
-      flash[:error] = 'A scavenger hunt was not found for that code, sorry!'
-    end
+    @templates = Templater.templates.sort_by { |hunt| hunt[:name] }
+    @popular_templates = Templater.popular_templates
   end
 
   def show

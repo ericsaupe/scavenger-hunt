@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class Templater
-  # rubocop:disable Style/MutableConstant
-  SUPPORTED_HUNTS = []
-  # rubocop:enable Style/MutableConstant
+  TEMPLATES = [] # rubocop:disable Style/MutableConstant
 
   def self.load_hunts
     Dir.glob(Rails.root.join('app/templates/*.yml')) do |filename|
@@ -21,7 +19,7 @@ class Templater
           end
         )
       end
-      SUPPORTED_HUNTS << hunt_config[:name]
+      TEMPLATES << hunt_config
     end
   end
 
@@ -29,7 +27,15 @@ class Templater
     send(name.parameterize.underscore)
   end
 
+  def self.templates
+    TEMPLATES
+  end
+
   def self.supported_hunts
-    SUPPORTED_HUNTS.sort
+    TEMPLATES.pluck(:name).sort
+  end
+
+  def self.popular_templates
+    ['Neighborhood Scavenger Hunt', 'The Ultimate Christmas Light Scavenger Hunt Challenge']
   end
 end

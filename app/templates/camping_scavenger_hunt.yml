@@ -1,9 +1,11 @@
 ---
   name: Camping Scavenger Hunt
+  description: "Going camping? You can find a few things to keep you company."
+  image_url: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d"
   categories:
     - name: Things to Find
-      points: 5
-      items:
+    - points: 5
+    - items:
         - Tent
         - Acorn
         - Camp fire

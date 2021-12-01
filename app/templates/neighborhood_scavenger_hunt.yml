@@ -1,5 +1,7 @@
 ---
   name: Neighborhood Scavenger Hunt
+  description: Search your neighborhood for things that can help you complete your scavenger hunt!
+  image_url: https://images.unsplash.com/photo-1618990908950-fd1a23294d11
   categories:
     - name: Things in the Neighborhood
       points: 1
