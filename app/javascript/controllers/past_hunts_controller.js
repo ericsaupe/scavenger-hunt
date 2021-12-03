@@ -23,7 +23,7 @@ export default class extends Controller {
     } else {
       if (this.teamValue) {
         pastHunts[this.codeValue] = `${this.teamValue} - ${this.nameValue}`
-      } else {
+      } else if(this.nameValue) {
         pastHunts[this.codeValue] = this.nameValue
       }
       localStorage.pastHunts = JSON.stringify(pastHunts)
