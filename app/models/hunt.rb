@@ -45,6 +45,16 @@ class Hunt < ApplicationRecord
     starts_at.present? || ends_at.present?
   end
 
+  def results
+    teams.map do |team|
+      {
+        name: team.name,
+        score: team.score,
+        submissions: team.submissions.with_attached_photo.size
+      }
+    end.sort_by { |team| team[:score] }.reverse
+  end
+
   private
 
   ##
