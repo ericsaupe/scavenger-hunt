@@ -46,9 +46,9 @@ export default class extends Controller {
 
     const content = this.modalTarget.querySelector("#content")
     if (event.target.dataset.video === 'true') {
-      content.innerHTML = `<video controls src='${event.target.dataset.src}'></video>`
+      content.innerHTML = `<video class="my-auto sm:flex-grow" controls src='${event.target.dataset.src}'></video>`
     } else {
-      content.innerHTML = `<img src='${event.target.dataset.src}'></img>`
+      content.innerHTML = `<img class="my-auto sm:flex-grow max-w-full" src='${event.target.dataset.src}'></img>`
     }
   }
 

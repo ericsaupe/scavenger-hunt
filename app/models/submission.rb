@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class Submission < ApplicationRecord
-  has_one_attached :photo
+  has_one_attached :photo do |attachable|
+    attachable.variant :small, resize_to_fit: [500, 500]
+    attachable.variant :large, resize_to_fit: [1500, 1500]
+  end
 
   belongs_to :item
   belongs_to :team, touch: true
