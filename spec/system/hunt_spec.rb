@@ -45,6 +45,14 @@ RSpec.describe 'Hunts', type: :system do
       expect(page).to have_css('ion-icon[name="checkbox"]')
     end
 
+    it 'supports video' do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      attach_file(Rails.root.join('spec/fixtures/video.mp4')) do
+        find(:label, text: hunt.items.first.name).click
+      end
+      expect(page).to have_css('ion-icon[name="checkbox"]')
+    end
+
     it 'does not cross off if hunt ended' do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       hunt.update(ends_at: 1.day.ago)

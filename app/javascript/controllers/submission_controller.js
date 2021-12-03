@@ -13,23 +13,30 @@ export default class extends Controller {
         this.formTarget.submit()
       }
       event.target.disabled = true
-    })
+    }).catch((e) => { console.log(e) })
   }
 
   compressImage() {
     const fieldTarget = this.fieldTarget
     const fileListItems = this.fileListItems.bind(this)
-    return new Promise(function(resolve, _reject) {
-      const compress = new Compress()
-      const files = [...fieldTarget.files]
-      compress.compress(files, {}).then((results) => {
-        const img = results[0]
-        const base64str = img.data
-        const imgExt = img.ext
-        const file = new File([Compress.convertBase64ToFile(base64str, imgExt)], img.name)
-        fieldTarget.files = fileListItems([file])
-        resolve()
-      })
+    return new Promise(function(resolve, reject) {
+      try {
+        const compress = new Compress()
+        const files = [...fieldTarget.files]
+        if (!files.every((file) => file && file['type'].split('/')[0] === 'image')) {
+          return resolve()
+        }
+        compress.compress(files, {}).then((results) => {
+          const img = results[0]
+          const base64str = img.data
+          const imgExt = img.ext
+          const file = new File([Compress.convertBase64ToFile(base64str, imgExt)], img.name)
+          fieldTarget.files = fileListItems([file])
+          resolve()
+        })
+      } catch (e) {
+        reject(e)
+      }
     })
   }
 
