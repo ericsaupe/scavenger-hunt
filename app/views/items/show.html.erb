@@ -23,18 +23,39 @@
     </div>
   </div>
 <% else %>
-  <div class="container grid grid-flow-cols auto-cols-auto grid-cols-1 gap-2 mx-auto <%= 'md:grid-cols-2' if @submissions.count > 1 %>">
-    <% @submissions.each_with_index do |submission, i| %>
-      <div class="w-full rounded shadow-xl animate__animated animate__fadeIn <%= "animate__delay-#{i}s" %>">
-        <div>
-          <% if submission.video? %>
-            <%= video_tag(url_for(submission.photo), controls: true) %>
-          <% else %>
-            <%= image_tag(url_for(submission.photo.variant(resize_to_fit: [1500, 1500]))) %>
-          <% end %>
-        </div>
-        <p class="text-lg text-gray-500 text-center my-4"><%= submission.team.name %></p>
-      </div>
-    <% end %>
+  <div data-controller="hunt">
+    <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+      <% @submissions.each_with_index do |submission, i| %>
+        <li class='col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200 animate__animated animate__fadeIn <%= "animate__delay-#{i}s" %>'>
+          <% image_url = url_for(submission.photo.variant(resize_to_fit: [1500, 1500])) %>
+          <div class="relative">
+            <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 filter drop-shadow-lg" style="background-image: url('<%= image_url %>')"></div>
+          </div>
+          <div>
+            <div class="-mt-px flex divide-x divide-gray-200">
+              <div class="w-0 flex-1 flex">
+                <span
+                  data-action="click->hunt#openModal"
+                  data-title="<%= submission.team.name %>"
+                  data-src="<%= submission_attachment_url(submission, variant_size: :large) %>"
+                  data-video="<%= submission.video? %>"
+                  data-object="<%= object_id %>"
+                  class="cursor-pointer relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500">
+                  <%= submission.team.name %>
+                </span>
+              </div>
+              <div class="-ml-px w-0 flex-1 flex">
+                <a href="#" class="bg-gray-100 pointer-events-none relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-300 font-medium border border-transparent rounded-bl-lg hover:text-gray-500">
+                  <ion-icon name="thumbs-up-outline" class="h-6 w-6"></ion-icon>
+                  <span class="ml-3">Vote</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= render partial: 'submissions/modal', locals: { fullscreen: true } %>
   </div>
 <% end %>
