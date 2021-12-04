@@ -22,7 +22,7 @@ gem 'stimulus-rails', '>= 0.4.0'
 gem 'turbo-rails', '0.9.0'
 
 group :development, :test do
-  gem 'debug', '>= 1.0.0', git: 'https://github.com/ruby/debug'
+  gem 'byebug'
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'rspec-rails'
