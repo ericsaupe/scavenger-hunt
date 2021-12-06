@@ -7,7 +7,7 @@
     "@tailwindcss/forms": "^0.3.4",
     "autoprefixer": "^10.3.7",
     "compress.js": "^1.2.1",
-    "esbuild": "^0.14.0",
+    "esbuild": "^0.14.2",
     "flatpickr": "^4.6.9",
     "postcss": "^8.4.4",
     "tailwindcss": "^2.2.17"
