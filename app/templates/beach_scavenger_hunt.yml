@@ -1,0 +1,31 @@
+---
+  name: Beach Scavenger Hunt
+  description: "Fun in the sun and so many things to find!"
+  image_path: templates/beach.jpg
+  categories:
+    - name: Animals and Nature
+      points: 5
+      items:
+        - Driftwood or Sticks
+        - 3 Seashells
+        - Waves
+        - Pelican, seagull, or tern
+        - Seaweed
+        - Sea foam (bubbles)
+        - Bird footprints
+        - Jellyfish
+        - Crab or crab hole
+        - Coral piece
+        - Urchin spine
+    - name: People Stuff
+      points: 5
+      items:
+        - Beach umbrella
+        - Sand bucket
+        - Flip flops
+        - Sunscreen
+        - Sunglasses
+        - Sand castle
+        - Boat
+        - 3 or more pieces of plastic
+        - Beach safety flag
