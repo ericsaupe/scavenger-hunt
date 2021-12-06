@@ -1,0 +1,28 @@
+---
+  name: Airport Scavenger Hunt
+  description: Stuck with a long layover? Pass the time scoping out your surroundings!
+  image_path: templates/airport.jpg
+  categories:
+    - name: Animals and Nature
+      points: 2
+      items:
+        - Airplane taking off or landing
+        - Traveler with a pet carrier
+        - Pink luggage
+        - Sign in another language
+        - Coffee cup sleeve
+        - Photo of 2 team members on opposite moving walkways
+        - A spicy snack
+        - Blue neck pillow
+        - Sign for baggage claim
+        - Someone wearing a sports jersey
+        - Postcard of your current location
+        - Team member with a Toblerone bar
+        - Red airline logo
+        - Someone sleeping at their gate
+        - An airline crew member (pilot or flight attendant)
+        - A travel magazine
+        - Restaurant selling burgers
+        - Water fountain
+        - Cell phone charging station
+        - Vending machine with Coke
