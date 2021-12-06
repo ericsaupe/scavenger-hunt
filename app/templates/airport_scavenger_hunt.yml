@@ -3,7 +3,7 @@
   description: Stuck with a long layover? Pass the time scoping out your surroundings!
   image_path: templates/airport.jpg
   categories:
-    - name: Animals and Nature
+    - name: Airport Things
       points: 2
       items:
         - Airplane taking off or landing
