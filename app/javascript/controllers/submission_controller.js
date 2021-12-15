@@ -56,4 +56,8 @@ export default class extends Controller {
     for (var i = 0, len = files.length; i<len; i++) b.items.add(files[i])
     return b.files
   }
+
+  openFileField() {
+    this.fieldTarget.click()
+  }
 }

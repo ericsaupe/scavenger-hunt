@@ -8,9 +8,15 @@
     <div class="w-1/6 md:w-1/12">
       <div class="mt-1.5 text-lg font-medium" data-submission-target="icon">
         <% if submission.photo.attached? %>
-          <ion-icon name="checkbox"></ion-icon>
+          <ion-icon name="checkbox"
+            data-action="click->hunt#openModal"
+            data-title="<%= submission.item.name %>"
+            data-src="<%= submission_attachment_url(submission) %>"
+            data-video="<%= submission.video? %>"
+            data-object="<%= object_id %>"
+            class="cursor-pointer"></ion-icon>
         <% else %>
-          <ion-icon name="square-outline"></ion-icon>
+          <ion-icon name="square-outline" data-action="click->submission#openFileField"></ion-icon>
         <% end %>
       </div>
     </div>

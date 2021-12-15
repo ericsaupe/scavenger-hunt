@@ -18,16 +18,15 @@ export default class extends Controller {
 
     const overlay = this.modalTarget.querySelector("#overlay")
     const panel = this.modalTarget.querySelector("#panel")
+    this.showContent(event)
 
     overlay.classList.remove("opacity-0")
     overlay.classList.add("opacity-100")
     panel.classList.remove("opacity-0", "translate-y-4", "sm:translate-y-0", "sm:scale-95")
     panel.classList.add("opacity-100", "translate-y-0", "sm:scale-100")
-
-    this.showContent(event)
   }
 
-  closeModal(event) {
+  closeModal() {
     this.modalTarget.classList.add('pointer-events-none')
     this.objectValue = null
 
@@ -48,11 +47,16 @@ export default class extends Controller {
     if (event.target.dataset.video === 'true') {
       content.innerHTML = `<video class="my-auto sm:flex-grow" controls src='${event.target.dataset.src}'></video>`
     } else {
-      content.innerHTML = `<img class="my-auto sm:flex-grow max-w-full" src='${event.target.dataset.src}'></img>`
+      // Trying to load the image before showing it to stop the popping effect
+      const img = new Image()
+      img.src = event.target.dataset.src
+      img.classList.add("my-auto", "sm:flex-grow", "max-w-full")
+      content.appendChild(img)
+      content.firstElementChild.remove()
     }
   }
 
-  clickForm(event) {
+  clickForm() {
     document.getElementById(`${this.objectValue}`).querySelector('input[type="file"]').click()
   }
 }

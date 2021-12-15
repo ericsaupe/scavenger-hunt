@@ -85,9 +85,9 @@ RSpec.describe 'Hunts', type: :system do
       expect(page).to have_css('ion-icon[name="checkbox"]')
 
       find('.cursor-pointer', text: hunt.items.first.name).click
-      expect(page).to have_text('Cancel')
-      click_on 'Cancel'
-      expect(page).not_to have_text('Cancel')
+      expect(page).to have_text('Close')
+      click_on 'Close'
+      expect(page).not_to have_text('Close')
     end
 
     it 'updates the score' do
