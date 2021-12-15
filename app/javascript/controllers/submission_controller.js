@@ -3,20 +3,30 @@ import Compress from "compress.js"
 
 export default class extends Controller {
   static targets = [ "field", "form", "icon" ]
+  static values = {
+    submitting: { type: Boolean, default: false }
+  }
 
   submitForm(event) {
+    // Skip if we are already submitting
+    if (this.submittingValue) {
+      return
+    }
+
+    let formTarget = this.formTarget
+    this.submittingValue = true
     this.iconTarget.innerHTML = '<ion-icon name="cloud-upload-outline" class="animate__animated animate__bounce animate__infinite"></ion-icon>'
-    this.compressImage().then(() => {
-      if (this.formTarget.requestSubmit){
-        this.formTarget.requestSubmit()
+    this.compressImage(event).then(() => {
+      if (formTarget.requestSubmit){
+        formTarget.requestSubmit()
       } else {
-        this.formTarget.submit()
+        formTarget.submit()
       }
       event.target.disabled = true
     }).catch((e) => { console.log(e) })
   }
 
-  compressImage() {
+  compressImage(event) {
     const fieldTarget = this.fieldTarget
     const fileListItems = this.fileListItems.bind(this)
     return new Promise(function(resolve, reject) {
@@ -27,6 +37,7 @@ export default class extends Controller {
           return resolve()
         }
         compress.compress(files, {}).then((results) => {
+          event.stopImmediatePropagation()
           const img = results[0]
           const base64str = img.data
           const imgExt = img.ext
