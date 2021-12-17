@@ -30,7 +30,7 @@
           <% image_url = submission_attachment_url(submission, variant_size: :large) %>
           <div class="relative">
             <% if submission.video? %>
-              <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 drop-shadow-lg"><%= video_tag(image_url, controls: true) %></div>
+              <div class="p-8 h-96 drop-shadow-lg"><%= video_tag(image_url, controls: true, class: 'h-full mx-auto') %></div>
             <% else %>
               <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 drop-shadow-lg" style="background-image: url('<%= image_url %>')"></div>
             <% end %>
