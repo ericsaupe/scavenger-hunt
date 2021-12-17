@@ -45,7 +45,7 @@ export default class extends Controller {
 
     const content = this.modalTarget.querySelector("#content")
     if (event.target.dataset.video === 'true') {
-      content.innerHTML = `<video class="my-auto sm:flex-grow h-screen" controls src='${event.target.dataset.src}'></video>`
+      content.innerHTML = `<video class="my-auto sm:flex-grow h-screen" controls loop src='${event.target.dataset.src}'></video>`
     } else {
       // Trying to load the image before showing it to stop the popping effect
       const img = new Image()
