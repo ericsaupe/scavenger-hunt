@@ -27,9 +27,13 @@
     <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
       <% @submissions.each_with_index do |submission, i| %>
         <li class='col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200 animate__animated animate__fadeIn <%= "animate__delay-#{i}s" %>'>
-          <% image_url = url_for(submission.photo.variant(resize_to_fit: [1500, 1500])) %>
+          <% image_url = submission_attachment_url(submission, variant_size: :large) %>
           <div class="relative">
-            <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 drop-shadow-lg" style="background-image: url('<%= image_url %>')"></div>
+            <% if submission.video? %>
+              <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 drop-shadow-lg"><%= video_tag(image_url, controls: true) %></div>
+            <% else %>
+              <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 drop-shadow-lg" style="background-image: url('<%= image_url %>')"></div>
+            <% end %>
           </div>
           <div>
             <div class="-mt-px flex divide-x divide-gray-200">
