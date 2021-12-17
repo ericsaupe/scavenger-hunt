@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     resources :items, only: %i[show]
     get :results
     get :print
+    post :unlock_results, on: :member
   end
 
   resources :submissions, only: %i[update]

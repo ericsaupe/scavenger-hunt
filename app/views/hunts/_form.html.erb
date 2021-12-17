@@ -30,8 +30,40 @@
         <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
           <%= f.label :ends_at, class: 'block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2' %>
           <div class="mt-1 sm:mt-0 sm:col-span-2">
-            <%= f.text_field :ends_at, class: 'datetime max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md' %>
+            <%= f.text_field :ends_at, class: 'datetime max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md', data: { action: 'change->form#toggleEndFields' } %>
             <p class="mt-2 text-sm text-gray-500">If you don't want to stop accepting submissions at this time.</p>
+          </div>
+
+          <label class="hidden mt-6 block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2" data-form-target="endConfig">Lock results until after the hunt ends?</label>
+          <div class="hidden mt-1 sm:mt-0 sm:col-span-2" data-form-target="endConfig">
+            <button type="button"
+              class="bg-gray-200 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              role="switch"
+              aria-checked="false"
+              data-action="form#toggleSwitch"
+              data-test="lock-results-switch">
+              <span class="sr-only">Lock results</span>
+              <span class="circle translate-x-0 pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200">
+                <span class="x opacity-100 ease-in duration-200 absolute inset-0 h-full w-full flex items-center justify-center transition-opacity" aria-hidden="true">
+                  <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
+                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+                <span class="check opacity-0 ease-out duration-100 absolute inset-0 h-full w-full flex items-center justify-center transition-opacity" aria-hidden="true">
+                  <svg class="h-3 w-3 text-indigo-600" fill="currentColor" viewBox="0 0 12 12">
+                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+                  </svg>
+                </span>
+              </span>
+            </button>
+            <%= f.check_box :lock_results, class: 'hidden' %>
+            <p class="mt-2 text-sm text-gray-500">If you want to hide the results until after the timer ends.</p>
+          </div>
+
+          <%= f.label :lock_password, 'Lock results with a password', class: 'hidden mt-6 block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2', 'data-form-target': 'endConfig' %>
+          <div class="hidden mt-1 sm:mt-0 sm:col-span-2" data-form-target="endConfig">
+            <%= f.text_field :lock_password, class: 'max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md' %>
+            <p class="mt-2 text-sm text-gray-500">If you want to require a one-time password be entered before people can see the results.</p>
           </div>
         </div>
       </div>

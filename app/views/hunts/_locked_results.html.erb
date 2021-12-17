@@ -1,0 +1,27 @@
+<div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 overflow-hidden shadow rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <p class="m-4 text-2xl text-white">Results are not yet available!</p>
+    <% if hunt.lock_password.present? %>
+      <%= form_with url: unlock_results_hunt_path(code: hunt.code.upcase), method: :post do |f| %>
+        <div class="space-y-8 sm:space-y-5">
+          <div>
+            <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+              <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <%= f.label :password, class: 'block text-sm font-medium text-white sm:mt-px sm:pt-2' %>
+                <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <%= f.password_field :password, required: true, class: 'max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-5">
+          <div class="flex justify-end">
+            <%= f.submit 'Unlock Results!', class: 'cursor-pointer ml-3 inline-flex justify-center px-5 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

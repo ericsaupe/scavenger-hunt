@@ -32,6 +32,17 @@ class HuntsController < ApplicationController
     @results = @hunt.results
   end
 
+  def unlock_results
+    @hunt = Hunt.find_by!(code: params[:code].upcase)
+    if @hunt.password == params[:password]
+      @hunt.update(password_entered: true)
+      flash[:success] = 'Results unlocked!'
+    else
+      flash[:warning] = 'Incorrect password'
+    end
+    redirect_to hunt_results_path(hunt_code: @hunt.code.upcase)
+  end
+
   def print
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
   end
@@ -39,6 +50,6 @@ class HuntsController < ApplicationController
   private
 
   def hunt_params
-    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at)
+    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password)
   end
 end

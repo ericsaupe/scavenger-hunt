@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-unless Rails.env.production?
+if Rails.env.development?
   require 'byebug/core'
-  Byebug.start_server 'localhost', 8989
+  begin
+    Byebug.start_server 'localhost', 8989
+  rescue Errno::EADDRINUSE
+    Rails.logger.debug 'Byebug server already running'
+  end
 end

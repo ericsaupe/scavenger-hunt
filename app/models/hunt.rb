@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Hunt < ApplicationRecord
+  include BCrypt
+
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
   has_many :teams, dependent: :destroy
@@ -53,6 +55,19 @@ class Hunt < ApplicationRecord
         submissions: team.submissions.with_attached_photo.size
       }
     end.sort_by { |team| team[:score] }.reverse
+  end
+
+  def results_locked?
+    (lock_results && ends_at > Time.current) || (lock_password.present? && !password_entered)
+  end
+
+  def password
+    @password ||= Password.new(lock_password)
+  end
+
+  def password=(new_password)
+    @password = Password.create(new_password)
+    self.lock_password = @password
   end
 
   private
