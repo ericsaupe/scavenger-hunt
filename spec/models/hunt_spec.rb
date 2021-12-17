@@ -59,4 +59,38 @@ RSpec.describe Hunt, type: :model do
       end
     end
   end
+
+  describe '#results_locked?' do
+    let(:hunt) { create(:hunt) }
+
+    describe 'when true' do
+      it 'is true when a password is present and not entered yet' do
+        hunt.update(ends_at: nil, password: 'hunter2', password_entered: false)
+        expect(hunt).to be_results_locked
+        hunt.update(ends_at: 1.month.ago, password: 'hunter2', password_entered: false)
+        expect(hunt).to be_results_locked
+      end
+
+      it 'is true when the end is in the future and results are locked' do
+        hunt.update(ends_at: 1.month.from_now, lock_results: true)
+        expect(hunt).to be_results_locked
+      end
+    end
+
+    describe 'when false' do
+      it 'is false when there is a password and it has been entered' do
+        hunt.update(password: 'hunter2', password_entered: true)
+        expect(hunt).not_to be_results_locked
+      end
+
+      it 'is false when the end is in the past and no password' do
+        hunt.update(ends_at: 1.month.ago, lock_results: true)
+        expect(hunt).not_to be_results_locked
+      end
+
+      it 'is false by default' do
+        expect(hunt).not_to be_results_locked
+      end
+    end
+  end
 end

@@ -12,8 +12,41 @@ RSpec.describe 'Results', type: :system do
     describe 'results page' do
       it 'displays the results' do
         visit "/scavenger_hunts/#{hunt.code}/results"
+        expect(page).not_to have_content('Results are not yet available!')
         expect(page).to have_content(hunt.name.upcase)
         expect(page).to have_content(team.score)
+      end
+
+      context 'locked by time' do
+        before do
+          hunt.update(ends_at: 1.year.from_now, lock_results: true)
+        end
+
+        it 'does not display the results' do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_content('Results are not yet available!')
+        end
+      end
+
+      context 'locked with password' do
+        before do
+          hunt.update(password: 'hunter2')
+        end
+
+        it 'does not display the results' do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_content('Results are not yet available!')
+        end
+
+        it 'displays results after entering password' do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_content('Results are not yet available!')
+          fill_in 'Password', with: 'hunter2'
+          click_on 'Unlock Results!'
+          expect(page).not_to have_content('Results are not yet available!')
+          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content(team.score)
+        end
       end
     end
 

@@ -10,6 +10,12 @@ Scavenger Hunt Party! is a simple web app to manage the experience of a photo sc
 ### Running
 - `bin/dev`
 
+#### Debugging
+
+With `foreman` handling multiple processes it's difficult to use a debugger without using a remote server. Luckily, `byebug` supports that. To connect to the `byebug` remote server simply use this command in another terminal.
+
+`byebug -R localhost:8989`
+
 ### Testing
 - `bin/test`
 
