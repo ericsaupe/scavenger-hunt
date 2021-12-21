@@ -57,8 +57,8 @@ ActiveRecord::Schema.define(version: 2021_12_17_210910) do
     t.string "code"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.datetime "starts_at", precision: 6
-    t.datetime "ends_at", precision: 6
+    t.datetime "starts_at"
+    t.datetime "ends_at"
     t.boolean "lock_results"
     t.string "lock_password"
     t.boolean "password_entered"

@@ -32,6 +32,12 @@ class HuntsController < ApplicationController
     @results = @hunt.results
   end
 
+  def download_results
+    @hunt = Hunt.find_by!(code: params[:code].upcase)
+    @hunt.create_archive_file unless @hunt.archive.attached?
+    redirect_to rails_blob_path(@hunt.archive, disposition: 'attachment')
+  end
+
   def unlock_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]

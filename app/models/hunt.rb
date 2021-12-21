@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require 'zip'
+
 class Hunt < ApplicationRecord
   include BCrypt
 
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
   has_many :teams, dependent: :destroy
+
+  has_one_attached :archive
 
   before_save :generate_code, if: :new_record?
 
@@ -68,6 +72,29 @@ class Hunt < ApplicationRecord
   def password=(new_password)
     @password = Password.create(new_password)
     self.lock_password = @password
+  end
+
+  def create_archive_file
+    zipfile_name = Rails.root.join('tmp', "archive-#{id}.zip")
+    File.delete(zipfile_name) if File.exist?(zipfile_name)
+
+    Zip::File.open(zipfile_name, create: true) do |zipfile|
+      teams.find_each do |team|
+        folder = [name, team.name].join('/')
+        team.submissions.with_attached_photo.find_each do |submission|
+          extension = Rack::Mime::MIME_TYPES.invert[submission.photo.content_type]
+          filename = [submission.item.name, extension].join
+
+          submission.photo.open(tmpdir: Rails.root.join('tmp')) do |file|
+            filepath = file.path
+            zipfile.add("#{folder}/#{filename}", filepath)
+            zipfile.commit
+          end
+        end
+      end
+    end
+
+    archive.attach(io: File.open(zipfile_name), filename: "#{name}.zip")
   end
 
   private

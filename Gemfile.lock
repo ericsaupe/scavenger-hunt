@@ -309,6 +309,7 @@ DEPENDENCIES
   rspec-rails
   rubocop-rails
   rubocop-rspec
+  rubyzip
   selenium-webdriver
   shoulda-matchers (~> 5.0)
   sprockets-rails
