@@ -75,6 +75,7 @@ class Hunt < ApplicationRecord
   end
 
   def create_archive_file
+    Dir.mkdir(Rails.root.join('tmp')) unless Dir.exist?(Rails.root.join('tmp'))
     zipfile_name = Rails.root.join('tmp', "archive-#{id}.zip")
     File.delete(zipfile_name) if File.exist?(zipfile_name)
 
