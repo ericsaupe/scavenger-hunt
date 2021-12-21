@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     resources :items, only: %i[show]
     get :results
     get :print
+    get :download_results, on: :member
     post :unlock_results, on: :member
   end
 

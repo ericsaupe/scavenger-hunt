@@ -12,3 +12,19 @@
 ion-icon {
   --ionicon-stroke-width: 48px;
 }
+
+.spinning {
+  animation-name: spin;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+}

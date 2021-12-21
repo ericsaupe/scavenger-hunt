@@ -17,6 +17,13 @@ RSpec.describe 'Results', type: :system do
         expect(page).to have_content(team.score)
       end
 
+      it 'downloads the results' do
+        expect(hunt.archive.attached?).to be(false)
+        visit "/scavenger_hunts/#{hunt.code}/results"
+        expect(page).to have_content('Download')
+        expect { click_on('Download') }.not_to raise_error
+      end
+
       context 'locked by time' do
         before do
           hunt.update(ends_at: 1.year.from_now, lock_results: true)
