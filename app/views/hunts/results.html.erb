@@ -9,17 +9,7 @@
     <p class="my-auto m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-600">Let's see how everyone did!</p>
     <div class="grid grid-cols-1 place-items-end">
       <div>
-        <%= link_to download_results_hunt_path(@hunt.code.upcase),
-                    target: '_blank',
-                    class: 'text-black rounded-md border border-transparent px-4 py-1 mx-4 bg-gray-100 text-base font-medium shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center',
-                    rel: 'noopener',
-                    data: {
-                      controller: 'download',
-                      action: 'click->download#toggleDownload',
-                      'download-filename-value': @hunt.name.to_s
-                    } do %>
-          <ion-icon name="cloud-download-outline" data-download-target="icon"></ion-icon> Download
-        <% end %>
+        <%# render partial: 'download_button' %>
       </div>
     </div>
   </div>
