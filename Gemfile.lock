@@ -247,7 +247,7 @@ GEM
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2)
-    shoulda-matchers (5.0.0)
+    shoulda-matchers (5.1.0)
       activesupport (>= 5.2.0)
     smart_properties (1.17.0)
     sprockets (4.0.2)
@@ -311,7 +311,7 @@ DEPENDENCIES
   rubocop-rspec
   rubyzip
   selenium-webdriver
-  shoulda-matchers (~> 5.0)
+  shoulda-matchers (~> 5.1)
   sprockets-rails
   stimulus-rails (>= 0.4.0)
   turbo-rails (>= 1.0.0)
