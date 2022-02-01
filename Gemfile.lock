@@ -135,7 +135,7 @@ GEM
     ffi (1.15.4)
     globalid (1.0.0)
       activesupport (>= 5.0)
-    honeybadger (4.9.0)
+    honeybadger (4.10.0)
     html_tokenizer (0.0.7)
     i18n (1.9.1)
       concurrent-ruby (~> 1.0)
@@ -322,7 +322,7 @@ DEPENDENCIES
   erb_lint
   factory_bot_rails
   faker
-  honeybadger (~> 4.0)
+  honeybadger (~> 4.10)
   image_processing (~> 1.2)
   jbuilder (~> 2.11)
   jsbundling-rails (~> 1.0.0)
