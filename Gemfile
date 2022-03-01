@@ -10,7 +10,7 @@ gem 'bcrypt'
 gem 'bootsnap', '>= 1.4.4', require: false
 gem 'cssbundling-rails', '>= 0.1.0'
 gem 'honeybadger', '~> 4.10'
-gem 'image_processing', '~> 1.2'
+gem 'image_processing', '~> 1.12'
 gem 'jbuilder', '~> 2.11'
 gem 'jsbundling-rails', '~> 1.0.0'
 gem 'meta-tags'
