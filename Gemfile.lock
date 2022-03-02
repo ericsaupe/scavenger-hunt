@@ -147,7 +147,7 @@ GEM
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     jmespath (1.5.0)
-    jsbundling-rails (1.0.0)
+    jsbundling-rails (1.0.2)
       railties (>= 6.0.0)
     loofah (2.14.0)
       crass (~> 1.0.2)
@@ -325,7 +325,7 @@ DEPENDENCIES
   honeybadger (~> 4.10)
   image_processing (~> 1.12)
   jbuilder (~> 2.11)
-  jsbundling-rails (~> 1.0.0)
+  jsbundling-rails (~> 1.0.2)
   meta-tags
   pg
   puma (~> 5.6)
