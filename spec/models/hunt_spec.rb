@@ -32,29 +32,29 @@ RSpec.describe Hunt, type: :model do
       end
 
       it 'starts in the past' do
-        hunt.update(starts_at: Time.current - 1.day)
+        hunt.update(starts_at: 1.day.ago)
         expect(hunt).to be_in_progress
       end
 
       it 'ends in the past' do
-        hunt.update(ends_at: Time.current + 1.day)
+        hunt.update(ends_at: 1.day.from_now)
         expect(hunt).to be_in_progress
       end
 
       it 'is between the start and end' do
-        hunt.update(starts_at: Time.current - 1.day, ends_at: Time.current + 1.day)
+        hunt.update(starts_at: 1.day.ago, ends_at: 1.day.from_now)
         expect(hunt).to be_in_progress
       end
     end
 
     describe 'when false' do
       it 'starts in the future' do
-        hunt.update(starts_at: Time.current + 1.day)
+        hunt.update(starts_at: 1.day.from_now)
         expect(hunt).not_to be_in_progress
       end
 
       it 'ends in the past' do
-        hunt.update(ends_at: Time.current - 1.day)
+        hunt.update(ends_at: 1.day.ago)
         expect(hunt).not_to be_in_progress
       end
     end
