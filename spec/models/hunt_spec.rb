@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Hunt, type: :model do
+RSpec.describe Hunt do
   context 'associations' do
     it { is_expected.to have_many(:categories).class_name('Category') }
     it { is_expected.to have_many(:items).class_name('Item') }

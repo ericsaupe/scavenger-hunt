@@ -8,7 +8,7 @@ FactoryBot.define do
     factory :photo_submission do
       after :create do |submission|
         submission.photo.attach(
-          io: File.open(Rails.root.join('spec/fixtures/test.jpg')),
+          io: Rails.root.join('spec/fixtures/test.jpg').open,
           filename: 'test.jpg'
         )
       end
@@ -17,7 +17,7 @@ FactoryBot.define do
     factory :video_submission do
       after :create do |submission|
         submission.photo.attach(
-          io: File.open(Rails.root.join('spec/fixtures/video.mp4')),
+          io: Rails.root.join('spec/fixtures/video.mp4').open,
           filename: 'video.mp4'
         )
       end

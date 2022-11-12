@@ -43,7 +43,7 @@ class HuntsController < ApplicationController
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]
       @hunt.update(password_entered: true)
-      flash[:success] = 'Results unlocked!'
+      flash.now[:success] = 'Results unlocked!'
     else
       flash[:warning] = 'Incorrect password'
     end

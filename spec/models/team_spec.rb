@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Team, type: :model do
+RSpec.describe Team do
   context 'associations' do
     it { is_expected.to belong_to(:hunt).class_name('Hunt') }
     it { is_expected.to have_many(:submissions).class_name('Submission') }

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Results', type: :system do
+RSpec.describe 'Results' do
   context 'with a hunt started' do
     let(:hunt) { create(:hunt) }
     let(:team) { video_submission.team }

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Hunts', type: :system do
+RSpec.describe 'Hunts' do
   context 'creating a hunt' do
     it 'creates a new hunt' do
       visit '/'

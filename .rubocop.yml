@@ -9,6 +9,9 @@ inherit_from:
 AllCops:
   NewCops: enable
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 RSpec/ContextWording:
   Enabled: false
 
