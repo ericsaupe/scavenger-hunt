@@ -4,18 +4,18 @@
     <div class="grid justify-items-center h-16">
       <div class="hidden sm:flex justify-items-center">
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-          <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
-          <%= link_to 'Home', root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(root_url) ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+          <!-- Current: "border-teal-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+          <%= link_to 'Home', root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(root_url) ? 'border-teal-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
           <% if @hunt&.persisted? %>
             <% hunt_path = @team ? hunt_team_path(@hunt.code.upcase, @team) : hunt_path(@hunt.code.upcase) %>
-            <%= link_to 'Scavenger Hunt', hunt_path, class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(hunt_path) ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
-            <%= link_to 'Results', hunt_results_path(@hunt.code.upcase), class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(hunt_results_path(@hunt.code.upcase)) || @item ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+            <%= link_to 'Scavenger Hunt', hunt_path, class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(hunt_path) ? 'border-teal-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
+            <%= link_to 'Results', hunt_results_path(@hunt.code.upcase), class: "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium #{current_page?(hunt_results_path(@hunt.code.upcase)) || @item ? 'border-teal-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}" %>
           <% end %>
         </div>
       </div>
       <div class="-mr-2 flex items-center sm:hidden">
         <!-- Mobile menu button -->
-        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false" data-action="click->nav#toggleMenu">
+        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500" aria-controls="mobile-menu" aria-expanded="false" data-action="click->nav#toggleMenu">
           <span class="sr-only">Open main menu</span>
           <!--
             Icon when menu is closed.
@@ -45,12 +45,12 @@
   <!-- Mobile menu, show/hide based on menu state. -->
   <div class="hidden sm:hidden" data-nav-target="menu">
     <div class="pt-2 pb-3 space-y-1">
-      <!-- Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" -->
-      <%= link_to 'Home', root_path, class: "block pl-3 pr-4 py-2 border-l-4 text-base font-medium #{current_page?(root_url) ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}" %>
+      <!-- Current: "bg-teal-50 border-teal-500 text-teal-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" -->
+      <%= link_to 'Home', root_path, class: "block pl-3 pr-4 py-2 border-l-4 text-base font-medium #{current_page?(root_url) ? 'bg-teal-50 border-teal-500 text-teal-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}" %>
       <% if @hunt&.persisted? %>
         <% hunt_path = @team ? hunt_team_path(@hunt.code.upcase, @team) : hunt_path(@hunt.code.upcase) %>
-        <%= link_to 'Scavenger Hunt', hunt_path, class: "block pl-3 pr-4 py-2 border-l-4 text-base font-medium #{current_page?(hunt_path) ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}" %>
-        <%= link_to 'Results', hunt_results_path(@hunt.code.upcase), class: "block pl-3 pr-4 py-2 border-l-4 text-base font-medium #{current_page?(hunt_results_path(@hunt.code.upcase)) || @item ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}" %>
+        <%= link_to 'Scavenger Hunt', hunt_path, class: "block pl-3 pr-4 py-2 border-l-4 text-base font-medium #{current_page?(hunt_path) ? 'bg-teal-50 border-teal-500 text-teal-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}" %>
+        <%= link_to 'Results', hunt_results_path(@hunt.code.upcase), class: "block pl-3 pr-4 py-2 border-l-4 text-base font-medium #{current_page?(hunt_results_path(@hunt.code.upcase)) || @item ? 'bg-teal-50 border-teal-500 text-teal-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}" %>
       <% end %>
     </div>
   </div>
