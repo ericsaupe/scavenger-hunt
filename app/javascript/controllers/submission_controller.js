@@ -18,9 +18,12 @@ export default class extends Controller {
     this.iconTarget.innerHTML = '<ion-icon name="cloud-upload-outline" class="animate__animated animate__bounce animate__infinite"></ion-icon>'
     this.compressImage(event).then(() => {
       if (formTarget.requestSubmit){
-        formTarget.requestSubmit()
+        formTarget.requestSubmit() // rails-ujs handles an async form submission
       } else {
-        formTarget.submit()
+        fetch(formTarget.action, {
+          method: formTarget.method,
+          body: new FormData(formTarget),
+        })
       }
       event.target.disabled = true
     }).catch((e) => { console.log(e) })
