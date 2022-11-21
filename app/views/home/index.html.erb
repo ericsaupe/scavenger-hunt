@@ -4,16 +4,20 @@
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
   <div class="bg-white overflow-hidden shadow rounded-lg relative">
     <div class="px-4 py-5 sm:p-6 border-b border-gray-200 bg-teal-300">
-      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Start</p>
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">
+        <ion-icon name="rocket-outline"></ion-icon> Start
+      </p>
     </div>
     <div class="px-4 py-4 sm:px-6 sm:absolute sm:inset-x-0 sm:bottom-0">
-      <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-orange-400 text-base font-medium text-black shadow hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
+      <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-pink-400 text-base font-medium text-white shadow hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
     </div>
   </div>
 
   <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
     <div class="px-4 py-5 sm:p-6 bg-teal-300">
-      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Join</p>
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">
+        <ion-icon name="sparkles-outline"></ion-icon> Join
+      </p>
     </div>
     <div class="px-4 py-4 sm:px-6">
       <%= form_with url: root_path, method: :get, class: 'sm:flex md:flex-col space-y-4' do |form| %>
@@ -30,7 +34,7 @@
           </div>
         </div>
         <div class="mt-4 sm:mt-0 w-full">
-          <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-orange-400 text-base font-medium text-black shadow hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
+          <%= form.submit 'Let\'s go!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-pink-400 text-base font-medium text-white shadow hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
         </div>
       <% end %>
     </div>
@@ -38,7 +42,9 @@
 
   <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200" data-controller="past-hunts" data-past-hunts-target="container">
     <div class="px-4 py-5 sm:p-6 bg-teal-300">
-      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Rejoin</p>
+      <p class="text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">
+        <ion-icon name="ribbon-outline"></ion-icon> Rejoin
+      </p>
     </div>
     <div class="px-4 py-4 sm:px-6">
       <%= form_with url: root_path,
@@ -57,7 +63,7 @@
           </div>
         </div>
         <div class="mt-4 sm:mt-0 w-full">
-          <%= form.submit 'Rejoin the scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-orange-400 text-base font-medium text-black shadow hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
+          <%= form.submit 'Rejoin the scavenger hunt!', class: 'cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-pink-400 text-base font-medium text-white shadow hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
         </div>
       <% end %>
     </div>
