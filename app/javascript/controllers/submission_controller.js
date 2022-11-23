@@ -26,7 +26,21 @@ export default class extends Controller {
         })
       }
       event.target.disabled = true
-    }).catch((e) => { console.log(e) })
+    }).catch((e) => {
+      this.addBanner(e.message)
+    })
+  }
+
+  addBanner(message) {
+    fetch(`/banner?message=${message}`, {
+      method: 'GET',
+    }).then((response) => {
+      return response.text()
+    }).then((html) => {
+      let banner = document.createElement('div')
+      banner.innerHTML = html
+      document.getElementById('content').before(banner)
+    })
   }
 
   compressImage(event) {

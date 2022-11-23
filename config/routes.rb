@@ -12,5 +12,7 @@ Rails.application.routes.draw do
     post :unlock_results, on: :member
   end
 
+  get :banner, to: 'banners#show'
+
   resources :submissions, only: %i[update]
 end
