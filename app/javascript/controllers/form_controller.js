@@ -37,7 +37,7 @@ export default class extends Controller {
       toggle.setAttribute('aria-checked', true)
       toggle.value = true
       toggle.classList.remove("bg-gray-200")
-      toggle.classList.add("bg-teal-600")
+      toggle.classList.add("bg-pantone-600")
 
       circle.classList.remove("translate-x-0")
       circle.classList.add("translate-x-5")
@@ -53,7 +53,7 @@ export default class extends Controller {
       toggle.setAttribute('aria-checked', false)
       toggle.value = false
       toggle.classList.add("bg-gray-200")
-      toggle.classList.remove("bg-teal-600")
+      toggle.classList.remove("bg-pantone-600")
 
       circle.classList.add("translate-x-0")
       circle.classList.remove("translate-x-5")

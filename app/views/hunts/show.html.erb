@@ -31,7 +31,7 @@
             <% if @hunt.teams.empty? %>
               <p class="text-lg text-gray-500">No teams are available. Start a new one below.</p>
             <% else %>
-              <%= form.collection_select :team_id, @hunt.teams.all, :id, :name, { include_blank: 'Select a team' }, { class: 'block max-w-lg w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md' } %>
+              <%= form.collection_select :team_id, @hunt.teams.all, :id, :name, { include_blank: 'Select a team' }, { class: 'block max-w-lg w-full shadow-sm focus:ring-pantone-500 focus:border-pantone-500 sm:text-sm border-gray-300 rounded-md' } %>
             <% end %>
           </div>
         </div>
@@ -50,15 +50,15 @@
         <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start pb-5">
           <%= form.label :name, 'New Team Name', class: 'uppercase block text-xl font-medium text-gray-700 sm:mt-px sm:pt-2' %>
           <div class="mt-1 sm:mt-0 sm:col-span-2">
-            <%= form.text_field :name, class: 'block max-w-lg w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md' %>
+            <%= form.text_field :name, class: 'block max-w-lg w-full shadow-sm focus:ring-pantone-500 focus:border-pantone-500 sm:text-sm border-gray-300 rounded-md' %>
           </div>
         </div>
       </div>
     </div>
 
     <div class="flex justify-end">
-      <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full md:w-1/2 rounded-md border border-transparent px-5 py-3 bg-pink-400 text-base font-medium text-white shadow hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-600 sm:px-10' %>
-      <%= link_to 'View Results', hunt_results_path(@hunt.code), class: 'block w-full md:w-1/2 rounded-md border border-transparent px-5 py-3 mx-4 bg-green-400 text-base font-medium text-white shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-green-600 sm:px-10 text-center' %>
+      <%= form.submit 'Let\'s Go!', class: 'cursor-pointer block w-full md:w-1/2 rounded-md border border-transparent px-5 py-3 bg-pantone-400 text-base font-medium text-white shadow hover:bg-pantone-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-pantone-600 sm:px-10' %>
+      <%= link_to 'View Results', hunt_results_path(@hunt.code), class: 'block w-full md:w-1/2 rounded-md border border-transparent px-5 py-3 mx-4 bg-white text-base font-medium text-gray-800 shadow hover:bg-teal-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-pantone-600 sm:px-10 text-center' %>
     </div>
   <% end %>
 </div>

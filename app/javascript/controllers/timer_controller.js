@@ -26,7 +26,7 @@ export default class extends Controller {
       let explanation
       if (startsAt && startsAt > Date.now()) {
         explanation = "Starts in "
-        toggleBackgroundClasses("bg-teal-500")
+        toggleBackgroundClasses("bg-pantone-500")
         disableFieldsets()
       } else if (endsAt && endsAt > Date.now()) {
         explanation = "Ends in "
@@ -68,7 +68,7 @@ export default class extends Controller {
   }
 
   toggleBackgroundClasses(color) {
-    const colors = ["bg-teal-500", "bg-green-500", "bg-red-500"]
+    const colors = ["bg-pantone-500", "bg-green-500", "bg-red-500"]
     this.containerTarget.classList.add(color)
     this.containerTarget.classList.remove(...colors.filter(item => item !== color))
   }
