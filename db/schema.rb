@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_17_210910) do
-
+ActiveRecord::Schema[7.0].define(version: 2021_12_17_210910) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,7 +19,7 @@ ActiveRecord::Schema.define(version: 2021_12_17_210910) do
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
-    t.datetime "created_at", precision: 6, null: false
+    t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
@@ -33,7 +32,7 @@ ActiveRecord::Schema.define(version: 2021_12_17_210910) do
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
-    t.datetime "created_at", precision: 6, null: false
+    t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -47,16 +46,16 @@ ActiveRecord::Schema.define(version: 2021_12_17_210910) do
     t.integer "hunt_id", null: false
     t.string "name", null: false
     t.integer "points"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["hunt_id"], name: "index_categories_on_hunt_id"
   end
 
   create_table "hunts", force: :cascade do |t|
     t.string "name", null: false
     t.string "code"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.boolean "lock_results"
@@ -68,16 +67,16 @@ ActiveRecord::Schema.define(version: 2021_12_17_210910) do
   create_table "items", force: :cascade do |t|
     t.integer "category_id", null: false
     t.string "name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_items_on_category_id"
   end
 
   create_table "submissions", force: :cascade do |t|
     t.integer "item_id", null: false
     t.integer "team_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["item_id", "team_id"], name: "index_submissions_on_item_id_and_team_id"
     t.index ["item_id"], name: "index_submissions_on_item_id"
     t.index ["team_id"], name: "index_submissions_on_team_id"
@@ -86,8 +85,8 @@ ActiveRecord::Schema.define(version: 2021_12_17_210910) do
   create_table "teams", force: :cascade do |t|
     t.integer "hunt_id", null: false
     t.string "name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["hunt_id", "name"], name: "index_teams_on_hunt_id_and_name", unique: true
     t.index ["hunt_id"], name: "index_teams_on_hunt_id"
   end
