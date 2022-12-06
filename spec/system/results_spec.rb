@@ -7,7 +7,7 @@ RSpec.describe 'Results' do
     let(:hunt) { create(:hunt) }
     let(:team) { video_submission.team }
     let(:video_submission) { create(:video_submission, item: hunt.items.first) }
-    let(:photo_submission) { create(:photo_submission, item: hunt.items.second, team: team) }
+    let(:photo_submission) { create(:photo_submission, item: hunt.items.second, team:) }
 
     describe 'results page' do
       it 'displays the results' do

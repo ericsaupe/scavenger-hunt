@@ -15,7 +15,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Color Lights',
                          'Laser Lights',
                          'Blue Lights',
-                         'Tunnel of Lights'].map { |name| Item.new(name: name) }
+                         'Tunnel of Lights'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Decor',
@@ -27,7 +27,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Candle',
                          'Christmas Tree',
                          'Bell',
-                         'Nativity Scene'].map { |name| Item.new(name: name) }
+                         'Nativity Scene'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Characters',
@@ -39,7 +39,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Rudolph',
                          'Carolers',
                          'The Grinch',
-                         'Nativity Scene'].map { |name| Item.new(name: name) }
+                         'Nativity Scene'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Phrases',
@@ -51,7 +51,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Peace',
                          'Ho Ho Ho!',
                          'Joy',
-                         'Season\'s Greetings'].map { |name| Item.new(name: name) }
+                         'Season\'s Greetings'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Special Features',
@@ -61,7 +61,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Decorations on a roof',
                          'Santa falling off the roof',
                          'Something dancing',
-                         'Santa\'s sleigh with all the reindeer'].map { |name| Item.new(name: name) }
+                         'Santa\'s sleigh with all the reindeer'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Challenges - Easy',
@@ -70,7 +70,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Stand on something tall and shout, "Merry Christmas to all and to all a good night!"',
                          'Hug a snowman',
                          'Take a photo of you as a shepherd in a nativity scene',
-                         'Make a snow angel'].map { |name| Item.new(name: name) }
+                         'Make a snow angel'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Challenges - Medium',
@@ -79,7 +79,7 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Run around a tree 5x singing "Rocking Around the Christmas Tree"',
                          'Go up to a reindeer decoration and give him a pep talk',
                          'Dramatically say goodbye to Frosty the Snowman as though he has melted before you',
-                         'Take a selfie with Santa'].map { |name| Item.new(name: name) }
+                         'Take a selfie with Santa'].map { |name| Item.new(name:) }
                ),
                Category.new(
                  name: 'Challenges - Hard',
@@ -88,6 +88,6 @@ Hunt.create!(name: 'The Ultimate Christmas Light Scavenger Hunt Challenge',
                          'Find a stranger who can name each of "The 12 Days of Christmas"',
                          'Ask 3 strangers to tell you what they want for Christmas',
                          'Find a stranger that can name all of Santa\'s reindeer',
-                         'Act out "Rudolph the Red Nosed Reindeer" while singing it'].map { |name| Item.new(name: name) }
+                         'Act out "Rudolph the Red Nosed Reindeer" while singing it'].map { |name| Item.new(name:) }
                )
              ])

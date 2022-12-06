@@ -40,7 +40,7 @@ RSpec.describe 'Hunts' do
 
   context 'with a hunt started' do
     let(:hunt) { create(:hunt) }
-    let(:team) { create(:team, hunt: hunt) }
+    let(:team) { create(:team, hunt:) }
 
     it 'creates a team' do
       visit "/scavenger_hunts/#{hunt.code.upcase}"
@@ -151,7 +151,7 @@ RSpec.describe 'Hunts' do
 
   context 'timers' do
     let(:hunt) { create(:hunt) }
-    let(:team) { create(:team, hunt: hunt) }
+    let(:team) { create(:team, hunt:) }
 
     describe 'when starting' do
       before do

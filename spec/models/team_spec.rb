@@ -14,7 +14,7 @@ RSpec.describe Team do
 
     it 'does not allow duplicate neams within the same hunt' do
       [team.name, team.name.upcase, team.name.downcase].each do |name|
-        new_team = build(:team, hunt: team.hunt, name: name)
+        new_team = build(:team, hunt: team.hunt, name:)
         expect(new_team).not_to be_valid
       end
 

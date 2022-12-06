@@ -65,10 +65,10 @@
           <div class="flex flex-wrap">
             <% category.items.each do |item, i| %>
               <% if local_assigns[:results] %>
-                <%= render partial: 'submissions/result_submission', locals: { item: item } %>
+                <%= render partial: 'submissions/result_submission', locals: { item: } %>
               <% else %>
-                <% submission = @submissions&.find_by(item: item) || item.submissions.new %>
-                <%= render partial: 'submissions/submission', locals: { submission: submission, animate: false } %>
+                <% submission = @submissions&.find_by(item:) || item.submissions.new %>
+                <%= render partial: 'submissions/submission', locals: { submission:, animate: false } %>
               <% end %>
             <% end %>
           </div>
