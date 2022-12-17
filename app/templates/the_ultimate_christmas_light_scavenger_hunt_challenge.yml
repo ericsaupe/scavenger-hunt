@@ -9,11 +9,11 @@
         - Icicle Lights
         - Blinking Lights
         - All White Lights
+        - All Blue Lights
+        - All Red Lights
+        - All Green Lights
         - Projection Lights
-        - Color Lights
-        - Laser Lights
-        - Blue Lights
-        - Tunnel of Lights
+        - Multicolor Lights
     - name: Decor
       points: 2
       items:
@@ -25,17 +25,23 @@
         - Christmas Tree
         - Bell
         - Nativity Scene
+        - Santa's Sleigh
+        - Lamp Post with Lights
+        - Ornament
+        - Santa Letter Mailbox
     - name: Characters
       points: 3
       items:
         - Santa Claus
         - Snowman
-        - Mrs. Claus
+        - Penguin
         - Elf
         - Rudolph
         - Carolers
         - The Grinch
         - Nutcracker
+        - Disney Character
+        - Polar Bear
     - name: Phrases
       points: 4
       items:
@@ -50,12 +56,16 @@
     - name: Special Features
       points: 5
       items:
-        - Lights timed to music
-        - Laser light show
         - Decorations on a roof
         - Santa falling off the roof
         - Something dancing
-        - Santa's sleigh with all the reindeer
+        - Blow up character
+        - More than 3 animals together
+        - Moving decorations
+        - Giant ornaments
+        - Christmas train
+        - A leg lamp
+        - Decorated car
     - name: Challenges - Easy
       points: 6
       items:
@@ -68,7 +78,7 @@
       points: 8
       items:
         - Find and eat a candy cane
-        - Run around a tree 5x singing "Rocking Around the Christmas Tree"
+        - Run around a tree 3x singing "Rocking Around the Christmas Tree"
         - Go up to a reindeer decoration and give him a pep talk
         - Dramatically say goodbye to Frosty the Snowman as though he has melted before you
         - Take a selfie with Santa
