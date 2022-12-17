@@ -2,19 +2,8 @@
 <p class="m-4 text-center text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-800">Let's get started on your photo scavenger hunt by starting one or join a hunt that has already been started!</p>
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-  <div class="bg-white overflow-hidden shadow rounded-lg relative">
-    <div class="px-4 py-5 sm:p-6 border-b border-gray-200 bg-pantone-200">
-      <p class="flex justify-center items-center gap-2 text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-800">
-        <ion-icon name="rocket-outline"></ion-icon> <span>Start</span>
-      </p>
-    </div>
-    <div class="px-4 py-4 sm:px-6 sm:absolute sm:inset-x-0 sm:bottom-0">
-      <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-pantone-400 text-base font-medium text-white shadow hover:bg-pantone-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-pantone-600 sm:px-10' %>
-    </div>
-  </div>
-
   <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
-    <div class="px-4 py-5 sm:p-6 bg-pantone-200">
+    <div class="px-4 py-5 sm:p-6 bg-pantone-50">
       <p class="flex justify-center items-center gap-2 text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-800">
         <ion-icon name="sparkles-outline"></ion-icon> <span>Join</span>
       </p>
@@ -40,8 +29,19 @@
     </div>
   </div>
 
+  <div class="bg-white overflow-hidden shadow rounded-lg relative">
+    <div class="px-4 py-5 sm:p-6 border-b border-gray-200 bg-pantone-50">
+      <p class="flex justify-center items-center gap-2 text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-800">
+        <ion-icon name="rocket-outline"></ion-icon> <span>Start</span>
+      </p>
+    </div>
+    <div class="px-4 py-4 sm:px-6 sm:absolute sm:inset-x-0 sm:bottom-0">
+      <%= link_to 'Browse our premade scavenger hunts to get started!', hunts_path, class: 'text-center cursor-pointer block w-full rounded-md border border-transparent px-5 py-3 bg-pantone-400 text-base font-medium text-white shadow hover:bg-pantone-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-pantone-600 sm:px-10' %>
+    </div>
+  </div>
+
   <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200" data-controller="past-hunts" data-past-hunts-target="container">
-    <div class="px-4 py-5 sm:p-6 bg-pantone-200">
+    <div class="px-4 py-5 sm:p-6 bg-pantone-50">
       <p class="flex justify-center items-center gap-2 text-center uppercase text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-800">
         <ion-icon name="ribbon-outline"></ion-icon> <span>Rejoin</span>
       </p>
@@ -76,7 +76,7 @@
     <dl class="grid grid-cols-1 gap-16 lg:grid lg:grid-cols-3">
       <div>
         <dt>
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-400 text-gray-800">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-200 text-gray-800">
             <ion-icon name="rocket-outline" class="h-6 w-6"></ion-icon>
           </div>
           <p class="mt-6 text-lg font-semibold leading-8 tracking-tight text-gray-900">Choose a premade scavenger hunt</p>
@@ -86,7 +86,7 @@
 
       <div>
         <dt>
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-400 text-gray-800">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-200 text-gray-800">
             <ion-icon name="sparkles-outline" class="h-6 w-6"></ion-icon>
           </div>
           <p class="mt-6 text-lg font-semibold leading-8 tracking-tight text-gray-900">Share</p>
@@ -96,7 +96,7 @@
 
       <div>
         <dt>
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-400 text-gray-800">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-200 text-gray-800">
             <ion-icon name="people-outline" class="h-6 w-6"></ion-icon>
           </div>
           <p class="mt-6 text-lg font-semibold leading-8 tracking-tight text-gray-900">Create teams</p>
@@ -106,7 +106,7 @@
 
       <div>
         <dt>
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-400 text-gray-800">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-200 text-gray-800">
             <ion-icon name="camera-outline" class="h-6 w-6"></ion-icon>
           </div>
           <p class="mt-6 text-lg font-semibold leading-8 tracking-tight text-gray-900">Go hunt!</p>
@@ -116,7 +116,7 @@
 
       <div>
         <dt>
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-400 text-gray-800">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-200 text-gray-800">
             <ion-icon name="star-outline" class="h-6 w-6"></ion-icon>
           </div>
           <p class="mt-6 text-lg font-semibold leading-8 tracking-tight text-gray-900">View the results</p>
@@ -126,7 +126,7 @@
 
       <div>
         <dt>
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-400 text-gray-800">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-white to-pantone-200 text-gray-800">
             <ion-icon name="infinite-outline" class="h-6 w-6"></ion-icon>
           </div>
           <p class="mt-6 text-lg font-semibold leading-8 tracking-tight text-gray-900">Play again</p>
