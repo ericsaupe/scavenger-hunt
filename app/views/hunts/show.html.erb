@@ -7,12 +7,10 @@
 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
   <div class="grid grid-cols-2">
     <p class="m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Let's get started on your scavenger hunt by joining or starting a team!</p>
-    <div class="grid grid-cols-1 m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">
-      <div>
-        <%= link_to hunt_print_path(@hunt.code.upcase), target: '_blank', class: 'text-black rounded-md border border-transparent px-4 py-1 mx-4 bg-gray-100 text-base font-medium text-white shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center', rel: 'noopener' do %>
-          <ion-icon name="print-outline"></ion-icon> Print List
-        <% end %>
-      </div>
+    <div class="grid grid-cols-1 place-items-end m-4 text-right text-xl sm:text-2xl sm:tracking-tight lg:text-3xl text-gray-700">
+      <%= link_to hunt_print_path(@hunt.code.upcase), target: '_blank', class: 'sm:w-1/3 text-black rounded-md border border-transparent px-4 py-1 sm:mx-4 bg-gray-100 text-base font-medium text-white shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center', rel: 'noopener' do %>
+        <ion-icon name="print-outline"></ion-icon> Print List
+      <% end %>
       <div class="sm:mt-4">
         Party Code: <%= @hunt.code.upcase %>
       </div>
