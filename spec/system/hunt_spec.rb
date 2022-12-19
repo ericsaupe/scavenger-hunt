@@ -186,4 +186,24 @@ RSpec.describe 'Hunts' do
       end
     end
   end
+
+  context 'results' do
+    it 'unlocks with the correct password' do
+      hunt = create(:hunt, lock_password: 'password', lock_results: true)
+      visit "/scavenger_hunts/#{hunt.code.upcase}/results"
+      expect(page).to have_text('Results are not yet available!')
+      fill_in 'Password', with: 'password'
+      click_on 'Unlock Results!'
+      expect(page).to have_text('Let\'s see how everyone did!')
+    end
+
+    it 'shows an error with an incorrect password' do
+      hunt = create(:hunt, lock_password: 'password', lock_results: true)
+      visit "/scavenger_hunts/#{hunt.code.upcase}/results"
+      expect(page).to have_text('Results are not yet available!')
+      fill_in 'Password', with: 'wrong'
+      click_on 'Unlock Results!'
+      expect(page).to have_text('Incorrect password')
+    end
+  end
 end

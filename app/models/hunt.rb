@@ -62,11 +62,11 @@ class Hunt < ApplicationRecord
   end
 
   def results_locked?
-    (lock_results && ends_at > Time.current) || (lock_password.present? && !password_entered)
+    (lock_results && ends_at && ends_at > Time.current) || (lock_password.present? && !password_entered)
   end
 
   def password
-    @password ||= Password.new(lock_password)
+    @password ||= lock_password
   end
 
   def password=(new_password)

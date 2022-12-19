@@ -37,7 +37,7 @@ RSpec.describe 'Results' do
 
       context 'locked with password' do
         before do
-          hunt.update(password: 'hunter2')
+          hunt.update(lock_password: 'hunter2')
         end
 
         it 'does not display the results' do
