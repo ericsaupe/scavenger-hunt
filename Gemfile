@@ -30,13 +30,13 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'rspec-rails'
+  gem 'standard'
+  gem 'standard-rails'
 end
 
 group :development do
   gem 'better_html'
   gem 'erb_lint', require: false
-  gem 'rubocop-rails', require: false
-  gem 'rubocop-rspec', require: false
   gem 'web-console', '>= 4.1.0'
 end
 
