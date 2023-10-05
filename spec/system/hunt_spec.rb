@@ -7,7 +7,9 @@ RSpec.describe "Hunts" do
     it "creates a new hunt" do
       visit "/"
       click_on "Browse our premade scavenger hunts to get started!"
-      click_link "Start", match: :first
+      within("#content") do
+        click_link "Start", match: :first
+      end
       fill_in("Name", with: "My Fun Scavenger Hunt")
       find("input#hunt_starts_at", visible: false).execute_script("this.value = '2020-01-01 12:00'")
       find("input#hunt_ends_at", visible: false).execute_script("this.value = '2020-02-01 12:00'")
@@ -20,7 +22,9 @@ RSpec.describe "Hunts" do
     it "supports locking" do
       visit "/"
       click_on "Browse our premade scavenger hunts to get started!"
-      click_link "Start", match: :first
+      within("#content") do
+        click_link "Start", match: :first
+      end
       fill_in("Name", with: "My Fun Scavenger Hunt")
       # TODO: this is a hack to get around the fact that the datepicker is not visible
       find("input#hunt_starts_at", visible: false).execute_script("this.value = '2020-01-01 12:00'")
