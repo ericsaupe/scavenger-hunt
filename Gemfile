@@ -24,6 +24,7 @@ gem "sidekiq", "< 7"
 gem "sprockets-rails"
 gem "stimulus-rails", ">= 0.4.0"
 gem "turbo-rails", ">= 1.0.0"
+gem "view_component"
 
 group :development, :test do
   gem "byebug"
