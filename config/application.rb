@@ -25,6 +25,6 @@ module ScavengerHunt
       g.test_framework :rspec
     end
 
-    config.active_job.queue_adapter = :sidekiq
+    config.active_job.queue_adapter = :good_job
   end
 end

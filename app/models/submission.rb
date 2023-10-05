@@ -25,7 +25,7 @@ class Submission < ApplicationRecord
   end
 
   def process_variants_later
-    ProcessVariantsJob.perform_async(id)
+    ProcessVariantsJob.perform_later(id)
   end
 
   def process_variants
