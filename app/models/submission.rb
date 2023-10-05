@@ -25,7 +25,7 @@ class Submission < ApplicationRecord
   end
 
   def process_variants_later
-    ProcessVariantsJob.perform_later(id)
+    ProcessVariantsJob.set(wait: 3.seconds).perform_later(id)
   end
 
   def process_variants
