@@ -1,5 +1,4 @@
-<h1 class="my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
-<p class="m-4 text-center text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-700">Change some settings or just leave the defaults to get started!</p>
+<%= render(PageHeaderComponent.new(title: @hunt.name, subtitle: "Change some settings or just leave the defaults to get started!")) %>
 
 <div class="mx-4 space-y-8 sm:space-y-5">
   <%= render partial: 'form', locals: { hunt: @hunt } %>

@@ -27,6 +27,17 @@ class HuntsController < ApplicationController
     redirect_to hunt_path(code: @hunt.code.upcase)
   end
 
+  def join
+    return if params[:code].blank?
+
+    hunt = Hunt.find_by(code: params[:code].upcase)
+    if hunt
+      redirect_to hunt_path(code: hunt.code.upcase)
+    else
+      flash.now[:error] = "A scavenger hunt was not found for that code, sorry!"
+    end
+  end
+
   def results
     @hunt = Hunt.includes(items: {submissions: :photo_attachment}).find_by!(code: params[:hunt_code].upcase)
     @results = @hunt.results

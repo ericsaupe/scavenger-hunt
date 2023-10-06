@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   root "home#index"
 
   resources :hunts, only: %i[index new create show], param: :code, path: "scavenger_hunts" do
+    get :join, on: :collection
     resources :teams, only: %i[create show]
     resources :items, only: %i[show]
     get :results

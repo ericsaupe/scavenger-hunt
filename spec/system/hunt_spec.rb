@@ -6,7 +6,7 @@ RSpec.describe "Hunts" do
   context "creating a hunt" do
     it "creates a new hunt" do
       visit "/"
-      click_on "Browse our premade scavenger hunts to get started!"
+      click_on "Start"
       within("#content") do
         click_link "Start", match: :first
       end
@@ -21,7 +21,7 @@ RSpec.describe "Hunts" do
 
     it "supports locking" do
       visit "/"
-      click_on "Browse our premade scavenger hunts to get started!"
+      click_on "Start"
       within("#content") do
         click_link "Start", match: :first
       end
@@ -137,16 +137,16 @@ RSpec.describe "Hunts" do
       it "remembers past hunts" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
         visit "/"
-        expect(page).to have_text("Rejoin a scavenger hunt")
-        select(hunt.name, from: "Rejoin a scavenger hunt you participated in!")
+        click_on "Join"
+        select(hunt.name, from: "hunt_select")
         click_on "Rejoin the scavenger hunt"
         expect(page).to have_text("Available Teams".upcase)
 
         second_hunt = create(:hunt)
         visit "/scavenger_hunts/#{second_hunt.code.upcase}"
         visit "/"
-        expect(page).to have_text("Rejoin a scavenger hunt")
-        select(second_hunt.name, from: "Rejoin a scavenger hunt you participated in!")
+        click_on "Join"
+        select(second_hunt.name, from: "hunt_select")
         click_on "Rejoin the scavenger hunt"
         expect(page).to have_text("Available Teams".upcase)
       end
