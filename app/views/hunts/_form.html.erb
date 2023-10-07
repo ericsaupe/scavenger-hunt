@@ -1,79 +1,58 @@
-<%= form_with model: hunt, url: hunts_path, method: :post, class: 'space-y-8', data: { controller: 'form' } do |f| %>
-  <div class="space-y-8 sm:space-y-5">
-    <%= f.hidden_field :template, value: @hunt.name %>
-    <%= f.hidden_field :timezone, data: { 'form-target': 'timezone' } %>
-    <div>
-      <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-        <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-          <%= f.label :name, class: 'block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2' %>
-          <div class="mt-1 sm:mt-0 sm:col-span-2">
-            <%= f.text_field :name, required: true, class: 'max-w-lg shadow-sm block w-full focus:ring-pantone-500 focus:border-pantone-500 sm:text-sm border border-gray-300 rounded-md' %>
-          </div>
-        </div>
-      </div>
-    </div>
+<%= form_with model: hunt, url: hunts_path, method: :post, data: { controller: 'form' } do |f| %>
+  <%= f.hidden_field :template, value: @hunt.name %>
+  <%= f.hidden_field :timezone, data: { 'form-target': 'timezone' } %>
 
-    <div>
-      <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-        <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-          <%= f.label :starts_at, class: 'block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2' %>
-          <div class="mt-1 sm:mt-0 sm:col-span-2">
-            <%= f.text_field :starts_at, class: 'datetime max-w-lg shadow-sm block w-full focus:ring-pantone-500 focus:border-pantone-500 sm:text-sm border border-gray-300 rounded-md' %>
-            <p class="mt-2 text-sm text-gray-500">If you don't want participants to submit photos until this date and time.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-        <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-          <%= f.label :ends_at, class: 'block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2' %>
-          <div class="mt-1 sm:mt-0 sm:col-span-2">
-            <%= f.text_field :ends_at, class: 'datetime max-w-lg shadow-sm block w-full focus:ring-pantone-500 focus:border-pantone-500 sm:text-sm border border-gray-300 rounded-md', data: { action: 'change->form#toggleEndFields' } %>
-            <p class="mt-2 text-sm text-gray-500">If you want to stop accepting submissions at this time.</p>
-          </div>
-
-          <label class="hidden mt-6 block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2" data-form-target="endConfig">Lock results until after the hunt ends?</label>
-          <div class="hidden mt-1 sm:mt-0 sm:col-span-2" data-form-target="endConfig">
-            <button type="button"
-              class="bg-gray-200 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pantone-500"
-              role="switch"
-              aria-checked="false"
-              data-action="form#toggleSwitch"
-              data-test="lock-results-switch">
-              <span class="sr-only">Lock results</span>
-              <span class="circle translate-x-0 pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200">
-                <span class="x opacity-100 ease-in duration-200 absolute inset-0 h-full w-full flex items-center justify-center transition-opacity" aria-hidden="true">
-                  <svg class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 12 12">
-                    <path d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-                <span class="check opacity-0 ease-out duration-100 absolute inset-0 h-full w-full flex items-center justify-center transition-opacity" aria-hidden="true">
-                  <svg class="h-3 w-3 text-pantone-600" fill="currentColor" viewBox="0 0 12 12">
-                    <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
-                  </svg>
-                </span>
-              </span>
-            </button>
-            <%= f.check_box :lock_results, class: 'hidden' %>
-            <p class="mt-2 text-sm text-gray-500">If you want to hide the results until after the timer ends.</p>
-          </div>
-
-          <%= f.label :lock_password, 'Lock results with a password', class: 'hidden mt-6 block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2', 'data-form-target': 'endConfig' %>
-          <div class="hidden mt-1 sm:mt-0 sm:col-span-2" data-form-target="endConfig">
-            <%= f.text_field :lock_password, class: 'max-w-lg shadow-sm block w-full focus:ring-pantone-500 focus:border-pantone-500 sm:text-sm border border-gray-300 rounded-md' %>
-            <p class="mt-2 text-sm text-gray-500">If you want to require a one-time password be entered before people can see the results.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="form-control w-full">
+    <%= f.label :name, class: "label" do %>
+      <span class="label-text">What do you want to call your scavenger hunt?</span>
+    <% end %>
+    <%= f.text_field :name, required: true, class: "input input-bordered w-full" %>
   </div>
 
-  <div class="pt-5">
-    <div class="flex justify-end">
-      <%= link_to 'Cancel', hunts_path, class: 'cursor-pointer bg-white py-3 px-5 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pantone-500' %>
-      <%= f.submit 'Get started!', class: 'cursor-pointer ml-3 inline-flex justify-center px-5 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-pantone-500 hover:bg-pantone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500' %>
-    </div>
+  <div class="form-control w-full">
+    <%= f.label :starts_at, class: "label" do %>
+      <span class="label-text">When do you want to start your scavenger hunt?</span>
+      <span class="label-text-alt"><i>Optional</i></span>
+    <% end %>
+    <%= f.text_field :starts_at, class: "datetime input input-bordered w-full" %>
+    <label class="label">
+      <span class="label-text-alt">Set this if you don't want participants to submit photos until this date and time.</span>
+    </label>
   </div>
+
+  <div class="form-control w-full">
+    <%= f.label :ends_at, class: "label" do %>
+      <span class="label-text">When do you want to end your scavenger hunt?</span>
+      <span class="label-text-alt"><i>Optional</i></span>
+    <% end %>
+    <%= f.text_field :ends_at, class: "datetime input input-bordered w-full", data: { action: "change->form#toggleEndFields" } %>
+    <label class="label">
+      <span class="label-text-alt">Set this if you you want to stop accepting submissions at this date and time.</span>
+    </label>
+  </div>
+
+  <div class="form-control hidden" data-form-target="endConfig">
+    <%= f.label :lock_results, class: "label cursor-pointer" do %>
+      <span class="label-text">Lock results until after the hunt ends?</span>
+      <%= f.check_box :lock_results, class: "checkbox", data: { test: "lock-results-switch" } %>
+    <% end %>
+  </div>
+
+  <div class="form-control w-full hidden" data-form-target="endConfig">
+    <%= f.label :lock_password, class: "label" do %>
+      <span class="label-text">Lock results with a password</span>
+      <span class="label-text-alt"><i>Optional</i></span>
+    <% end %>
+    <%= f.text_field :lock_password, class: "input input-bordered w-full" %>
+    <label class="label">
+      <span class="label-text-alt">If you want to require a one-time password be entered before people can see the results.</span>
+    </label>
+  </div>
+
+  <%= f.button type: :submit, class: "btn btn-primary mt-4" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+    </svg>
+    Start!
+  <% end %>
 <% end %>

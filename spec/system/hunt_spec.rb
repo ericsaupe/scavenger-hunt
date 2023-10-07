@@ -10,10 +10,10 @@ RSpec.describe "Hunts" do
       within("#content") do
         click_link "Start", match: :first
       end
-      fill_in("Name", with: "My Fun Scavenger Hunt")
+      fill_in("What do you want to call your scavenger hunt?", with: "My Fun Scavenger Hunt")
       find("input#hunt_starts_at", visible: false).execute_script("this.value = '2020-01-01 12:00'")
       find("input#hunt_ends_at", visible: false).execute_script("this.value = '2020-02-01 12:00'")
-      click_on "Get started!"
+      click_on "Start!"
       expect(page).to have_text("My Fun Scavenger Hunt".upcase)
       expect(page).to have_text("Available Teams".upcase)
       expect(page).to have_text("Print List")
@@ -25,14 +25,14 @@ RSpec.describe "Hunts" do
       within("#content") do
         click_link "Start", match: :first
       end
-      fill_in("Name", with: "My Fun Scavenger Hunt")
+      fill_in("What do you want to call your scavenger hunt?", with: "My Fun Scavenger Hunt")
       # TODO: this is a hack to get around the fact that the datepicker is not visible
       find("input#hunt_starts_at", visible: false).execute_script("this.value = '2020-01-01 12:00'")
       find("input#hunt_ends_at", visible: false).execute_script("this.value = '2020-02-01 12:00'")
       # TODO: this is a hack to fill in hidden fields
       find("input#hunt_lock_results", visible: false).execute_script("this.checked = true")
       find("input#hunt_lock_password", visible: false).execute_script("this.value = 'hunter2'")
-      click_on "Get started!"
+      click_on "Start!"
       expect(page).to have_text("My Fun Scavenger Hunt".upcase)
       expect(page).to have_text("Available Teams".upcase)
       expect(page).to have_text("Print List")
