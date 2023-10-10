@@ -96,9 +96,9 @@ RSpec.describe "Hunts" do
       expect(page).to have_css('ion-icon[name="checkbox"]')
 
       find(".cursor-pointer", text: hunt.items.first.name).click
-      expect(page).to have_text("Change")
+      expect(page).to have_text("Change".upcase)
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:button, text: "Change").click
+        find(:button, text: "Change".upcase).click
       end
       expect(page).to have_css('ion-icon[name="checkbox"]')
     end
@@ -111,9 +111,9 @@ RSpec.describe "Hunts" do
       expect(page).to have_css('ion-icon[name="checkbox"]')
 
       find(".cursor-pointer", text: hunt.items.first.name).click
-      expect(page).to have_text("Close")
+      expect(page).to have_text("Close".upcase)
       click_on "Close"
-      expect(page).not_to have_text("Close")
+      expect(page).not_to have_text("Close".upcase)
     end
 
     it "updates the score" do
