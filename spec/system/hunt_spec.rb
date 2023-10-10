@@ -15,8 +15,8 @@ RSpec.describe "Hunts" do
       find("input#hunt_ends_at", visible: false).execute_script("this.value = '2020-02-01 12:00'")
       click_on "Start!"
       expect(page).to have_text("My Fun Scavenger Hunt".upcase)
-      expect(page).to have_text("Available Teams".upcase)
-      expect(page).to have_text("Print List")
+      expect(page).to have_text("Pick a team".upcase)
+      expect(page).to have_text("Print List".upcase)
     end
 
     it "supports locking" do
@@ -34,8 +34,8 @@ RSpec.describe "Hunts" do
       find("input#hunt_lock_password", visible: false).execute_script("this.value = 'hunter2'")
       click_on "Start!"
       expect(page).to have_text("My Fun Scavenger Hunt".upcase)
-      expect(page).to have_text("Available Teams".upcase)
-      expect(page).to have_text("Print List")
+      expect(page).to have_text("Pick a team".upcase)
+      expect(page).to have_text("Print List".upcase)
       hunt = Hunt.last
       expect(hunt.lock_results).to be_truthy
       expect(hunt.lock_password).to be_present
@@ -48,8 +48,8 @@ RSpec.describe "Hunts" do
 
     it "creates a team" do
       visit "/scavenger_hunts/#{hunt.code.upcase}"
-      fill_in "New Team Name", with: "Test"
-      click_on "Let's Go!"
+      fill_in "Start a team", with: "Test"
+      click_on "Start!"
       expect(page).to have_text("Test".upcase)
       expect(page).to have_text("Find the following items to earn points for your team. Take a picture or video for evidence!")
     end
@@ -57,8 +57,8 @@ RSpec.describe "Hunts" do
     it "joins a team" do
       team_name = team.name
       visit "/scavenger_hunts/#{hunt.code.upcase}"
-      select(team_name, from: "Available Teams")
-      click_on "Let's Go!"
+      choose(team_name)
+      click_on "Start!"
       expect(page).to have_text(team_name.upcase)
       expect(page).to have_text("Find the following items to earn points for your team. Take a picture or video for evidence!")
     end
@@ -140,7 +140,7 @@ RSpec.describe "Hunts" do
         click_on "Join"
         select(hunt.name, from: "hunt_select")
         click_on "Rejoin the scavenger hunt"
-        expect(page).to have_text("Available Teams".upcase)
+        expect(page).to have_text("Pick a team".upcase)
 
         second_hunt = create(:hunt)
         visit "/scavenger_hunts/#{second_hunt.code.upcase}"
@@ -148,7 +148,7 @@ RSpec.describe "Hunts" do
         click_on "Join"
         select(second_hunt.name, from: "hunt_select")
         click_on "Rejoin the scavenger hunt"
-        expect(page).to have_text("Available Teams".upcase)
+        expect(page).to have_text("Pick a team".upcase)
       end
     end
   end

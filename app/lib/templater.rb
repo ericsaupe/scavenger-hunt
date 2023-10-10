@@ -36,6 +36,6 @@ class Templater
   end
 
   def self.popular_templates
-    ["Neighborhood Scavenger Hunt", "The Ultimate Christmas Light Scavenger Hunt Challenge"]
+    ["Neighborhood Navigator", "Christmas Light Spectacle"]
   end
 end
