@@ -1,20 +1,10 @@
-<%# Required to be on the page so the compiler will see it %>
-<% [
-     'bg-red-500',
-     'bg-green-500',
-     'bg-blue-500'
-   ] %>
-
-<div class="sticky top-0 z-50 relative <%= timer_background(hunt) %>"
+<div class="sticky top-0 z-10 rounded-none alert <%= timer_background(hunt) %>"
   data-controller="timer"
   data-timer-target="container"
   data-timer-starts-at-value="<%= hunt.starts_at ? hunt.starts_at.to_i * 1000 : nil %>"
   data-timer-ends-at-value="<%= hunt.ends_at ? hunt.ends_at.to_i * 1000 : nil %>">
-  <div class="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
-    <div class="text-center sm:px-16">
-      <p class="font-medium text-white" data-timer-target="countdown">
-        <%= hunt_status(@hunt) %>
-      </p>
-    </div>
-  </div>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden sm:block w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+  </svg>
+  <span class="font-mono text-xl" data-timer-target="countdown"><%= hunt_status(@hunt) %></span>
 </div>

@@ -16,8 +16,8 @@ module HuntHelper
   end
 
   def timer_background(hunt)
-    return "bg-red-500" if hunt.ended?
-    return "bg-green-500" if hunt.in_progress?
-    "bg-blue-500" if hunt.upcoming?
+    return "bg-error text-error-content" if hunt.ended?
+    return "bg-success text-success-content" if hunt.in_progress?
+    "bg-info text-info-content" if hunt.upcoming?
   end
 end
