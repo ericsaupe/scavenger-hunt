@@ -1,56 +1,44 @@
 <% description "Results for the scavenger hunt #{@hunt.name}." %>
+<% title "#{@hunt.name} Results" %>
 
-<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title "#{@hunt.name} Results" %></h1>
+<%= render(PageHeaderComponent.new(title: "#{@hunt.name} Results", subtitle: "Let's see how everyone did!")) %>
 
 <% if @hunt.results_locked? %>
   <%= render partial: 'locked_results', locals: { hunt: @hunt } %>
 <% else %>
-  <div class="grid grid-cols-2 mb-4">
-    <p class="my-auto m-4 text-lg sm:text-xl sm:tracking-tight lg:text-2xl text-gray-600">Let's see how everyone did!</p>
-    <div class="grid grid-cols-1 place-items-end">
-      <div>
-        <%= render partial: 'download_button' %>
-      </div>
-    </div>
+  <div class="grid grid-cols-1 place-items-end">
+    <%= render partial: 'download_button' %>
   </div>
 
-  <div class="flex flex-col my-2">
-    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">
-                  Submissions
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">
-                  Score
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @results.each_with_index do |result, i| %>
-                <tr class="<%= results_text_size(i) %> text-gray-900 <%= i.odd? ? 'bg-white' : 'bg-gray-50' %>">
-                  <td class="px-6 py-4 whitespace-nowrap font-medium">
-                    <%= result[:name] %>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <%= result[:submissions] %>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <%= result[:score] %>
-                  </td>
-                </tr>
+  <div class="overflow-x-auto mb-8">
+    <table class="table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Submissions</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @results.each_with_index do |result, i| %>
+          <tr class="<%= 'bg-base-200 text-xl' if i.zero? %>">
+            <th>
+              <% if i.zero? %>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+                </svg>
+              <% else %>
+                <%= i + 1 %>
               <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+            </th>
+            <td><%= result[:name] %></td>
+            <td><%= result[:submissions] %></td>
+            <td><%= result[:score] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
 
   <%= render partial: 'hunts/hunt', locals: { results: true } %>

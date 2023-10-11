@@ -35,4 +35,11 @@ export default class extends Controller {
   clickForm() {
     document.getElementById(`${this.objectValue}`).querySelector('input[type="file"]').click()
   }
+
+  handleKeydown(event) {
+    if (event.key === 'Escape') {
+      console.log('Escape key was pressed with out any group keys')
+      this.closeModal()
+    }
+  }
 }

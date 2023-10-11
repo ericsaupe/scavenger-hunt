@@ -20,7 +20,7 @@ RSpec.describe "Results" do
       it "downloads the results" do
         expect(hunt.archive.attached?).to be(false)
         visit "/scavenger_hunts/#{hunt.code}/results"
-        expect(page).to have_content("Download")
+        expect(page).to have_content("Download".upcase)
         expect { click_on("Download") }.not_to raise_error
       end
 

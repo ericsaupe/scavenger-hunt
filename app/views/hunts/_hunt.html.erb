@@ -2,20 +2,18 @@
 <% tailwind_colors = [
      'bg-primary print:border-primary text-primary-content',
      'bg-secondary print:border-secondary text-secondary-content',
-     'bg-accent print:border-accent  text-accent-content',
-     'bg-neutral print:border-neutral text-neutral-content'
+     'bg-accent print:border-accent text-accent-content',
    ] %>
 
 <% tailwind_divider_colors = [
   'before:bg-primary-content after:bg-primary-content',
   'before:bg-secondary-content after:bg-secondary-content',
   'before:bg-accent-content after:bg-accent-content',
-  'before:bg-neutral-content after:bg-neutral-content'
 ] %>
 
 <% unless local_assigns[:results] %>
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-3 place-items-center pb-4">
-    <p class="ml-2 text-center sm:text-start">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
+    <p class="mx-2 text-center sm:text-start">Find the following items to earn points for your team. Take a picture or video for evidence!</p>
     <% if @team %>
       <p class="text-bold text-2xl">Score: <%= render partial: 'score', locals: { team: @team } %></p>
     <% end %>
@@ -34,10 +32,10 @@
   </div>
 <% end %>
 
-<div data-controller="hunt">
+<div data-controller="hunt" data-action="keydown.esc->hunt#closeModal">
   <div class="grid grid-flow-row grid-cols-1 gap-2 <%= @hunt.categories.size < 2 ? 'md:grid-cols-1 print:grid-cols-1' : 'md:grid-cols-2 print:grid-cols-2' %> md:px-2 md:py-3">
     <% @hunt.categories.each_with_index do |category, i| %>
-      <div class="card w-96 <%= tailwind_colors[i % tailwind_colors.size] %>">
+      <div class="card w-96 sm:w-full <%= tailwind_colors[i % tailwind_colors.size] %>">
         <div class="card-body">
           <h2 class="card-title uppercase flex justify-between">
             <%= category.name %>
