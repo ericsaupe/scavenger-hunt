@@ -14,5 +14,13 @@ services:
         fromDatabase:
           name: scavenger_hunt_party
           property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: scavenger_hunt_party_redis
+          property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
+  - type: redis
+    name: scavenger_hunt_party_redis
+    ipAllowList: [] # only allow internal connections
