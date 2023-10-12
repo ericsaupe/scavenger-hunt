@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class HuntsController < ApplicationController
+  caches_action :index, expires_in: 1.day
+
   def index
     @templates = Templater.templates.sort_by { |hunt| hunt[:name] }
     @popular_templates = Templater.popular_templates

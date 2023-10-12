@@ -5,6 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.2.2"
 
+gem "actionpack-action_caching"
 gem "aws-sdk-s3", require: false
 gem "bcrypt"
 gem "bootsnap", ">= 1.4.4", require: false
@@ -22,6 +23,7 @@ gem "rails", "~> 7.1.0"
 gem "redis", "~> 4.0"
 gem "rqrcode", "~> 2.1"
 gem "rubyzip"
+gem "solid_cache"
 gem "sprockets-rails"
 gem "stimulus-rails", ">= 0.4.0"
 gem "turbo-rails", ">= 1.0.0"
