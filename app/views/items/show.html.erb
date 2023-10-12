@@ -1,18 +1,21 @@
 <% description "#{@item.name} was found #{pluralize(@submissions.size, 'times')} during #{@hunt.name}." %>
 
-<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= @hunt.name %></h1>
-<div class="grid grid-cols-3 gap-2 mx-auto my-4 font-sans text-center uppercase font-bold text-gray-700">
-  <div class="text-lg sm:text-lg sm:tracking-tight lg:text-xl my-auto truncate">
-    <%= link_to hunt_item_path(@hunt.code, @previous) do %>
-      <ion-icon name="chevron-back-outline"></ion-icon> <%= @previous.name %>
-    <% end %>
-  </div>
+<%= render(PageHeaderComponent.new(title: @hunt.name)) %>
+
+<div class="grid grid-cols-3 gap-2 mx-auto my-4 font-sans text-center uppercase font-bold">
+  <%= link_to hunt_item_path(@hunt.code, @previous), class: "btn btn-ghost my-auto text-ellipsis" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+    <span class="hidden sm:block"><%= @previous.name %></span>
+  <% end %>
   <h2 class="text-2xl sm:text-2xl sm:tracking-tight lg:text-3xl"><%= title @item.name %></h2>
-  <div class="text-lg sm:text-lg sm:tracking-tight lg:text-xl my-auto truncate">
-    <%= link_to hunt_item_path(@hunt.code, @next) do %>
-      <%= @next.name %> <ion-icon name="chevron-forward-outline"></ion-icon>
-    <% end %>
-  </div>
+  <%= link_to hunt_item_path(@hunt.code, @next), class: "btn btn-ghost my-auto text-ellipsis" do %>
+    <span class="hidden sm:block"><%= @next.name %></span>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+  <% end %>
 </div>
 
 <% if @submissions.empty? %>
@@ -23,36 +26,32 @@
     </div>
   </div>
 <% else %>
-  <div data-controller="hunt">
-    <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-      <% @submissions.each_with_index do |submission, i| %>
-        <li class='col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200 animate__animated animate__fadeIn <%= "animate__delay-#{i}s" %>'>
-          <% image_url = submission_attachment_url(submission, variant_size: :large) %>
-          <div class="relative">
-            <% if submission.video? %>
-              <div class="p-8 h-96 drop-shadow-lg"><%= video_tag(image_url, controls: true, class: 'h-full mx-auto') %></div>
-            <% else %>
-              <div class="flex-1 flex flex-col p-8 bg-center bg-no-repeat bg-contain h-96 drop-shadow-lg" style="background-image: url('<%= image_url %>')"></div>
-            <% end %>
-          </div>
-          <div>
-            <div class="-mt-px flex divide-x divide-gray-200">
-              <div class="w-0 flex-1 flex">
-                <span
-                  data-action="click->hunt#openModal"
-                  data-title="<%= submission.team.name %>"
-                  data-src="<%= submission_attachment_url(submission, variant_size: :large) %>"
-                  data-video="<%= submission.video? %>"
-                  data-object="<%= object_id %>"
-                  class="cursor-pointer relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500">
-                  <%= submission.team.name %>
-                </span>
-              </div>
-            </div>
-          </div>
-        </li>
+  <div data-controller="hunt" data-action="keydown.esc->hunt#closeModal" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+    <% @submissions.each_with_index do |submission, i| %>
+      <%= render(CardComponent.new()) do %>
+        <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+        <figure>
+          <% if submission.video? %>
+            <%= video_tag(image_url, controls: true) %>
+          <% else %>
+            <%= image_tag(image_url) %>
+          <% end %>
+        </figure>
+        <div class="card-body">
+          <h2 class="card-title">
+            <span
+              data-action="click->hunt#openModal"
+              data-title="<%= submission.team.name %>"
+              data-src="<%= submission_attachment_url(submission, variant_size: :large) %>"
+              data-video="<%= submission.video? %>"
+              data-object="<%= object_id %>"
+              class="cursor-pointer">
+              <%= submission.team.name %>
+            </span>
+          </h2>
+        </div>
       <% end %>
-    </ul>
+    <% end %>
 
     <%= render partial: 'submissions/modal', locals: { fullscreen: true } %>
   </div>

@@ -27,8 +27,19 @@ class HuntsController < ApplicationController
     redirect_to hunt_path(code: @hunt.code.upcase)
   end
 
+  def join
+    return if params[:code].blank?
+
+    hunt = Hunt.find_by(code: params[:code].upcase)
+    if hunt
+      redirect_to hunt_path(code: hunt.code.upcase)
+    else
+      flash.now[:error] = "A scavenger hunt was not found for that code, sorry!"
+    end
+  end
+
   def results
-    @hunt = Hunt.includes(items: { submissions: :photo_attachment }).find_by!(code: params[:hunt_code].upcase)
+    @hunt = Hunt.includes(items: {submissions: :photo_attachment}).find_by!(code: params[:hunt_code].upcase)
     @results = @hunt.results
   end
 
@@ -36,16 +47,16 @@ class HuntsController < ApplicationController
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     @hunt.create_archive_file unless @hunt.archive.attached?
     until @hunt.archive.attached?; end
-    redirect_to rails_blob_path(@hunt.archive, disposition: 'attachment')
+    redirect_to rails_blob_path(@hunt.archive, disposition: "attachment")
   end
 
   def unlock_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]
       @hunt.update(password_entered: true)
-      flash.now[:success] = 'Results unlocked!'
+      flash.now[:success] = "Results unlocked!"
     else
-      flash[:warning] = 'Incorrect password'
+      flash[:warning] = "Incorrect password"
     end
     redirect_to hunt_results_path(hunt_code: @hunt.code.upcase)
   end

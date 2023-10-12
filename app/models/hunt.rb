@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'zip'
+require "zip"
 
 class Hunt < ApplicationRecord
   include BCrypt
@@ -75,18 +75,18 @@ class Hunt < ApplicationRecord
   end
 
   def create_archive_file
-    FileUtils.mkdir_p(Rails.root.join('tmp'))
-    zipfile_name = Rails.root.join('tmp', "archive-#{id}.zip")
+    FileUtils.mkdir_p(Rails.root.join("tmp"))
+    zipfile_name = Rails.root.join("tmp", "archive-#{id}.zip")
     FileUtils.rm_f(zipfile_name)
 
     Zip::File.open(zipfile_name, create: true) do |zipfile|
       teams.find_each do |team|
-        folder = [name, team.name].join('/')
+        folder = [name, team.name].join("/")
         team.submissions.with_attached_photo.find_each do |submission|
           extension = Rack::Mime::MIME_TYPES.invert[submission.photo.content_type]
           filename = [submission.item.name, extension].join
 
-          submission.photo.open(tmpdir: Rails.root.join('tmp')) do |file|
+          submission.photo.open(tmpdir: Rails.root.join("tmp")) do |file|
             filepath = file.path
             zipfile.add("#{folder}/#{filename}", filepath)
             zipfile.commit
@@ -105,9 +105,9 @@ class Hunt < ApplicationRecord
   # and if it's not then generate a new one.
   #
   def generate_code(character_count: 5)
-    new_code = code&.upcase || ('A'..'Z').to_a.sample(character_count).join
+    new_code = code&.upcase || ("A".."Z").to_a.sample(character_count).join
     while Hunt.find_by(code: new_code).present?
-      new_code = ('A'..'Z').to_a.sample(character_count).join
+      new_code = ("A".."Z").to_a.sample(character_count).join
     end
     self.code = new_code
   end

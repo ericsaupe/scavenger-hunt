@@ -1,11 +1,14 @@
 <%= link_to download_results_hunt_path(@hunt.code.upcase),
             target: '_blank',
-            class: 'text-black rounded-md border border-transparent px-4 py-1 mx-4 bg-gray-100 text-base font-medium shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600 text-center',
+            class: 'btn',
             rel: 'noopener',
             data: {
               controller: 'download',
               action: 'click->download#toggleDownload',
               'download-filename-value': @hunt.name.to_s
             } do %>
-  <ion-icon name="cloud-download-outline" data-download-target="icon"></ion-icon> Download
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+  </svg>
+  Download
 <% end %>

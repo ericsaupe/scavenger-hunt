@@ -6,9 +6,9 @@ class ItemsController < ApplicationController
     @item = @hunt.items.with_photo_submissions.find(params[:id])
     @submissions = @item.submissions.with_attached_photo.order(:team_id)
     hunt_items = @hunt.items.with_photo_submissions
-    @next = hunt_items.where('items.id > ?', @item.id)
-                      .order('items.id ASC').first || hunt_items.first
-    @previous = hunt_items.where('items.id < ?', @item.id)
-                          .order('items.id DESC').first || hunt_items.last
+    @next = hunt_items.where("items.id > ?", @item.id)
+      .order("items.id ASC").first || hunt_items.first
+    @previous = hunt_items.where("items.id < ?", @item.id)
+      .order("items.id DESC").first || hunt_items.last
   end
 end

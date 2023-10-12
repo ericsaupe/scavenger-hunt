@@ -1,0 +1,46 @@
+<%= render(PageHeaderComponent.new(title: "Join a hunt", subtitle: "Join a hunt that's already been started!")) %>
+
+<div class="sm:flex sm:justify-center" data-controller="past-hunts">
+  <div class="sm:grid sm:grow 2xl:flex-none sm:gap-4 sm:grid-cols-2 sm:justify-items-center sm:w-full lg:w-1/2 sm:place-content-center">
+    <%= render(CardComponent.new) do %>
+      <div class="card-body">
+        <h2 class="card-title text-center">Enter your code to join a scavenger hunt!</h2>
+        <%= form_with url: join_hunts_path, method: :get do |form| %>
+          <div class="form-control w-full max-w-full">
+            <%= form.label :code, class: "label" do %>
+              <span class="label-text">Hunt code</span>
+            <% end %>
+            <%= form.text_field :code,
+                                value: params[:code],
+                                class: "input input-bordered sm:max-w-xs",
+                                required: true,
+                                oninput: "this.value = this.value.toUpperCase()",
+                                maxlength: 5,
+                                autofocus: true %>
+          </div>
+          <%= form.submit "Let's go!", class: "btn btn-primary btn-block mt-4" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="divider sm:hidden">OR</div>
+
+    <%= render(CardComponent.new) do %>
+      <div class="card-body">
+        <h2 class="card-title text-center">Rejoin a scavenger hunt you participated in!</h2>
+        <%= form_with url: join_hunts_path, method: :get do |form| %>
+          <div class="form-control w-full max-w-full">
+            <%= form.label :hunt_select, class: "label" do %>
+              <span class="label-text">Scavenger hunts</span>
+            <% end %>
+            <%= form.select :hunt_select, [], { include_blank: "Select a scavenger hunt" }, {
+              class: "select select-bordered w-full max-w-full sm:max-w-xs", data: { "past-hunts-target": "list" },
+              name: "code",
+              } %>
+          </div>
+          <%= form.submit "Rejoin the scavenger hunt!", class: "btn btn-primary btn-block mt-4" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -4,11 +4,11 @@ module ResultsHelper
   def results_text_size(index)
     case index
     when 0
-      'text-xl'
+      "text-xl"
     when 1
-      'text-lg'
+      "text-lg"
     else
-      'text-md'
+      "text-md"
     end
   end
 end

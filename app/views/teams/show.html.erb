@@ -1,12 +1,12 @@
 <% description "#{@team.name} is working hard to find everything on their scavenger hunt list: '#{@hunt.name}'." %>
+<% title @hunt.name %>
 
 <%= render(partial: 'hunts/timer', locals: { hunt: @hunt }) if @hunt.timer? %>
 
 <%= turbo_stream_from "submissions_#{@team.id}" %>
 <%= turbo_stream_from @team %>
 
-<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
-<h2 class="font-sans my-4 text-center uppercase text-2xl font-bold text-gray-700 sm:text-2xl sm:tracking-tight lg:text-3xl print:hidden"><%= @team.name %></h2>
+<%= render(PageHeaderComponent.new(title: @hunt.name, subtitle: @team.name.upcase)) %>
 
 <%= content_tag :div, nil, data: {
       controller: 'past-hunts',

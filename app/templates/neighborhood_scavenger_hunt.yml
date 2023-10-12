@@ -1,5 +1,5 @@
 ---
-  name: Neighborhood Scavenger Hunt
+  name: Neighborhood Navigator
   description: Search your neighborhood for things that can help you complete your scavenger hunt!
   image_path: templates/neighborhood.jpg
   categories:

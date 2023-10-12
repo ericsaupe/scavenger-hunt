@@ -1,5 +1,4 @@
-<h1 class="font-serif my-4 text-center uppercase text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"><%= title @hunt.name %></h1>
-
+<%= render(PageHeaderComponent.new(title: @hunt.name)) %>
 <%= render partial: 'hunt', locals: { print: true } %>
 
 <script>

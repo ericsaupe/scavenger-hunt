@@ -4,7 +4,7 @@ class Templater
   TEMPLATES = [] # rubocop:disable Style/MutableConstant
 
   def self.load_hunts
-    Rails.root.glob('app/templates/*.yml') do |filename|
+    Rails.root.glob("app/templates/*.yml") do |filename|
       yaml_contents = File.read(filename)
       hunt_config = YAML.safe_load(yaml_contents, symbolize_names: true)
       define_singleton_method hunt_config[:name].parameterize.underscore.to_sym do
@@ -36,6 +36,6 @@ class Templater
   end
 
   def self.popular_templates
-    ['Neighborhood Scavenger Hunt', 'The Ultimate Christmas Light Scavenger Hunt Challenge']
+    ["Neighborhood Navigator", "Christmas Light Spectacle"]
   end
 end
