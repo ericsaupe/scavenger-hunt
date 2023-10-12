@@ -1,0 +1,18 @@
+databases:
+  - name: scavenger_hunt_party
+    databaseName: scavenger_hunt_party
+    user: scavenger_hunt_party
+
+services:
+  - type: web
+    name: scavenger_hunt_party
+    runtime: ruby
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: scavenger_hunt_party
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
