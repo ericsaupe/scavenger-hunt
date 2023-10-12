@@ -39,3 +39,4 @@
 examples.txt
 .byebug_history
 .DS_Store
+yarn-error.log

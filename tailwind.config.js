@@ -10,7 +10,6 @@ module.exports = {
   ],
   plugins: [
     require('@tailwindcss/forms'),
-    require('tailwindcss-break')(),
     require("daisyui"),
   ],
   theme: {
