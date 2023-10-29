@@ -1,0 +1,42 @@
+---
+  name: Halloween Haunt Hunt
+  description: Search your neighborhood for these spooky things!
+  image_path: templates/halloween.jpg
+  categories:
+    - name: One Point
+      points: 1
+      items:
+        - Bat
+        - Spider
+        - Bowl of candy
+        - Scarecrow
+        - Ghost
+        - Skeleton
+    - name: Five Points
+      points: 5
+      items:
+        - Zombie
+        - A furry costume
+        - Vampire teeth
+        - A pet in a costume
+        - Orange leaves
+        - Spider web
+    - name: Ten Points
+      points: 10
+      items:
+        - Black cat
+        - Tombstone
+        - Haunted house
+        - An inflatable pumpkin
+        - Caution tape
+        - Fake blood
+    - name: Twenty Points
+      points: 20
+      items:
+        - A house with the number 31
+        - A couple in a couples costume
+        - A Halloween wreath
+        - A witch on a broomstick
+        - A haystack
+        - A creepy clown
+

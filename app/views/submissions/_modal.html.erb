@@ -1,5 +1,5 @@
 <dialog class="modal <%= "modal-bottom sm:modal-middle" unless local_assigns[:fullscreen] %>" data-hunt-target="modal">
-  <div class="modal-box <%= "w-11/12 max-w-7xl" if local_assigns[:fullscreen] %>">
+  <div class="modal-box max-h-full <%= "w-11/12 max-w-7xl" if local_assigns[:fullscreen] %>">
     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->hunt#closeModal">✕</button>
     <h3 id="title" class="font-bold text-lg">Loading!</h3>
     <p id="content" class="py-4">

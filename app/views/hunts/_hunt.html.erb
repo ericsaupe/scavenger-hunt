@@ -35,7 +35,7 @@
 <div data-controller="hunt" data-action="keydown.esc->hunt#closeModal">
   <div class="grid grid-flow-row grid-cols-1 gap-2 <%= @hunt.categories.size < 2 ? 'md:grid-cols-1 print:grid-cols-1' : 'md:grid-cols-2 print:grid-cols-2' %> md:px-2 md:py-3">
     <% @hunt.categories.each_with_index do |category, i| %>
-      <div class="card w-96 sm:w-full <%= tailwind_colors[i % tailwind_colors.size] %>">
+      <div class="card w-full <%= tailwind_colors[i % tailwind_colors.size] %>">
         <div class="card-body">
           <h2 class="card-title uppercase flex justify-between">
             <%= category.name %>
