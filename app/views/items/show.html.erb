@@ -28,7 +28,7 @@
 <% else %>
   <div data-controller="hunt" data-action="keydown.esc->hunt#closeModal" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
     <% @submissions.each_with_index do |submission, i| %>
-      <%= render(CardComponent.new()) do %>
+      <%= render(CardComponent.new(class_list: ["h-3/4"])) do %>
         <% image_url = submission.large_variant_url %>
         <figure>
           <% if submission.video? %>
