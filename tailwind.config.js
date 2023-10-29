@@ -37,6 +37,6 @@ module.exports = {
     },
   },
   daisyui: {
-    themes: ["pastel", "halloween", "dark", "winter"],
+    themes: ["cmyk", "halloween", "dark", "winter"],
   }
 }
