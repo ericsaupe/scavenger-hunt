@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
+ActiveRecord::Schema[7.1].define(version: 2023_10_21_211448) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -43,7 +43,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
   end
 
   create_table "categories", force: :cascade do |t|
-    t.integer "hunt_id", null: false
+    t.bigint "hunt_id", null: false
     t.string "name", null: false
     t.integer "points"
     t.datetime "created_at", null: false
@@ -133,8 +133,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "starts_at"
-    t.datetime "ends_at"
+    t.datetime "starts_at", precision: nil
+    t.datetime "ends_at", precision: nil
     t.boolean "lock_results", default: false, null: false
     t.string "lock_password"
     t.boolean "password_entered", default: false, null: false
@@ -142,11 +142,20 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.integer "category_id", null: false
+    t.bigint "category_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_items_on_category_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "hunt_id", null: false
+    t.string "user_id", null: false
+    t.string "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hunt_id"], name: "index_messages_on_hunt_id"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -157,8 +166,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
   end
 
   create_table "submissions", force: :cascade do |t|
-    t.integer "item_id", null: false
-    t.integer "team_id", null: false
+    t.bigint "item_id", null: false
+    t.bigint "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["item_id", "team_id"], name: "index_submissions_on_item_id_and_team_id"
@@ -167,7 +176,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
   end
 
   create_table "teams", force: :cascade do |t|
-    t.integer "hunt_id", null: false
+    t.bigint "hunt_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -177,4 +186,5 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "messages", "hunts"
 end
