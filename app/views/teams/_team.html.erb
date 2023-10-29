@@ -1,0 +1,6 @@
+<div class="form-control">
+  <%= label_tag :team_id, value: team.id, class: "label cursor-pointer" do %>
+    <span class="label-text"><%= team.name %></span>
+    <%= radio_button_tag :team_id, team.id, class: "radio radio-primary" %>
+  <% end %>
+</div>

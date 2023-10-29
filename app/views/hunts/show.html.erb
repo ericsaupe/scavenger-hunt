@@ -29,14 +29,10 @@
 
   <%= form_with url: hunt_teams_path(@hunt.code), method: :post, class: "px-6", data: { controller: 'past-hunts', 'past-hunts-code-value': @hunt.code, 'past-hunts-name-value': @hunt.name } do |f| %>
     <p class="uppercase">Pick a team</p>
-    <% @hunt.teams.find_each do |team| %>
-      <div class="form-control">
-        <%= f.label :team_id, value: team.id, class: "label cursor-pointer" do %>
-          <span class="label-text"><%= team.name %></span>
-          <%= f.radio_button :team_id, team.id, class: "radio" %>
-        <% end %>
-      </div>
-    <% end %>
+    <%= turbo_stream_from "teams_#{@hunt.id}" %>
+    <div id="teams">
+      <%= render(@hunt.teams) %>
+    </div>
     <div class="form-control w-full">
       <%= f.label :name, class: "label" do %>
         <span class="label-text">Start a team</span>

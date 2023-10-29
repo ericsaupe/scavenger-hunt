@@ -7,6 +7,7 @@ class Team < ApplicationRecord
 
   validates :name, uniqueness: {scope: :hunt, case_sensitive: false}
 
+  after_create_commit { broadcast_append_to("teams_#{hunt_id}") }
   after_update_commit { broadcast_replace(partial: "teams/score") }
 
   def score
