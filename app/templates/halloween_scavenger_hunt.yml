@@ -8,7 +8,7 @@
       items:
         - Bat
         - Spider
-        - Bowl of candy
+        - Jack-o-lantern
         - Scarecrow
         - Ghost
         - Skeleton
@@ -16,9 +16,10 @@
       points: 5
       items:
         - Zombie
-        - A furry costume
         - Vampire teeth
-        - A pet in a costume
+        - The word "Boo"
+        - A potion
+        - Mummy
         - Orange leaves
         - Spider web
     - name: Ten Points
@@ -30,11 +31,12 @@
         - An inflatable pumpkin
         - Caution tape
         - Fake blood
+        - Werewolf
     - name: Twenty Points
       points: 20
       items:
         - A house with the number 31
-        - A couple in a couples costume
+        - Raven
         - A Halloween wreath
         - A witch on a broomstick
         - A haystack
