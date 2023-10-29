@@ -9,8 +9,11 @@ class TeamsController < ApplicationController
   def create
     team = if params[:team_id].present?
       hunt.teams.find(params[:team_id])
-    else
+    elsif params[:name].present?
       hunt.start_a_new_team(params[:name])
+    else
+      flash[:error] = "Please select a team or enter a team name"
+      redirect_to hunt_path(hunt.code) and return
     end
 
     redirect_to hunt_team_path(hunt.code, team)

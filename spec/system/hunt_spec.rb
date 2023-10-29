@@ -54,6 +54,12 @@ RSpec.describe "Hunts" do
       expect(page).to have_text("Find the following items to earn points for your team. Take a picture or video for evidence!")
     end
 
+    it "requires a name to start a team" do
+      visit "/scavenger_hunts/#{hunt.code.upcase}"
+      click_on "Start!"
+      expect(page).to have_text("Please select a team or enter a team name")
+    end
+
     it "joins a team" do
       team_name = team.name
       visit "/scavenger_hunts/#{hunt.code.upcase}"
@@ -166,6 +172,11 @@ RSpec.describe "Hunts" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
         expect(page).to have_text("Starts in")
       end
+
+      it "does not show the view results button" do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).not_to have_text("View Results!".upcase)
+      end
     end
 
     describe "when in progress" do
@@ -177,6 +188,11 @@ RSpec.describe "Hunts" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
         expect(page).to have_text("Ends in")
       end
+
+      it "does not show the view results button" do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).not_to have_text("View Results!".upcase)
+      end
     end
 
     describe "when ended" do
@@ -187,6 +203,11 @@ RSpec.describe "Hunts" do
       it "shows the timer" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
         expect(page).to have_text("This scavenger hunt has ended. No more submissions will be accepted.")
+      end
+
+      it "shows the view results button" do
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).to have_text("View Results!".upcase)
       end
     end
   end

@@ -12,7 +12,7 @@
             <% end %>
             <%= form.text_field :code,
                                 value: params[:code],
-                                class: "input input-bordered sm:max-w-xs",
+                                class: "input input-bordered w-full",
                                 required: true,
                                 oninput: "this.value = this.value.toUpperCase()",
                                 maxlength: 5,
@@ -34,7 +34,7 @@
               <span class="label-text">Scavenger hunts</span>
             <% end %>
             <%= form.select :hunt_select, [], { include_blank: "Select a scavenger hunt" }, {
-              class: "select select-bordered w-full max-w-full sm:max-w-xs", data: { "past-hunts-target": "list" },
+              class: "select select-bordered w-full max-w-full", data: { "past-hunts-target": "list" },
               name: "code",
               } %>
           </div>
