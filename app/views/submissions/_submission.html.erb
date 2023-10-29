@@ -11,7 +11,7 @@
           <ion-icon name="checkbox"
             data-action="click->hunt#openModal"
             data-title="<%= submission.item.name %>"
-            data-src="<%= submission_attachment_url(submission) %>"
+            data-src="<%= submission.large_variant_url %>"
             data-video="<%= submission.video? %>"
             data-object="<%= object_id %>"
             class="cursor-pointer"></ion-icon>
@@ -30,7 +30,7 @@
             <span
               data-action="click->hunt#openModal"
               data-title="<%= submission.item.name %>"
-              data-src="<%= submission_attachment_url(submission) %>"
+              data-src="<%= submission.large_variant_url %>"
               data-video="<%= submission.video? %>"
               data-object="<%= object_id %>"
               class="cursor-pointer">

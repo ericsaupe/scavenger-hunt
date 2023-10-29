@@ -29,6 +29,7 @@ export default class extends Controller {
       img.src = event.target.dataset.src
       content.firstElementChild.remove()
       content.appendChild(img)
+      this.modalTarget.focus()
     }
   }
 

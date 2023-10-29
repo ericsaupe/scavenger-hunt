@@ -31,6 +31,7 @@ gem "view_component"
 
 group :development, :test do
   gem "byebug"
+  gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "faker"
   gem "rspec-rails"

@@ -127,6 +127,10 @@ GEM
       railties (>= 6.0.0)
     date (3.3.3)
     diff-lcs (1.5.0)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     drb (2.1.1)
       ruby2_keywords
     erb_lint (0.5.0)
@@ -399,6 +403,7 @@ DEPENDENCIES
   byebug
   capybara (>= 3.26)
   cssbundling-rails (>= 0.1.0)
+  dotenv-rails
   erb_lint
   factory_bot_rails
   faker

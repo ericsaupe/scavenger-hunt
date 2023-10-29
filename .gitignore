@@ -41,3 +41,5 @@ examples.txt
 .DS_Store
 yarn-error.log
 public/scavenger_hunts/*
+
+.env.local

@@ -64,6 +64,7 @@ RSpec.describe "Results" do
       end
 
       it "displays the photo submission" do
+        allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000")
         visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
         expect(page).to have_content(team.name)
       end
