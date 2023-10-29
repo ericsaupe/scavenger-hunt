@@ -114,6 +114,7 @@ Rails.application.configure do
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
 
   config.action_mailer.default_url_options = {host: "scavengerhunt.party"}
+  self.default_url_options = config.action_mailer.default_url_options
 
   Rails.application.config.hosts << ".scavengerhunt.party"
 end
