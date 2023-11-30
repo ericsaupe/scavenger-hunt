@@ -1,13 +1,13 @@
 <%= turbo_stream_from "hunts_chat_#{hunt.id}" %>
 
-<div class="mb-8 h-5/6">
+<div class="mb-8 h-5/6 py-4 bg-base-300 border-base-300 border" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
   <div id="hunt_chat_<%= hunt.id %>" class="chat-container max-h-96 overflow-y-scroll mb-4">
     <%= render hunt.messages %>
   </div>
   <%= form_for Message.new(hunt: hunt), url: hunt_messages_path(hunt.code.upcase), method: :post do |f| %>
-    <div class="join">
-      <%= f.text_field :content, class: "input input-bordered w-full max-w-xs" %>
-      <%= f.submit "Send", class: "btn btn-primary" %>
+    <div class="join w-full sm:max-w-xs">
+      <%= f.text_field :content, class: "input input-bordered w-full sm:max-w-xs join-item", placeholder: "Chat here" %>
+      <%= f.submit "Send", class: "btn btn-primary join-item" %>
     </div>
   <% end %>
 </div>

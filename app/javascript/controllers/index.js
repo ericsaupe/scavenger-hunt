@@ -4,26 +4,32 @@
 
 import { application } from "./application"
 
-import DownloadController from "./download_controller.js"
+import ChatController from "./chat_controller"
+application.register("chat", ChatController)
+
+import DownloadController from "./download_controller"
 application.register("download", DownloadController)
 
-import FlashController from "./flash_controller.js"
+import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
-import FormController from "./form_controller.js"
+import FormController from "./form_controller"
 application.register("form", FormController)
 
-import HuntController from "./hunt_controller.js"
+import HuntController from "./hunt_controller"
 application.register("hunt", HuntController)
 
-import NavController from "./nav_controller.js"
+import MessageController from "./message_controller"
+application.register("message", MessageController)
+
+import NavController from "./nav_controller"
 application.register("nav", NavController)
 
-import PastHuntsController from "./past_hunts_controller.js"
+import PastHuntsController from "./past_hunts_controller"
 application.register("past-hunts", PastHuntsController)
 
-import SubmissionController from "./submission_controller.js"
+import SubmissionController from "./submission_controller"
 application.register("submission", SubmissionController)
 
-import TimerController from "./timer_controller.js"
+import TimerController from "./timer_controller"
 application.register("timer", TimerController)
