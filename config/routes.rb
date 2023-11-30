@@ -16,5 +16,7 @@ Rails.application.routes.draw do
 
   get :banner, to: "banners#show"
 
-  resources :submissions, only: %i[update]
+  resources :submissions, only: %i[update] do
+    resources :votes, only: %i[create]
+  end
 end

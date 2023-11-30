@@ -8,6 +8,7 @@ class Submission < ApplicationRecord
 
   belongs_to :item
   belongs_to :team, touch: true
+  has_many :votes, dependent: :destroy
 
   delegate :hunt, to: :team
 

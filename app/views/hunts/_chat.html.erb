@@ -6,6 +6,7 @@
   </div>
   <%= form_for Message.new(hunt: hunt), url: hunt_messages_path(hunt.code.upcase), method: :post do |f| %>
     <div class="join w-full sm:max-w-xs">
+      <%= image_tag "https://api.dicebear.com/7.x/fun-emoji/svg?seed=#{cookies[:user_id]}", class: "h-full w-12 rounded join-item" %>
       <%= f.text_field :content, class: "input input-bordered w-full sm:max-w-xs join-item", placeholder: "Chat here" %>
       <%= f.submit "Send", class: "btn btn-primary join-item" %>
     </div>

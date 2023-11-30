@@ -33,3 +33,6 @@ application.register("submission", SubmissionController)
 
 import TimerController from "./timer_controller"
 application.register("timer", TimerController)
+
+import VoteController from "./vote_controller"
+application.register("vote", VoteController)
