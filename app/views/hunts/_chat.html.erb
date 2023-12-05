@@ -1,6 +1,6 @@
 <%= turbo_stream_from "hunts_chat_#{hunt.id}" %>
 
-<div class="mb-8 h-5/6 py-4 bg-base-300 border-base-300 border" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
+<div class="mb-8 h-5/6 bg-base-300 border-base-300 border" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
   <div id="hunt_chat_<%= hunt.id %>" class="chat-container max-h-96 overflow-y-scroll mb-4">
     <%= render hunt.messages %>
   </div>

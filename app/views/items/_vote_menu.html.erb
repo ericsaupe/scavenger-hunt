@@ -3,7 +3,8 @@
   class="dropdown dropdown-end absolute top-4 right-4"
   data-controller="vote"
   data-vote-submission-id-value="<%= vote.submission_id %>"
-  data-vote-user-id-value="<%= vote.user_id %>">
+  data-vote-user-id-value="<%= vote.user_id %>"
+  data-vote-value-value="<%= vote.value %>">
   <summary class="btn btn-circle">
     <% if vote.value.blank? %>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
