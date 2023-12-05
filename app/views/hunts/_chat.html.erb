@@ -1,13 +1,13 @@
 <%= turbo_stream_from "hunts_chat_#{hunt.id}" %>
 
-<div class="mb-8 h-5/6 bg-base-300 border-base-300 border" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
-  <div id="hunt_chat_<%= hunt.id %>" class="chat-container max-h-96 overflow-y-scroll mb-4">
+<div class="flex flex-col bg-base-300 border-base-300 border h-1/2 min-h-[85vh] sm:h-[90vh]" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
+  <div id="hunt_chat_<%= hunt.id %>" class="chat-container overflow-y-scroll mb-2">
     <%= render hunt.messages %>
   </div>
   <%= form_for Message.new(hunt: hunt), url: hunt_messages_path(hunt.code.upcase), method: :post do |f| %>
-    <div class="join w-full sm:max-w-xs">
+    <div class="join w-full">
       <%= image_tag "https://api.dicebear.com/7.x/fun-emoji/svg?seed=#{cookies[:user_id]}", class: "h-full w-12 rounded join-item" %>
-      <%= f.text_field :content, class: "input input-bordered w-full sm:max-w-xs join-item", placeholder: "Chat here" %>
+      <%= f.text_field :content, class: "input input-bordered w-full join-item", placeholder: "Chat here" %>
       <%= f.submit "Send", class: "btn btn-primary join-item" %>
     </div>
   <% end %>
