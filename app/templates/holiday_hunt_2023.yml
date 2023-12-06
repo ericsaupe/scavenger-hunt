@@ -1,0 +1,93 @@
+---
+  name: Holiday Hunt 2023
+  description: Find decorations and complete challenges to score points!
+  image_path: templates/christmas.jpg
+  categories:
+    - name: Decor
+      points: 2
+      items:
+        - Star on top of a tree
+        - Candy cane
+        - Red bow
+        - Paper snowflake
+        - Candle in a window
+        - Christmas tree in a window
+        - Bell
+        - Nativity scene
+        - Santa's sleigh
+        - Lamp post with lights
+        - Santa letter mailbox
+        - Gingerbread house
+        - Snow globe
+        - Stocking
+        - Poinsettia
+        - Broken or missing lights
+    - name: Characters
+      points: 3
+      items:
+        - Santa Claus
+        - Snowman
+        - Penguin
+        - Elf
+        - Rudolph
+        - Carolers
+        - The Grinch
+        - Nutcracker
+        - Anna or Elsa from Frozen
+        - Polar bear
+        - Gnome
+        - Dinosaur
+    - name: Phrases
+      points: 4
+      items:
+        - Merry Christmas
+        - Merry and Bright
+        - Noel
+        - Feliz Navidad
+        - Peace
+        - Ho Ho Ho!
+        - Joy
+        - Snow
+    - name: Special Features
+      points: 5
+      items:
+        - Decorations on a roof (not including lights)
+        - Santa falling off the roof
+        - Something dancing
+        - Snow shovel
+        - More than 3 animals together
+        - Moving decorations
+        - Giant ornaments
+        - Christmas train
+        - A leg lamp
+        - Decorated car
+        - Ugly Christmas sweater
+        - Leftover Fall or Halloween decorations
+        - Dog wearing a sweater
+    - name: Challenges - Easy
+      points: 6
+      items:
+        - Teammate wearing a Santa hat
+        - Stand on something tall and shout, "Merry Christmas to all and to all a good night!"
+        - Hug a snowman
+        - Tongue on a frozen pole
+        - Make a snow angel
+    - name: Challenges - Medium
+      points: 8
+      items:
+        - Find and eat a candy cane
+        - Run around a tree 3x singing "Rocking Around the Christmas Tree"
+        - Kiss under the mistletoe
+        - Slide down a hill on a sled
+        - Group Christmas card photo
+        - Sing a Christmas carol to strangers
+    - name: Challenges - Hard
+      points: 10
+      items:
+        - Find a stranger who can name each of "The 12 Days of Christmas"
+        - Find a stranger that can name all of Santa's reindeer
+        - Take a selfie with a real Santa Claus
+        - Act out Elf's "I'm singing" scene in a store
+        - Find someone buying a Christmas gift
+        - Have someone share their Christmas cookie recipe with you
+        - Perform lines 21-24 of "A Visit from St. Nicholas"
