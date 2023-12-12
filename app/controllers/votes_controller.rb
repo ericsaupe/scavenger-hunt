@@ -7,6 +7,7 @@ class VotesController < ApplicationController
       vote.attributes = vote_params
     end
     vote.save!
+    submission.calculate_denied_points
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("submission_vote_#{[vote.user_id, vote.submission_id].join("_")}",

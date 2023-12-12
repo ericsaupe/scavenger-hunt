@@ -11,6 +11,6 @@ class Team < ApplicationRecord
   after_update_commit { broadcast_replace(partial: "teams/score") }
 
   def score
-    submissions.includes(item: :category).with_attached_photo.sum { |submission| submission.item.category.points }
+    submissions.with_points.includes(item: :category).with_attached_photo.sum { |submission| submission.item.category.points }
   end
 end

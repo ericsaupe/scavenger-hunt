@@ -26,7 +26,13 @@ export default class extends Controller {
           "value": value,
         }
       }),
-    }).then(r => r.text())
+    }).then(r => {
+        if (!r.ok) {
+          return Promise.reject(r);
+        }
+
+        return r.text()
+      })
       .then(html => Turbo.renderStreamMessage(html))
       .then(() => {
         if (currentValue === value) {
@@ -65,6 +71,9 @@ export default class extends Controller {
             },
           })
         }
+      })
+      .catch(error => {
+        console.log(error)
       })
   }
 

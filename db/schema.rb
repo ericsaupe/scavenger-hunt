@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_30_054238) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -138,6 +138,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_30_054238) do
     t.boolean "lock_results", default: false, null: false
     t.string "lock_password"
     t.boolean "password_entered", default: false, null: false
+    t.integer "max_downvotes_to_lose_points"
     t.index ["code"], name: "index_hunts_on_code"
   end
 
@@ -170,6 +171,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_30_054238) do
     t.bigint "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "denied_points", default: false, null: false
     t.index ["item_id", "team_id"], name: "index_submissions_on_item_id_and_team_id"
     t.index ["item_id"], name: "index_submissions_on_item_id"
     t.index ["team_id"], name: "index_submissions_on_team_id"
