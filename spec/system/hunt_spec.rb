@@ -175,7 +175,7 @@ RSpec.describe "Hunts" do
 
       it "does not show the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).not_to have_text("View Results!".upcase)
+        expect(page).not_to have_text("View Results!")
       end
     end
 
@@ -191,7 +191,7 @@ RSpec.describe "Hunts" do
 
       it "does not show the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).not_to have_text("View Results!".upcase)
+        expect(page).not_to have_text("View Results!")
       end
     end
 

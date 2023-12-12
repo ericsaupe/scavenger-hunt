@@ -70,6 +70,6 @@ class HuntsController < ApplicationController
   private
 
   def hunt_params
-    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password)
+    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password, :max_downvotes_to_lose_points)
   end
 end

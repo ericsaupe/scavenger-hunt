@@ -33,7 +33,7 @@ class Submission < ApplicationRecord
   end
 
   def calculate_denied_points
-    return unless max_downvotes_to_lose_points.positive?
+    return unless max_downvotes_to_lose_points&.positive?
 
     denied_vote_ratio = votes.denied.count / max_downvotes_to_lose_points.to_f
     should_broadcast_changes = false
@@ -44,9 +44,11 @@ class Submission < ApplicationRecord
       update(denied_points: false)
       should_broadcast_changes = true
     end
-    broadcast_replace_to("submission_#{id}_downvote_counter",
-                        target: "submission_#{id}_downvote_counter",
-                        partial: "items/downvote_counter",
-                        locals: { submission: self }) if should_broadcast_changes
+    if should_broadcast_changes
+      broadcast_replace_to("submission_#{id}_downvote_counter",
+        target: "submission_#{id}_downvote_counter",
+        partial: "items/downvote_counter",
+        locals: {submission: self})
+    end
   end
 end

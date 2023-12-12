@@ -43,7 +43,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
   end
 
   create_table "categories", force: :cascade do |t|
-    t.bigint "hunt_id", null: false
+    t.integer "hunt_id", null: false
     t.string "name", null: false
     t.integer "points"
     t.datetime "created_at", null: false
@@ -133,8 +133,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "starts_at", precision: nil
-    t.datetime "ends_at", precision: nil
+    t.datetime "starts_at"
+    t.datetime "ends_at"
     t.boolean "lock_results", default: false, null: false
     t.string "lock_password"
     t.boolean "password_entered", default: false, null: false
@@ -143,7 +143,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
   end
 
   create_table "items", force: :cascade do |t|
-    t.bigint "category_id", null: false
+    t.integer "category_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -167,8 +167,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
   end
 
   create_table "submissions", force: :cascade do |t|
-    t.bigint "item_id", null: false
-    t.bigint "team_id", null: false
+    t.integer "item_id", null: false
+    t.integer "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "denied_points", default: false, null: false
@@ -178,7 +178,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
   end
 
   create_table "teams", force: :cascade do |t|
-    t.bigint "hunt_id", null: false
+    t.integer "hunt_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

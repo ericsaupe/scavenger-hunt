@@ -7,6 +7,10 @@ export default class extends Controller {
     value: String,
   }
 
+  connect() {
+    console.log("connected")
+  }
+
   vote(event) {
     const submissionId = this.submissionIdValue
     const currentValue = this.valueValue
