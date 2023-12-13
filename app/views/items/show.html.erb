@@ -1,6 +1,6 @@
 <% description "#{@item.name} was found #{pluralize(@submissions.size, 'times')} during #{@hunt.name}." %>
 
-<%= render(PageHeaderComponent.new(title: @hunt.name)) %>
+<%= render(PageHeaderComponent.new(title: @hunt.name, link_to: hunt_results_path(code: @hunt.code))) %>
 
 <div class="grid grid-cols-3 gap-2 mx-auto my-4 font-sans text-center uppercase font-bold">
   <%= link_to hunt_item_path(@hunt.code, @previous), class: "btn btn-ghost my-auto text-ellipsis" do %>
@@ -26,7 +26,7 @@
     </div>
   </div>
 <% else %>
-  <div class="flex flex-col sm:flex-row items-center">
+  <div id="items" class="flex flex-col sm:flex-row items-center">
     <div class="w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
       <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
         <% @submissions.each do |submission| %>
@@ -42,7 +42,7 @@
               vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
               }) %>
 
-            <div class="absolute bottom-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
+            <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
               <%= submission.team.name %>
             </div>
           </div>

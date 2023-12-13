@@ -1,7 +1,7 @@
 <%= turbo_stream_from "hunts_chat_#{hunt.id}" %>
 
-<div class="flex flex-col bg-base-300 border-base-300 border h-1/2 min-h-[85vh] sm:h-[90vh]" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
-  <div id="hunt_chat_<%= hunt.id %>" class="chat-container overflow-y-scroll mb-2">
+<div class="flex flex-col bg-base-300 h-1/2 min-h-[85vh] sm:h-[90vh]" data-controller="chat" data-action="turbo:submit-end->chat#reset" >
+  <div id="hunt_chat_<%= hunt.id %>" class="chat-container overflow-y-scroll mb-2 h-full">
     <%= render hunt.messages %>
   </div>
   <%= form_for Message.new(hunt: hunt), url: hunt_messages_path(hunt.code.upcase), method: :post do |f| %>

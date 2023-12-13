@@ -1,7 +1,7 @@
-<div id="submission_vote_<%= [vote.user_id, vote.submission_id].join("_") %>" class="flex flex-col-reverse items-center absolute bottom-0 right-0 z-10">
+<div id="submission_vote_<%= [vote.user_id, vote.submission_id].join("_") %>" class="flex flex-col-reverse items-center absolute top-0 right-0 z-10">
   <%= render partial: "items/downvote_counter", locals: { submission: vote.submission } %>
   <details
-    class="m-2 dropdown dropdown-top dropdown-end"
+    class="m-2 dropdown dropdown-end"
     data-controller="vote"
     data-vote-submission-id-value="<%= vote.submission_id %>"
     data-vote-user-id-value="<%= vote.user_id %>"

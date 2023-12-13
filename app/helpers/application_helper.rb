@@ -7,7 +7,7 @@ module ApplicationHelper
       if current_time.month == 10 # October
         "halloween"
       elsif current_time.month == 11 || current_time.month == 12 # November/December
-        "winter"
+        "autumn"
       else
         "cmyk"
       end
