@@ -86,6 +86,13 @@ RSpec.describe "Results" do
           expect(Vote.last).to be_loved
         end
       end
+
+      it "hides downvote if downvotes are not enabled" do
+        hunt.update(max_downvotes_to_lose_points: nil)
+        visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
+        find("[data-testid='vote-menu-button']").click
+        expect(page).not_to have_selector("[data-testid='vote-menu-deny-button']")
+      end
     end
   end
 end

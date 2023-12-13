@@ -33,12 +33,14 @@
     <div id="teams">
       <%= render(@hunt.teams) %>
     </div>
-    <div class="form-control w-full">
-      <%= f.label :name, class: "label" do %>
-        <span class="label-text">Start a team</span>
-      <% end %>
-      <%= f.text_field :name, class: "input input-bordered w-full" %>
-    </div>
+    <% unless @hunt.ended? %>
+      <div class="form-control w-full">
+        <%= f.label :name, class: "label" do %>
+          <span class="label-text">Start a team</span>
+        <% end %>
+        <%= f.text_field :name, class: "input input-bordered w-full" %>
+      </div>
+    <% end %>
 
     <div class="flex mt-4">
       <%= f.button type: :submit, class: "btn btn-primary" do %>
