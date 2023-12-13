@@ -63,6 +63,20 @@ class HuntsController < ApplicationController
     redirect_to hunt_results_path(hunt_code: @hunt.code.upcase)
   end
 
+  def presenter
+    @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
+    submissions = @hunt.submissions.includes(:item, :team).with_attached_photo.order(:item_id, :team_id)
+    @submission = if params[:submission_id].present?
+      submissions.find(params[:submission_id])
+    else
+      submissions.first
+    end
+    @next_submission = submissions.where.not(id: @submission.id).where("team_id > ?", @submission.team_id)
+      .order("item_id ASC").first || submissions.where.not(id: @submission.id).first
+    @previous_submission = submissions.where.not(id: @submission.id).where("team_id < ?", @submission.team_id)
+      .order("item_id DESC").first || submissions.where.not(id: @submission.id).last
+  end
+
   def print
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
   end

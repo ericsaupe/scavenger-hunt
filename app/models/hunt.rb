@@ -7,6 +7,7 @@ class Hunt < ApplicationRecord
 
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
+  has_many :submissions, through: :items
   has_many :messages, dependent: :destroy
   has_many :teams, dependent: :destroy
 

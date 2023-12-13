@@ -9,7 +9,7 @@
   <div class="grid grid-cols-1 place-items-end">
     <%= render partial: 'download_button' %>
   </div>
-
+  <%= link_to("Presenter Mode", hunt_presenter_path(@hunt.code.upcase), class: "btn") %>
   <%= render(partial: 'hunts/leaderboard', locals: { results: @results }) %>
   <%= render(partial: 'hunts/hunt', locals: { results: true }) %>
 <% end %>

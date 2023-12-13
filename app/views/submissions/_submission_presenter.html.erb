@@ -1,0 +1,16 @@
+<div id="submission_<%= submission.id %>" class="carousel-item w-full justify-center relative">
+  <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+  <% if submission.video? %>
+    <%= video_tag(image_url, controls: true, class: "w-full object-contain") %>
+  <% else %>
+    <%= image_tag(image_url, class: "object-contain") %>
+  <% end %>
+
+  <%= render(partial: "items/vote_menu", locals: {
+    vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
+    }) %>
+
+  <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
+    <%= submission.team.name %>
+  </div>
+</div>

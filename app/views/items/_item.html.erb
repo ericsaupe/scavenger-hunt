@@ -34,7 +34,7 @@
               <%= image_tag(image_url, class: "object-contain") %>
             <% end %>
 
-            <%= render(partial: "vote_menu", locals: {
+            <%= render(partial: "items/vote_menu", locals: {
               vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
               }) %>
 
