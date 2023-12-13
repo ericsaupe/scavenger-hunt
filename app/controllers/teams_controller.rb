@@ -3,7 +3,7 @@
 class TeamsController < ApplicationController
   def show
     @team = hunt.teams.find(params[:id])
-    @submissions = @team.submissions
+    @submissions = @team.submissions.includes(:photo_attachment)
   end
 
   def create
