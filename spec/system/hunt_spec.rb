@@ -16,7 +16,7 @@ RSpec.describe "Hunts" do
       click_on "Start!"
       expect(page).to have_text("My Fun Scavenger Hunt".upcase)
       expect(page).to have_text("Pick a team".upcase)
-      expect(page).to have_text("Print List".upcase)
+      expect(page).to have_text("Print List")
     end
 
     it "supports locking" do
@@ -35,7 +35,7 @@ RSpec.describe "Hunts" do
       click_on "Start!"
       expect(page).to have_text("My Fun Scavenger Hunt".upcase)
       expect(page).to have_text("Pick a team".upcase)
-      expect(page).to have_text("Print List".upcase)
+      expect(page).to have_text("Print List")
       hunt = Hunt.last
       expect(hunt.lock_results).to be_truthy
       expect(hunt.lock_password).to be_present
@@ -102,9 +102,9 @@ RSpec.describe "Hunts" do
       expect(page).to have_css('ion-icon[name="checkbox"]')
 
       find(".cursor-pointer", text: hunt.items.first.name).click
-      expect(page).to have_text("Change".upcase)
+      expect(page).to have_text("Change")
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:button, text: "Change".upcase).click
+        find(:button, text: "Change").click
       end
       expect(page).to have_css('ion-icon[name="checkbox"]')
     end
@@ -117,9 +117,9 @@ RSpec.describe "Hunts" do
       expect(page).to have_css('ion-icon[name="checkbox"]')
 
       find(".cursor-pointer", text: hunt.items.first.name).click
-      expect(page).to have_text("Close".upcase)
+      expect(page).to have_text("Close")
       click_on "Close"
-      expect(page).not_to have_text("Close".upcase)
+      expect(page).not_to have_text("Close")
     end
 
     it "updates the score" do
@@ -175,7 +175,7 @@ RSpec.describe "Hunts" do
 
       it "does not show the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).not_to have_text("View Results!".upcase)
+        expect(page).not_to have_text("View Results!")
       end
     end
 
@@ -191,7 +191,7 @@ RSpec.describe "Hunts" do
 
       it "does not show the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).not_to have_text("View Results!".upcase)
+        expect(page).not_to have_text("View Results!")
       end
     end
 
@@ -207,7 +207,7 @@ RSpec.describe "Hunts" do
 
       it "shows the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).to have_text("View Results!".upcase)
+        expect(page).to have_text("View Results!")
       end
     end
   end

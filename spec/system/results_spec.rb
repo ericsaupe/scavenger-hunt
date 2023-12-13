@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe "Results" do
   context "with a hunt started" do
     let(:hunt) { create(:hunt) }
-    let(:team) { video_submission.team }
-    let(:video_submission) { create(:video_submission, item: hunt.items.first) }
+    let(:team) { create(:team, hunt:) }
+    let(:video_submission) { create(:video_submission, item: hunt.items.first, team:) }
     let(:photo_submission) { create(:photo_submission, item: hunt.items.second, team:) }
 
     describe "results page" do
@@ -20,7 +20,7 @@ RSpec.describe "Results" do
       it "downloads the results" do
         expect(hunt.archive.attached?).to be(false)
         visit "/scavenger_hunts/#{hunt.code}/results"
-        expect(page).to have_content("Download".upcase)
+        expect(page).to have_content("Download")
         expect { click_on("Download") }.not_to raise_error
       end
 
@@ -60,13 +60,17 @@ RSpec.describe "Results" do
     describe "single result page" do
       it "displays the video submission" do
         visit "scavenger_hunts/#{hunt.code}/items/#{video_submission.item_id}"
-        expect(page).to have_content(team.name)
+        within("#items") do
+          expect(page).to have_selector("video")
+        end
       end
 
       it "displays the photo submission" do
         allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000")
         visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
-        expect(page).to have_content(team.name)
+        within("#items") do
+          expect(page).to have_selector("img")
+        end
       end
     end
   end

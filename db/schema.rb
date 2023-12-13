@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -138,6 +138,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
     t.boolean "lock_results", default: false, null: false
     t.string "lock_password"
     t.boolean "password_entered", default: false, null: false
+    t.integer "max_downvotes_to_lose_points"
     t.index ["code"], name: "index_hunts_on_code"
   end
 
@@ -147,6 +148,15 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_items_on_category_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "hunt_id", null: false
+    t.string "user_id", null: false
+    t.string "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hunt_id"], name: "index_messages_on_hunt_id"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -161,6 +171,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
     t.integer "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "denied_points", default: false, null: false
     t.index ["item_id", "team_id"], name: "index_submissions_on_item_id_and_team_id"
     t.index ["item_id"], name: "index_submissions_on_item_id"
     t.index ["team_id"], name: "index_submissions_on_team_id"
@@ -175,6 +186,18 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_12_052242) do
     t.index ["hunt_id"], name: "index_teams_on_hunt_id"
   end
 
+  create_table "votes", force: :cascade do |t|
+    t.bigint "submission_id", null: false
+    t.string "user_id", null: false
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["submission_id", "user_id"], name: "index_votes_on_submission_id_and_user_id", unique: true
+    t.index ["submission_id"], name: "index_votes_on_submission_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "messages", "hunts"
+  add_foreign_key "votes", "submissions"
 end

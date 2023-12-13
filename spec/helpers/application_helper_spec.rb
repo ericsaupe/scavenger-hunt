@@ -16,15 +16,15 @@ RSpec.describe ApplicationHelper do
       end
     end
 
-    it "returns the winter theme in November" do
+    it "returns the autumn theme in November" do
       travel_to Time.zone.local(2023, 11, 1, 1, 0, 0) do
-        expect(helper.daisy_theme).to eq("winter")
+        expect(helper.daisy_theme).to eq("autumn")
       end
     end
 
-    it "returns the winter theme in December" do
+    it "returns the autumn theme in December" do
       travel_to Time.zone.local(2023, 12, 1, 1, 0, 0) do
-        expect(helper.daisy_theme).to eq("winter")
+        expect(helper.daisy_theme).to eq("autumn")
       end
     end
   end

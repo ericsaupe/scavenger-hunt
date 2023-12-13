@@ -39,7 +39,6 @@ export default class extends Controller {
 
   handleKeydown(event) {
     if (event.key === 'Escape') {
-      console.log('Escape key was pressed with out any group keys')
       this.closeModal()
     }
   }

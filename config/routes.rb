@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     get :join, on: :collection
     resources :teams, only: %i[create show]
     resources :items, only: %i[show]
+    resources :messages, only: %i[create]
     get :results
     get :print
     get :download_results, on: :member
@@ -15,5 +16,7 @@ Rails.application.routes.draw do
 
   get :banner, to: "banners#show"
 
-  resources :submissions, only: %i[update]
+  resources :submissions, only: %i[update] do
+    resources :votes, only: %i[create]
+  end
 end

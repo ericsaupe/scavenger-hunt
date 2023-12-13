@@ -1,6 +1,6 @@
 <% description "#{@item.name} was found #{pluralize(@submissions.size, 'times')} during #{@hunt.name}." %>
 
-<%= render(PageHeaderComponent.new(title: @hunt.name)) %>
+<%= render(PageHeaderComponent.new(title: @hunt.name, link_to: hunt_results_path(code: @hunt.code))) %>
 
 <div class="grid grid-cols-3 gap-2 mx-auto my-4 font-sans text-center uppercase font-bold">
   <%= link_to hunt_item_path(@hunt.code, @previous), class: "btn btn-ghost my-auto text-ellipsis" do %>
@@ -26,33 +26,36 @@
     </div>
   </div>
 <% else %>
-  <div data-controller="hunt" data-action="keydown.esc->hunt#closeModal" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-    <% @submissions.each_with_index do |submission, i| %>
-      <%= render(CardComponent.new(class_list: ["h-3/4"])) do %>
-        <% image_url = submission.large_variant_url %>
-        <figure>
-          <% if submission.video? %>
-            <%= video_tag(image_url, controls: true, class: "h-full") %>
-          <% else %>
-            <%= image_tag(image_url, class: "h-full") %>
-          <% end %>
-        </figure>
-        <div class="card-body">
-          <h2 class="card-title">
-            <span
-              data-action="click->hunt#openModal"
-              data-title="<%= submission.team.name %>"
-              data-src="<%= submission.large_variant_url %>"
-              data-video="<%= submission.video? %>"
-              data-object="<%= object_id %>"
-              class="cursor-pointer">
-              <%= submission.team.name %>
-            </span>
-          </h2>
-        </div>
-      <% end %>
-    <% end %>
+  <div id="items" class="flex flex-col sm:flex-row items-center">
+    <div class="w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
+      <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
+        <% @submissions.each do |submission| %>
+          <div id="submission_<%= submission.id %>" class="carousel-item w-full justify-center relative">
+            <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+            <% if submission.video? %>
+              <%= video_tag(image_url, controls: true, class: "w-full object-contain") %>
+            <% else %>
+              <%= image_tag(image_url, class: "object-contain") %>
+            <% end %>
 
-    <%= render partial: 'submissions/modal', locals: { fullscreen: true } %>
+            <%= render(partial: "vote_menu", locals: {
+              vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
+              }) %>
+
+            <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
+              <%= submission.team.name %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div id="pages" class="flex justify-center w-full py-2 gap-2">
+        <% @submissions.each_with_index do |submission, i| %>
+          <a href="#submission_<%= submission.id %>" class="btn btn-xs"><%= i + 1 %></a>
+        <% end %>
+      </div>
+    </div>
+    <div class="w-full sm:w-2/12 h-[90vh]">
+      <%= render partial: "hunts/chat", locals: { hunt: @hunt } %>
+    </div>
   </div>
 <% end %>

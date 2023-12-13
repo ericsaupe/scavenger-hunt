@@ -8,12 +8,15 @@ class Submission < ApplicationRecord
 
   belongs_to :item
   belongs_to :team, touch: true
+  has_many :votes, dependent: :destroy
 
   delegate :hunt, to: :team
+  delegate :max_downvotes_to_lose_points, to: :hunt
 
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
 
   scope :with_attached_photo, -> { joins(:photo_attachment).where.not(active_storage_attachments: {id: nil}) }
+  scope :with_points, -> { where(denied_points: false) }
 
   def image?
     !!photo&.blob&.content_type&.include?("image")
@@ -27,5 +30,25 @@ class Submission < ApplicationRecord
     return nil unless photo.attached?
 
     video? ? Rails.application.routes.url_helpers.url_for(photo) : photo.variant(:large).processed.url
+  end
+
+  def calculate_denied_points
+    return unless max_downvotes_to_lose_points&.positive?
+
+    denied_vote_ratio = votes.denied.count / max_downvotes_to_lose_points.to_f
+    should_broadcast_changes = false
+    if denied_vote_ratio >= 1 && !denied_points?
+      update(denied_points: true)
+      should_broadcast_changes = true
+    elsif denied_vote_ratio < 1 && denied_points?
+      update(denied_points: false)
+      should_broadcast_changes = true
+    end
+    if should_broadcast_changes
+      broadcast_replace_to("submission_#{id}_downvote_counter",
+        target: "submission_#{id}_downvote_counter",
+        partial: "items/downvote_counter",
+        locals: {submission: self})
+    end
   end
 end
