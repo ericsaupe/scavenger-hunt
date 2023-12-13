@@ -100,6 +100,10 @@ class Hunt < ApplicationRecord
     archive.attach(io: File.open(zipfile_name), filename: "#{name}.zip")
   end
 
+  def broadcast_presentation_update(submission)
+    broadcast_replace_to("hunt_presenter_#{id}", target: "current_submission", partial: "submissions/submission_presenter", locals: {submission: submission})
+  end
+
   private
 
   ##

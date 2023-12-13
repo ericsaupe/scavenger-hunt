@@ -75,6 +75,7 @@ class HuntsController < ApplicationController
       .order("item_id ASC").first || submissions.where.not(id: @submission.id).first
     @previous_submission = submissions.where.not(id: @submission.id).where("team_id < ?", @submission.team_id)
       .order("item_id DESC").first || submissions.where.not(id: @submission.id).last
+    @hunt.broadcast_presentation_update(@submission)
   end
 
   def print

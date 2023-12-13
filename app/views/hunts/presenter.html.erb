@@ -1,20 +1,20 @@
 <%= turbo_stream_from "hunt_presenter_#{@hunt.id}" %>
 
 <div class="flex flex-col sm:flex-row items-center">
-    <div class="w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
-      <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
-        <%= render(partial: "submissions/submission_presenter", locals: { submission: @submission }) %>
-      </div>
-      <div class="join">
-        <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "join-item btn") do %>
-          «
-        <% end %>
-        <button class="join-item btn"><%= @submission.item.name %></button>
-        <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "join-item btn") do %>
-          »
-        <% end %>
-      </div>
+  <div class="w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
+    <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
+      <%= render(partial: "submissions/submission_presenter", locals: { submission: @submission }) %>
     </div>
+    <div class="join">
+      <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "join-item btn") do %>
+        «
+      <% end %>
+      <button class="join-item btn"><%= @submission.item.name %></button>
+      <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "join-item btn") do %>
+        »
+      <% end %>
+    </div>
+  </div>
 
   <div class="w-full sm:w-2/12 h-[90vh]">
     <%= render partial: "hunts/chat", locals: { hunt: @hunt } %>
