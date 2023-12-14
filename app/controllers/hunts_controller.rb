@@ -55,7 +55,7 @@ class HuntsController < ApplicationController
   def unlock_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]
-      @hunt.update(password_entered: true)
+      @hunt.update(password_entered: true, owner_id: cookies[:user_id])
       flash.now[:success] = "Results unlocked!"
     else
       flash[:warning] = "Incorrect password"
@@ -85,6 +85,7 @@ class HuntsController < ApplicationController
   private
 
   def hunt_params
-    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password, :max_downvotes_to_lose_points)
+    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password,
+      :max_downvotes_to_lose_points).with_defaults(owner_id: cookies[:user_id])
   end
 end

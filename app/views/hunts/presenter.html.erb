@@ -5,15 +5,17 @@
     <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
       <%= render(partial: "submissions/submission_presenter", locals: { submission: @submission }) %>
     </div>
-    <div class="join">
-      <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "join-item btn") do %>
-        «
-      <% end %>
-      <button class="join-item btn"><%= @submission.item.name %></button>
-      <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "join-item btn") do %>
-        »
-      <% end %>
-    </div>
+    <% if cookies[:user_id] == @hunt.owner_id %>
+      <div class="join">
+        <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "join-item btn") do %>
+          «
+        <% end %>
+        <button class="join-item btn"><%= @submission.item.name %></button>
+        <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "join-item btn") do %>
+          »
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <div class="w-full sm:w-2/12 h-[90vh]">
