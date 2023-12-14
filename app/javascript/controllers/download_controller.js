@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "button", "icon" ]
+  static targets = [ "button", "icon", "loadingIcon" ]
   static values = {
     filename: String
   }
@@ -21,18 +21,16 @@ export default class extends Controller {
 
   disableButton(button) {
     button.disabled = true
-    button.classList.remove("hover:bg-gray-200", "text-black", "focus:outline-none", "focus:ring-2", "focus:ring-white", "focus:ring-offset-2", "focus:ring-offset-gray-600")
-    button.classList.add("text-gray-400", "cursor-default")
-    this.iconTarget.name = "sync-outline"
-    this.iconTarget.classList.add("spinning")
+    button.classList.add('btn-disabled')
+    this.iconTarget.classList.add('hidden')
+    this.loadingIconTarget.classList.remove('hidden')
   }
 
   enableButton(button) {
     button.disabled = false
-    button.classList.add("hover:bg-gray-200", "text-black", "focus:outline-none", "focus:ring-2", "focus:ring-white", "focus:ring-offset-2", "focus:ring-offset-gray-600")
-    button.classList.remove("text-gray-400", "cursor-default")
-    this.iconTarget.name = "cloud-download-outline"
-    this.iconTarget.classList.remove("spinning")
+    button.classList.remove('btn-disabled')
+    this.iconTarget.classList.remove('hidden')
+    this.loadingIconTarget.classList.add('hidden')
   }
 
   downloadBlob(blob) {
