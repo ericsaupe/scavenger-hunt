@@ -7,6 +7,7 @@ class Hunt < ApplicationRecord
 
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
+  has_many :submissions, through: :items
   has_many :messages, dependent: :destroy
   has_many :teams, dependent: :destroy
 
@@ -97,6 +98,14 @@ class Hunt < ApplicationRecord
     end
 
     archive.attach(io: File.open(zipfile_name), filename: "#{name}.zip")
+  end
+
+  def broadcast_presentation_update(submission)
+    broadcast_replace_to("hunt_presenter_#{id}", target: "current_submission", partial: "submissions/submission_presenter", locals: {submission: submission})
+  end
+
+  def owner?(user_id)
+    owner_id == user_id
   end
 
   private

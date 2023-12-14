@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     resources :items, only: %i[show]
     resources :messages, only: %i[create]
     get :results
+    get :presenter
     get :print
     get :download_results, on: :member
     post :unlock_results, on: :member
@@ -18,5 +19,6 @@ Rails.application.routes.draw do
 
   resources :submissions, only: %i[update] do
     resources :votes, only: %i[create]
+    get :vote_menu
   end
 end

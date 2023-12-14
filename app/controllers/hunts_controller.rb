@@ -55,12 +55,36 @@ class HuntsController < ApplicationController
   def unlock_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]
-      @hunt.update(password_entered: true)
+      @hunt.update(password_entered: true, owner_id: cookies[:user_id])
       flash.now[:success] = "Results unlocked!"
     else
       flash[:warning] = "Incorrect password"
     end
     redirect_to hunt_results_path(hunt_code: @hunt.code.upcase)
+  end
+
+  def presenter
+    @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
+    submissions = @hunt.submissions.includes(:item, :team).with_attached_photo.order(:item_id, :team_id)
+    if submissions.empty?
+      flash[:warning] = "No submissions yet!"
+      return redirect_to hunt_path(code: @hunt.code.upcase)
+    end
+
+    if ActiveModel::Type::Boolean.new.cast(params[:become_presenter]) && !@hunt.owner?(cookies[:user_id])
+      @hunt.update(owner_id: cookies[:user_id])
+    end
+
+    @submission = if params[:submission_id].present?
+      submissions.find(params[:submission_id])
+    else
+      submissions.first
+    end
+    @next_submission = submissions.where.not(id: @submission.id).where("team_id > ?", @submission.team_id)
+      .order("item_id ASC").first || submissions.where.not(id: @submission.id).first
+    @previous_submission = submissions.where.not(id: @submission.id).where("team_id < ?", @submission.team_id)
+      .order("item_id DESC").first || submissions.where.not(id: @submission.id).last
+    @hunt.broadcast_presentation_update(@submission)
   end
 
   def print
@@ -70,6 +94,7 @@ class HuntsController < ApplicationController
   private
 
   def hunt_params
-    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password, :max_downvotes_to_lose_points)
+    params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password,
+      :max_downvotes_to_lose_points).with_defaults(owner_id: cookies[:user_id])
   end
 end

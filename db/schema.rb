@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_14_183316) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -139,7 +139,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_12_004611) do
     t.string "lock_password"
     t.boolean "password_entered", default: false, null: false
     t.integer "max_downvotes_to_lose_points"
+    t.string "owner_id"
     t.index ["code"], name: "index_hunts_on_code"
+    t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end
 
   create_table "items", force: :cascade do |t|

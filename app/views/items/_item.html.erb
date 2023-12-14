@@ -1,0 +1,57 @@
+<div class="grid grid-cols-3 gap-2 mx-auto my-4 font-sans text-center uppercase font-bold">
+  <%= link_to hunt_item_path(hunt.code, previous_item), class: "btn btn-ghost my-auto text-ellipsis" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+    <span class="hidden sm:block"><%= previous_item.name %></span>
+  <% end %>
+  <h2 class="text-2xl sm:text-2xl sm:tracking-tight lg:text-3xl"><%= title item.name %></h2>
+  <%= link_to hunt_item_path(hunt.code, next_item), class: "btn btn-ghost my-auto text-ellipsis" do %>
+    <span class="hidden sm:block"><%= next_item.name %></span>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+  <% end %>
+</div>
+
+<% if submissions.empty? %>
+  <div class="container grid grid-cols-1 gap-2 mx-auto">
+    <h3 class="text-2xl sm:text-2xl sm:tracking-tight lg:text-3xl text-center">Huh, I guess nobody found this one.</h2>
+    <div class="w-2/4 mx-auto rounded shadow-xl animate__animated animate__fadeIn">
+      <%= image_tag 'nothing.png' %>
+    </div>
+  </div>
+<% else %>
+  <div id="items" class="flex flex-col sm:flex-row items-center">
+    <div class="w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
+      <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
+        <% submissions.each do |submission| %>
+          <div id="submission_<%= submission.id %>" class="carousel-item w-full justify-center relative">
+            <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+            <% if submission.video? %>
+              <%= video_tag(image_url, controls: true, class: "w-full object-contain") %>
+            <% else %>
+              <%= image_tag(image_url, class: "object-contain") %>
+            <% end %>
+
+            <%= render(partial: "items/vote_menu", locals: {
+              vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
+              }) %>
+
+            <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
+              <%= submission.team.name %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div id="pages" class="flex justify-center w-full py-2 gap-2">
+        <% submissions.each_with_index do |submission, i| %>
+          <a href="#submission_<%= submission.id %>" class="btn btn-xs"><%= i + 1 %></a>
+        <% end %>
+      </div>
+    </div>
+    <div class="w-full sm:w-2/12 h-[90vh]">
+      <%= render partial: "hunts/chat", locals: { hunt: hunt } %>
+    </div>
+  </div>
+<% end %>

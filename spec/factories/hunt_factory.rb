@@ -3,6 +3,7 @@
 FactoryBot.define do
   factory :hunt do
     name { Faker::Movies::HarryPotter.quote }
+    max_downvotes_to_lose_points { 1 }
 
     after :create do |hunt|
       category = create(:category, hunt:)
