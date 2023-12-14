@@ -66,6 +66,11 @@ class HuntsController < ApplicationController
   def presenter
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
     submissions = @hunt.submissions.includes(:item, :team).with_attached_photo.order(:item_id, :team_id)
+    if submissions.empty?
+      flash[:warning] = "No submissions yet!"
+      return redirect_to hunt_path(code: @hunt.code.upcase)
+    end
+
     @submission = if params[:submission_id].present?
       submissions.find(params[:submission_id])
     else

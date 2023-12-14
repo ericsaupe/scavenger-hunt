@@ -104,6 +104,10 @@ class Hunt < ApplicationRecord
     broadcast_replace_to("hunt_presenter_#{id}", target: "current_submission", partial: "submissions/submission_presenter", locals: {submission: submission})
   end
 
+  def owner?(user_id)
+    owner_id == user_id
+  end
+
   private
 
   ##
