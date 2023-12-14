@@ -6,9 +6,7 @@
     <%= image_tag(image_url, class: "object-contain") %>
   <% end %>
 
-  <%= render(partial: "items/vote_menu", locals: {
-    vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
-    }) %>
+  <%= turbo_frame_tag "vote_menu", src: submission_vote_menu_path(submission) %>
 
   <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
     <%= submission.team.name %>

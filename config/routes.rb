@@ -19,5 +19,6 @@ Rails.application.routes.draw do
 
   resources :submissions, only: %i[update] do
     resources :votes, only: %i[create]
+    get :vote_menu
   end
 end

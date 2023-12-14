@@ -26,6 +26,10 @@ class SubmissionsController < ApplicationController
     end
   end
 
+  def vote_menu
+    @submission = Submission.find(params[:submission_id])
+  end
+
   private
 
   def submission_params
