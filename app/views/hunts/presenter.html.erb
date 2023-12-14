@@ -17,10 +17,6 @@
           »
         <% end %>
       </div>
-    <% else %>
-      <div class="join">
-        <button class="join-item btn"><%= @submission.item.name %></button>
-      </div>
     <% end %>
 
     <% if @hunt.owner_id.blank? %>
