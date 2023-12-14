@@ -2,6 +2,8 @@
 
 <div class="flex flex-col sm:flex-row items-center">
   <div class="flex flex-col items-center w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
+    <%= render(PageHeaderComponent.new(title: @submission.item.name, subtitle: @submission.team.name)) %>
+
     <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
       <%= render(partial: "submissions/submission_presenter", locals: { submission: @submission }) %>
     </div>

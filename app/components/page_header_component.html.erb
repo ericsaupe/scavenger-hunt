@@ -1,4 +1,4 @@
-<h1 class="my-4 px-2 text-center uppercase text-xl font-extrabold sm:text-2xl sm:tracking-tight lg:text-3xl">
+<h1 class="mt-2 px-2 text-center uppercase text-xl font-extrabold sm:text-2xl sm:tracking-tight lg:text-3xl">
   <% if @link_to %>
     <%= link_to @link_to do %>
       <%= @title %>
@@ -8,5 +8,5 @@
   <% end %>
 </h1>
 <% if @subtitle %>
-  <p class="m-4 text-center text-md sm:text-lg sm:tracking-tight lg:text-xl"><%= @subtitle %></p>
+  <p class="text-center text-md sm:text-lg sm:tracking-tight lg:text-xl"><%= @subtitle %></p>
 <% end %>
