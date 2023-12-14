@@ -71,6 +71,10 @@ class HuntsController < ApplicationController
       return redirect_to hunt_path(code: @hunt.code.upcase)
     end
 
+    if ActiveModel::Type::Boolean.new.cast(params[:become_presenter]) && !@hunt.owner?(cookies[:user_id])
+      @hunt.update(owner_id: cookies[:user_id])
+    end
+
     @submission = if params[:submission_id].present?
       submissions.find(params[:submission_id])
     else
