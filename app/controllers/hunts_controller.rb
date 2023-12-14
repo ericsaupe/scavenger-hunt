@@ -80,10 +80,13 @@ class HuntsController < ApplicationController
     else
       submissions.first
     end
-    @next_submission = submissions.where.not(id: @submission.id).where("team_id > ?", @submission.team_id)
-      .order("item_id ASC").first || submissions.where.not(id: @submission.id).first
-    @previous_submission = submissions.where.not(id: @submission.id).where("team_id < ?", @submission.team_id)
-      .order("item_id DESC").first || submissions.where.not(id: @submission.id).last
+
+    ordered_submissions = submissions.order(:item_id, :team_id)
+    submission_index = ordered_submissions.index(@submission)
+    next_index = (submission_index + 1 >= ordered_submissions.length) ? 0 : submission_index + 1
+    previous_index = (submission_index - 1 < 0) ? ordered_submissions.length - 1 : submission_index - 1
+    @next_submission = ordered_submissions[next_index]
+    @previous_submission = ordered_submissions[previous_index]
     @hunt.broadcast_presentation_update(@submission)
   end
 
