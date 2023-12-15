@@ -52,6 +52,17 @@ class HuntsController < ApplicationController
     redirect_to rails_blob_path(@hunt.archive, disposition: "attachment")
   end
 
+  def unlock_leaderboard
+    @hunt = Hunt.find_by!(code: params[:code].upcase)
+    if @hunt.password == params[:password]
+      @hunt.update(password_entered_for_leaderboard: true, owner_id: cookies[:user_id])
+      flash.now[:success] = "Leaderboard unlocked!"
+    else
+      flash[:warning] = "Incorrect password"
+    end
+    redirect_to hunt_results_path(hunt_code: @hunt.code.upcase)
+  end
+
   def unlock_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]

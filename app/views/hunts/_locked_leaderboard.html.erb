@@ -1,0 +1,30 @@
+<% if hunt.lock_password %>
+  <div class="hero h-fit sm:h-[50vh] bg-base-200">
+    <div class="hero-content flex flex-col lg:flex-row-reverse">
+      <div class="text-center lg:text-left">
+        <h1 class="text-3xl sm:text-5xl font-bold">Leaderboard is not yet available!</h1>
+        <p class="py-6">
+          The leaderboard is locked until the password is entered.
+        </p>
+      </div>
+      <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+        <%= form_with url: unlock_leaderboard_hunt_path(code: hunt.code.upcase), method: :post, class: "card-body" do |f| %>
+          <div class="form-control w-full max-w-xs">
+            <%= f.label :password, class: "label" do %>
+              <span class="label-text">Password</span>
+            <% end %>
+            <%= f.password_field :password, required: true, class: "input input-bordered w-full max-w-xs", autofocus: true %>
+          </div>
+          <div class="form-control mt-6">
+            <button class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden sm:block w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              Unlock Leaderboard!
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

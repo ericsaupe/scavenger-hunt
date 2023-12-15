@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_12_15_192142) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_15_194055) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -141,6 +141,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_15_192142) do
     t.integer "max_downvotes_to_lose_points"
     t.string "owner_id"
     t.integer "victory_item_id"
+    t.boolean "password_entered_for_leaderboard", default: false, null: false
     t.index ["code"], name: "index_hunts_on_code"
     t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end
