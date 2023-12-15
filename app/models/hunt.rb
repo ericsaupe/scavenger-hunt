@@ -58,7 +58,10 @@ class Hunt < ApplicationRecord
       {
         name: team.name,
         score: team.score,
-        submissions: team.submissions.with_attached_photo.size
+        total_score: team.total_score,
+        deductions: team.total_score - team.score,
+        submissions: team.submissions.with_attached_photo.size,
+        victory_photo_url: team.victory_photo_url
       }
     end.sort_by { |team| team[:score] }.reverse
   end
