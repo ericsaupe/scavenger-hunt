@@ -34,6 +34,6 @@ class Team < ApplicationRecord
     end
 
     winning_photo ||= submissions.with_attached_photo.sample
-    winning_photo.large_variant_url
+    winning_photo&.large_variant_url
   end
 end
