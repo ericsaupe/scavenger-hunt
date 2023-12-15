@@ -1,7 +1,8 @@
 ---
   name: Holiday Hunt 2023
   description: Find decorations and complete challenges to score points!
-  image_path: templates/christmas.jpg
+  image_path: templates/holiday_2023.jpg
+  victory_item_name: Group Christmas card photo
   categories:
     - name: Decor
       points: 2
