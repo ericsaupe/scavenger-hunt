@@ -3,5 +3,5 @@ class Message < ApplicationRecord
 
   validates :content, :user_id, presence: true
 
-  after_create_commit { broadcast_append_to("hunt_chat_#{hunt_id}") }
+  after_create_commit { broadcast_append_to("hunts_chat_#{hunt_id}", target: "hunt_chat_#{hunt_id}") }
 end
