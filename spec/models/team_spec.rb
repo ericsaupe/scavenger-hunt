@@ -24,6 +24,7 @@ RSpec.describe Team do
   end
 
   context "victory_photo_url" do
+    let(:hunt) { team.hunt }
     let(:team) { create(:team) }
 
     before do
@@ -45,7 +46,8 @@ RSpec.describe Team do
       loved_submission = create(:submission, team: team)
       create(:upvote, submission: loved_submission)
       winning_submission = create(:submission, team: team)
-      expect(team.victory_photo_url(winning_item_name: winning_submission.item.name)).to eq(winning_submission.large_variant_url)
+      hunt.update(victory_item_id: winning_submission.item.id)
+      expect(team.victory_photo_url(victory_item_id: hunt.victory_item_id)).to eq(winning_submission.large_variant_url)
     end
   end
 end

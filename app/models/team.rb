@@ -18,10 +18,10 @@ class Team < ApplicationRecord
     submissions.includes(item: :category).with_attached_photo.sum { |submission| submission.item.category.points }
   end
 
-  def victory_photo_url(winning_item_name: nil)
-    if winning_item_name.present?
-      winning_item = hunt.items.find_by(name: winning_item_name)
-      winning_photo ||= submissions.with_attached_photo.find_by(item: winning_item)
+  def victory_photo_url(victory_item_id: nil)
+    if victory_item_id.present?
+      item = hunt.items.find_by(id: victory_item_id)
+      winning_photo = submissions.with_attached_photo.find_by(item:)
     end
 
     if Vote.loved.where(submission: submissions).count.positive?

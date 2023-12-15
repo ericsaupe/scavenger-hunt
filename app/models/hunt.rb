@@ -10,6 +10,7 @@ class Hunt < ApplicationRecord
   has_many :submissions, through: :items
   has_many :messages, dependent: :destroy
   has_many :teams, dependent: :destroy
+  belongs_to :victory_item, class_name: "Item", optional: true
 
   has_one_attached :archive
 
@@ -61,7 +62,7 @@ class Hunt < ApplicationRecord
         total_score: team.total_score,
         deductions: team.total_score - team.score,
         submissions: team.submissions.with_attached_photo.size,
-        victory_photo_url: team.victory_photo_url
+        victory_photo_url: team.victory_photo_url(victory_item_id:)
       }
     end.sort_by { |team| team[:score] }.reverse
   end
