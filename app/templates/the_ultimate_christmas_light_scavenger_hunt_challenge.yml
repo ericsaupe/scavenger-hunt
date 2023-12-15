@@ -2,6 +2,7 @@
   name: Christmas Light Spectacle
   description: Find the lights and decorations to score points!
   image_path: templates/christmas.jpg
+  victory_item_name: Take a kissing selfie in front of a light display
   categories:
     - name: Lights
       points: 1

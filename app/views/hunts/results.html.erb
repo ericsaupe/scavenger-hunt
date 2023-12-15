@@ -17,6 +17,10 @@
       <%= render partial: 'download_button' %>
     </div>
   </div>
-  <%= render(partial: 'hunts/leaderboard', locals: { results: @results }) %>
+  <% if @hunt.lock_password.present? && !@hunt.password_entered_for_leaderboard %>
+    <%= render(partial: 'hunts/locked_leaderboard', locals: { hunt: @hunt }) %>
+  <% else %>
+    <%= render(partial: 'hunts/leaderboard', locals: { results: @results }) %>
+  <% end %>
   <%= render(partial: 'hunts/hunt', locals: { results: true }) %>
 <% end %>

@@ -10,6 +10,12 @@ RSpec.describe "Results" do
     let(:photo_submission) { create(:photo_submission, item: hunt.items.second, team:) }
 
     describe "results page" do
+      before do
+        allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000")
+        photo_submission
+        video_submission
+      end
+
       it "displays the results" do
         visit "/scavenger_hunts/#{hunt.code}/results"
         expect(page).not_to have_content("Results are not yet available!")
@@ -52,7 +58,61 @@ RSpec.describe "Results" do
           click_on "Unlock Results!"
           expect(page).not_to have_content("Results are not yet available!")
           expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content(hunt.categories.first.name.upcase)
+        end
+
+        it "has a locked leaderboard" do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_content("Results are not yet available!")
+          fill_in "Password", with: "hunter2"
+          click_on "Unlock Results!"
+          expect(page).not_to have_content("Results are not yet available!")
+          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content("Leaderboard is not yet available!")
+        end
+
+        it "displays leaderboard after entering password" do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_content("Results are not yet available!")
+          fill_in "Password", with: "hunter2"
+          click_on "Unlock Results!"
+          expect(page).not_to have_content("Results are not yet available!")
+          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content("Leaderboard is not yet available!")
+          fill_in "Password", with: "hunter2"
+          click_on "Unlock Leaderboard!"
+          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content("Score")
           expect(page).to have_content(team.score)
+        end
+      end
+
+      context "leaderboard" do
+        it "displays the scores" do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).not_to have_content("Results are not yet available!")
+          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content(team.score)
+        end
+
+        it "displays deductions if there are any" do
+          hunt.update(max_downvotes_to_lose_points: 1)
+          create(:downvote, submission: video_submission)
+          video_submission.calculate_denied_points
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_content("Submissions")
+          expect(page).to have_content("Total Score")
+          expect(page).to have_content("Deductions")
+          expect(page).to have_content("Final Score")
+          expect(page).to have_content(team.name)
+          expect(page).to have_content(team.score)
+          expect(page).to have_content(team.total_score)
+          expect(page).to have_content((team.total_score - team.score) * -1)
+        end
+
+        it "displays the winning team name in an image" do
+          visit "/scavenger_hunts/#{hunt.code}/results"
+          expect(page).to have_selector(".hero")
         end
       end
     end

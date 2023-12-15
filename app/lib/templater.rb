@@ -8,7 +8,7 @@ class Templater
       yaml_contents = File.read(filename)
       hunt_config = YAML.safe_load(yaml_contents, symbolize_names: true)
       define_singleton_method hunt_config[:name].parameterize.underscore.to_sym do
-        Hunt.create!(
+        hunt = Hunt.create!(
           name: hunt_config[:name],
           categories: hunt_config[:categories].map do |category|
             Category.new(
@@ -18,6 +18,10 @@ class Templater
             )
           end
         )
+        if hunt_config.dig(:victory_item_name)
+          hunt.update!(victory_item: hunt.items.find_by!(name: hunt_config[:victory_item_name]))
+        end
+        hunt
       end
       TEMPLATES << hunt_config
     end

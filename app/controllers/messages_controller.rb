@@ -6,13 +6,7 @@ class MessagesController < ApplicationController
     message.user_id = cookies[:user_id]
     message.save!
 
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.append("hunt_chat_#{hunt.id}", partial: "messages/message",
-          locals: {message:})
-      end
-      format.js
-    end
+    render json: {message: message}
   end
 
   private

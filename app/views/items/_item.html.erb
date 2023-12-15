@@ -23,7 +23,7 @@
   </div>
 <% else %>
   <div id="items" class="flex flex-col sm:flex-row items-center">
-    <div class="w-full sm:w-10/12 h-1/2 min-h-[75vh] sm:h-[90vh]">
+    <div class="w-full h-1/2 min-h-[75vh] sm:h-[90vh]">
       <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
         <% submissions.each do |submission| %>
           <div id="submission_<%= submission.id %>" class="carousel-item w-full justify-center relative">
@@ -49,9 +49,6 @@
           <a href="#submission_<%= submission.id %>" class="btn btn-xs"><%= i + 1 %></a>
         <% end %>
       </div>
-    </div>
-    <div class="w-full sm:w-2/12 h-[90vh]">
-      <%= render partial: "hunts/chat", locals: { hunt: hunt } %>
     </div>
   </div>
 <% end %>

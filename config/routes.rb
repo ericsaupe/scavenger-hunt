@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     get :presenter
     get :print
     get :download_results, on: :member
+    post :unlock_leaderboard, on: :member
     post :unlock_results, on: :member
   end
 
