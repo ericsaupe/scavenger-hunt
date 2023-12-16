@@ -10,6 +10,7 @@ class Hunt < ApplicationRecord
   has_many :submissions, through: :items
   has_many :messages, dependent: :destroy
   has_many :teams, dependent: :destroy
+  belongs_to :presentation_submission, class_name: "Submission", optional: true
   belongs_to :victory_item, class_name: "Item", optional: true
 
   has_one_attached :archive
