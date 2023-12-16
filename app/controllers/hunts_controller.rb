@@ -86,11 +86,13 @@ class HuntsController < ApplicationController
       @hunt.update(owner_id: cookies[:user_id])
     end
 
-    @submission = if params[:submission_id].present?
-      submissions.find(params[:submission_id])
-    else
-      submissions.first
+    if params[:submission_id].present? && @hunt.owner?(cookies[:user_id])
+      @submission = submissions.find(params[:submission_id])
+      @hunt.update(presentation_submission: @submission)
+    elsif @hunt.presentation_submission_id.present?
+      @submission = submissions.find_by(id: @hunt.presentation_submission_id)
     end
+    @submission ||= submissions.first
 
     ordered_submissions = submissions.order(:item_id, :team_id)
     submission_index = ordered_submissions.index(@submission)
@@ -98,7 +100,7 @@ class HuntsController < ApplicationController
     previous_index = (submission_index - 1 < 0) ? ordered_submissions.length - 1 : submission_index - 1
     @next_submission = ordered_submissions[next_index]
     @previous_submission = ordered_submissions[previous_index]
-    @hunt.broadcast_presentation_update(@submission)
+    @hunt.broadcast_presentation_update(@submission) if @hunt.owner?(cookies[:user_id])
   end
 
   def print
