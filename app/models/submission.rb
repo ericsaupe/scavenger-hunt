@@ -36,19 +36,14 @@ class Submission < ApplicationRecord
     return unless max_downvotes_to_lose_points&.positive?
 
     denied_vote_ratio = votes.denied.count / max_downvotes_to_lose_points.to_f
-    should_broadcast_changes = false
     if denied_vote_ratio >= 1 && !denied_points?
       update(denied_points: true)
-      should_broadcast_changes = true
     elsif denied_vote_ratio < 1 && denied_points?
       update(denied_points: false)
-      should_broadcast_changes = true
     end
-    if should_broadcast_changes
-      broadcast_replace_to("submission_#{id}_downvote_counter",
-        target: "submission_#{id}_downvote_counter",
-        partial: "items/downvote_counter",
-        locals: {submission: self})
-    end
+    broadcast_replace_to("submission_#{id}_downvote_counter",
+      target: "submission_#{id}_downvote_counter",
+      partial: "items/downvote_counter",
+      locals: {submission: self})
   end
 end
