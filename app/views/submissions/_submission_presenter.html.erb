@@ -1,14 +1,20 @@
-<div id="current_submission" class="carousel-item w-full justify-center relative">
-  <% image_url = submission_attachment_url(submission, variant_size: :large) %>
-  <% if submission.video? %>
-    <%= video_tag(image_url, controls: true, class: "w-full object-contain") %>
-  <% else %>
-    <%= image_tag(image_url, class: "object-contain") %>
-  <% end %>
+<div id="current_submission">
+  <%= render(PageHeaderComponent.new(title: submission.item.name, subtitle: submission.team.name)) %>
 
-  <%= turbo_frame_tag "vote_menu", src: submission_vote_menu_path(submission) %>
+  <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
+    <div class="carousel-item w-full justify-center relative">
+      <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+      <% if submission.video? %>
+        <%= video_tag(image_url, controls: true, class: "w-full object-contain") %>
+      <% else %>
+        <%= image_tag(image_url, class: "object-contain") %>
+      <% end %>
 
-  <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
-    <%= submission.team.name %>
+      <%= turbo_frame_tag "vote_menu", src: submission_vote_menu_path(submission) %>
+
+      <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300 bg-opacity-70 font-bold">
+        <%= submission.team.name %>
+      </div>
+    </div>
   </div>
 </div>
