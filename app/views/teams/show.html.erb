@@ -1,7 +1,7 @@
 <% description "#{@team.name} is working hard to find everything on their scavenger hunt list: '#{@hunt.name}'." %>
 <% title @hunt.name %>
 
-<%= render(partial: 'hunts/timer', locals: { hunt: @hunt }) if @hunt.timer? %>
+<%= render(partial: 'hunts/timer', locals: { hunt: @hunt }) if true || @hunt.timer? %>
 
 <%= turbo_stream_from "submissions_#{@team.id}" %>
 <%= turbo_stream_from @team %>
