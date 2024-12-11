@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.2.2"
+ruby "3.3.6"
 
 gem "actionpack-action_caching"
 gem "aws-sdk-s3", require: false
@@ -19,7 +19,7 @@ gem "jsbundling-rails", "~> 1.0.2"
 gem "meta-tags"
 gem "pg"
 gem "puma", "~> 6.0"
-gem "rails", "~> 7.1.0"
+gem "rails", "~> 7.2.0"
 gem "redis", "~> 4.0"
 gem "rqrcode", "~> 2.1"
 gem "rubyzip"
