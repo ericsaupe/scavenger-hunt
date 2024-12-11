@@ -2,7 +2,7 @@ class Vote < ApplicationRecord
   belongs_to :submission
 
   validates :user_id, presence: true
-  validates_uniqueness_of :user_id, scope: :submission_id
+  validates :user_id, uniqueness: {scope: :submission_id}
 
   delegate :hunt, to: :submission
 

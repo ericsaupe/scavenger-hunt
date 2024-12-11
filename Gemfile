@@ -10,7 +10,7 @@ gem "aws-sdk-s3", require: false
 gem "bcrypt"
 gem "bootsnap", ">= 1.4.4", require: false
 gem "cssbundling-rails", ">= 0.1.0"
-gem "good_job"
+gem "good_job", "~> 4.0"
 gem "sentry-ruby"
 gem "sentry-rails"
 gem "image_processing", "~> 1.12"
