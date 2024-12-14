@@ -1,0 +1,49 @@
+---
+  name: Holiday Hunt 2024
+  description: Embark on a festive adventure, find decorations, complete challenges, and score merry points!
+  image_path: templates/holiday_2024.jpg
+  victory_item_name: Group Christmas card photo
+  categories:
+    - name: Find It
+      points: 5
+      items:
+        - Anna or Elsa from Frozen
+        - Carolers
+        - Christmas train
+        - Decorations on a roof (not including lights)
+        - Dinosaur
+        - Dog wearing a sweater
+        - Elf
+        - Gingerbread house
+        - Gnome
+        - A leg lamp
+        - Leftover Fall or Halloween decorations
+        - More than 3 animals together
+        - Nativity scene
+        - Nutcracker
+        - Penguin
+        - Polar bear
+        - Rudolph
+        - Santa Claus
+        - Santa falling off the roof
+        - Santa's sleigh
+        - Snow globe
+        - Snowman
+        - Something dancing
+        - The decoration used in most winter holidays
+        - The Grinch
+        - Ugly Christmas sweater
+    - name: Do It
+      points: 10
+      items:
+        - Find a non-teammate that can name all of Santa's reindeer
+        - Find a non-teammate who can name each of "The 12 Days of Christmas"
+        - Group Christmas card photo
+        - Group hug a snowman
+        - Kiss under the mistletoe
+        - Perform a festive holiday dance and record a 10-second video
+        - Receive and eat a homemade Christmas treat from a non-team family
+        - Sing the chorus from the first song ever broadcast from space
+        - Take a selfie with a real Santa Claus
+        - Team photo all wearing Santa hats
+        - Write and deliver a thank you card to the most festive house you find
