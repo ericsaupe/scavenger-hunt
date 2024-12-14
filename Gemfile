@@ -10,6 +10,8 @@ gem "aws-sdk-s3", require: false
 gem "bcrypt"
 gem "bootsnap", ">= 1.4.4", require: false
 gem "cssbundling-rails", ">= 0.1.0"
+gem "flipper"
+gem "flipper-active_record"
 gem "good_job", "~> 4.0"
 gem "sentry-ruby"
 gem "sentry-rails"
