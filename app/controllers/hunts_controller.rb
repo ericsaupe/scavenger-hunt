@@ -101,6 +101,7 @@ class HuntsController < ApplicationController
     @next_submission = ordered_submissions[next_index]
     @previous_submission = ordered_submissions[previous_index]
     @hunt.broadcast_presentation_update(@submission) if @hunt.owner?(cookies[:user_id])
+    @presenter_mode = true
   end
 
   def print
