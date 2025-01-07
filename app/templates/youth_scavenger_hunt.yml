@@ -1,0 +1,58 @@
+---
+  name: Youth Scavenger Hunt
+  description: A fun scavenger hunt for youth groups!
+  image_path: templates/youth.jpg
+  victory_item_name: Everyone doing a model pose
+  categories:
+    - name: Things
+      points: 5
+      items:
+        - Basketball Hoop
+        - A Truck
+        - A Blue Car
+        - For Sale Sign
+        - Bricks
+        - Someone Running
+        - A Brown House
+        - Red Clothing
+        - A Bicycle
+        - Someone in Glasses
+        - A Mailbox
+        - A School
+        - Construction
+        - Recycling Can
+        - Headphones
+        - Welcome Sign
+        - A Ball
+        - A Streetlamp
+        - License Plate with K
+        - Dog on a Walk
+        - A Fence
+        - Blue Door
+        - Kids Playing
+        - A Family
+        - A Stroller
+        - A Yard Sign
+        - A Hose
+        - A Painted Rock
+        - Toys
+    - name: Challenges
+      points: 10
+      items:
+        - Everyone high fiving
+        - Everyone jumping (everyone must be off the ground for it to count)
+        - A picture where it looks like you're flying
+        - Charlie's Angels poses at the top of a flight of stairs
+        - Everyone on a slide
+        - Everyone doing a model pose
+        - Most creative use of "leap-frog"
+        - Doing exactly what a sign says
+        - Make yourselves appear very small
+        - I can't believe we all fit in here picture
+        - Entire team on the same park bench
+        - Whole team picking up litter
+        - Entire team doing the YMCA
+        - Entire team crossing the street like a duck
+        - Entire team in a group hug
+        - Make yourself appear really large
+        - Picture with an animal

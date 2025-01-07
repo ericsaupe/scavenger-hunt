@@ -34,7 +34,10 @@ export default class extends Controller {
   }
 
   clickForm() {
-    document.getElementById(`${this.objectValue}`).querySelector('input[type="file"]').click()
+    const fileLabel = document.querySelector(`label[for="submission_${this.objectValue}"]`)
+    if (fileLabel) {
+      fileLabel.click()
+    }
   }
 
   handleKeydown(event) {

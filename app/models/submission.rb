@@ -44,6 +44,6 @@ class Submission < ApplicationRecord
     broadcast_replace_to("submission_#{id}_downvote_counter",
       target: "submission_#{id}_downvote_counter",
       partial: "items/downvote_counter",
-      locals: {submission: self})
+      locals: {submission: self, disable_turbo_stream: true})
   end
 end

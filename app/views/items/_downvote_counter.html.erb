@@ -1,5 +1,5 @@
 <% if submission.max_downvotes_to_lose_points&.positive? %>
-  <%= turbo_stream_from "submission_#{submission.id}_downvote_counter" %>
+  <%= turbo_stream_from "submission_#{submission.id}_downvote_counter" unless local_assigns[:disable_turbo_stream] %>
 
   <div id="submission_<%= submission.id %>_downvote_counter" class="flex items-center p-2 space-x-2 rounded-btn <%= submission.denied_points? ? "bg-error text-error-content" : "bg-base-200 text-base-content" %>">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
