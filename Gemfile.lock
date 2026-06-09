@@ -249,7 +249,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (6.6.1)
+    puma (7.2.1)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
@@ -458,7 +458,7 @@ DEPENDENCIES
   jsbundling-rails (~> 1.0.2)
   meta-tags
   pg
-  puma (~> 6.0)
+  puma (~> 7.2)
   rails (~> 7.2.0)
   redis (~> 4.0)
   rqrcode (~> 2.1)
