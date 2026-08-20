@@ -1,0 +1,74 @@
+---
+  name: LCHS Swim Team Scavenger Hunt
+  description: Team up and rack up points with quick photo finds, goofy team poses, and video dares!
+  image_path: templates/lchs_swim.jpg
+  categories:
+    - name: Photos
+      points: 1
+      items:
+        - Someone standing on a bench
+        - A tree
+        - A stop sign
+        - A fire hydrant
+        - A hair brush
+        - A yellow door
+        - Goggles
+        - The little free library
+        - A trash can
+        - A teammate on the swing
+        - Someone with a hitchhiker's thumb
+        - A dry patch of grass
+        - A real animal
+        - Something round
+        - Something that starts with the letter of your captain's first name
+        - Something shiny
+        - Sunglasses
+        - A flower
+        - A bug
+        - A spider web
+    - name: Team Photos
+      points: 3
+      items:
+        - Everyone on your team making a silly face
+        - Everyone's feet off the ground
+        - Your whole team in someone's car
+        - With a team captain
+        - Everyone on a slide
+        - LCHS spelled out however you can
+        - SWIM spelled out however you can
+        - Your team with a random stranger
+        - Your team looking really short
+        - Your team looking really tall
+        - Your team making a star shape
+        - Your team playing dead
+        - Your team doing wall sits
+        - Your team touching grass
+        - KROC spelled out however you can
+        - Your team organized from shortest to tallest
+        - Your team making a pose on the basketball court
+        - Each team member throwing away a piece of trash they found
+        - Your team in a human pyramid
+        - Your team in an awkward family photo pose
+    - name: Team Videos
+      points: 5
+      items:
+        - Video of your team crossing the street like ducks
+        - Video of someone doing a safe trick while everyone cheers
+        - Video of your team doing the Macarena
+        - Video of your team doing a swim cheer
+        - Video of your team all rolling down a hill
+        - Video of a teammate getting a water bottle poured on them
+        - Video of your team captain saying the name of everyone on your team
+        - Video of your team playing leap frog
+        - Video of everyone on your team high fiving a coach
+        - Video of your team swimming their favorite stroke
+        - Video of your whole team doing cartwheels
+        - Video of a teammate singing the ABC's backwards
+        - Video of everyone touching an ultimate frisbee basket with their shoe
+        - Video of your team circling a tree and singing Let It Grow
+        - Video of a teammate walking out of the portable potty while the rest of your team plugs their nose
+        - Video of your whole team running a lap around the bluegrass loop
+        - Video of every team member swinging on the swing, one at a time
+        - Video of your team doing the scuba
+        - Video of your team doing a land relay
+        - Video of your team doing a minute of flutter kicks
