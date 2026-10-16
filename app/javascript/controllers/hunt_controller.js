@@ -14,6 +14,9 @@ export default class extends Controller {
       video.controls = true
       video.playsInline = true
       video.src = data.src
+      if (data.poster) {
+        video.poster = data.poster
+      }
       video.className = "max-h-[65dvh] w-full"
       this.contentTarget.appendChild(video)
     } else {

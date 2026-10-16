@@ -26,10 +26,10 @@ services:
   - type: worker
     name: scavenger_hunt_worker
     runtime: ruby
-    buildCommand: "bundle install"
+    buildCommand: "bundle install && ./bin/install-ffmpeg"
     startCommand: 'bundle exec good_job start --queues="+mailers,priority,default"'
     region: oregon
-    plan: starter
+    plan: standard
     branch: main
     autoDeployTrigger: commit
     envVars:
@@ -43,7 +43,7 @@ services:
           name: scavenger_hunt_web
           envVarKey: RAILS_MASTER_KEY
       - key: GOOD_JOB_THREADS
-        value: "5"
+        value: "8"
       - key: VIPS_CONCURRENCY
         value: "1"
       - key: MALLOC_ARENA_MAX

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -o errexit
+fixtures="$(cd "$(dirname "$0")/../../fixtures" && pwd)"
+
+if [ -n "${FAKE_FFMPEG_LOG:-}" ]; then
+  printf '%s\t' "$@" >> "$FAKE_FFMPEG_LOG"
+  echo >> "$FAKE_FFMPEG_LOG"
+fi
+
+case " $* " in
+  *" -version "*) echo "ffmpeg version fake" ;;
+  *" image2 "*) cat "$fixtures/poster.jpg" ;;
+  *)
+    if [ -n "${FAKE_FFMPEG_FAIL:-}" ]; then
+      echo "Conversion failed!" >&2
+      exit 1
+    fi
+    if [ -n "${FAKE_FFMPEG_SLEEP:-}" ]; then
+      sleep "$FAKE_FFMPEG_SLEEP"
+    fi
+    cp "$fixtures/video.mp4" "${@: -1}"
+    ;;
+esac

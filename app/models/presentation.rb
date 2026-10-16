@@ -102,7 +102,7 @@ class Presentation
   end
 
   def submissions
-    hunt.submissions.found.includes(:item, :team, :votes, photo_attachment: :blob)
+    hunt.submissions.found.includes(:item, :team, :votes, photo_attachment: :blob, playback_attachment: :blob)
   end
 
   def team_count

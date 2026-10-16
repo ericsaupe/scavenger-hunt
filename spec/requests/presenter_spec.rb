@@ -183,6 +183,26 @@ RSpec.describe "Presenter" do
       expect(response.body).not_to include(%(id="submission_vote_), "submission_#{submission.id}_video", "Doesn't count")
     end
 
+    it "plays the converted video with its poster" do
+      video = create(:video_submission, item: items.first, team: first_team).reload
+      hunt.update!(presentation_slide: "submission:#{video.id}")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(src="#{rails_blob_path(video.playback)}"), %(poster="#{video.poster_url}"))
+      expect(response.body).not_to include(rails_blob_path(video.photo))
+    end
+
+    it "plays the original while the converted video is still being made", :test_queue_adapter do
+      video = create(:video_submission, item: items.first, team: first_team)
+      hunt.update!(presentation_slide: "submission:#{video.id}")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(src="#{rails_blob_path(video.photo)}"))
+      expect(response.body).not_to include("poster=")
+    end
+
     it "keeps a hidden sound button on a big-screen video slide for browsers that block audio" do
       video = create(:video_submission, item: items.first, team: first_team)
       hunt.update!(presentation_slide: "submission:#{video.id}")

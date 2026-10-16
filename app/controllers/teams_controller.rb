@@ -4,7 +4,7 @@ class TeamsController < ApplicationController
   def show
     @hunt = Hunt.includes(categories: :items).find_by!(code: params[:hunt_code].upcase)
     @team = @hunt.teams.find(params[:id])
-    @submissions = @team.submissions.includes({item: :category}, photo_attachment: :blob).index_by(&:item_id)
+    @submissions = @team.submissions.includes({item: :category}, photo_attachment: :blob, playback_attachment: :blob).index_by(&:item_id)
     cookies.permanent.signed[:last_team_id] = @team.id unless request.headers["X-Sec-Purpose"] == "prefetch"
   end
 

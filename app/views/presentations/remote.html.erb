@@ -25,8 +25,8 @@
       <div class="grid aspect-square place-items-center overflow-hidden bg-black">
         <% if (submission = @slide.submission) %>
           <% if submission.video? %>
-            <% if submission.poster_url %>
-              <%= image_tag submission.poster_url, class: "size-full object-cover", alt: "" %>
+            <% if (poster = submission.poster_url(:small)) %>
+              <%= image_tag poster, class: "size-full object-cover", alt: "" %>
             <% else %>
               <%= icon :video, class: "size-8 text-white/70" %>
             <% end %>

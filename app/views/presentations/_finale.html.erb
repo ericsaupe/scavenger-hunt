@@ -22,8 +22,8 @@
       <figure class="polaroid-lg w-full max-w-sm shrink-0 pb-5!" style="transform: rotate(2deg)" data-testid="most-loved">
         <div class="grid aspect-[4/3] place-items-center overflow-hidden bg-black">
           <% if slide.most_loved.video? %>
-            <% if slide.most_loved.poster_url %>
-              <%= image_tag slide.most_loved.poster_url, class: "size-full object-cover", alt: "" %>
+            <% if (poster = slide.most_loved.poster_url(:small)) %>
+              <%= image_tag poster, class: "size-full object-cover", alt: "" %>
             <% else %>
               <%= icon :play, solid: true, class: "size-16 text-white/80" %>
             <% end %>

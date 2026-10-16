@@ -37,6 +37,7 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system in a temporary directory.
   config.active_storage.service = :test
+  config.active_storage.paths = {ffmpeg: Rails.root.join("spec/support/bin/ffmpeg").to_s, ffprobe: Rails.root.join("spec/support/bin/ffprobe").to_s}
 
   config.action_mailer.perform_caching = false
 

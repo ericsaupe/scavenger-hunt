@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+version="6.0.1"
+url="https://johnvansickle.com/ffmpeg/old-releases/ffmpeg-${version}-amd64-static.tar.xz"
+sha256="28268bf402f1083833ea269331587f60a242848880073be8016501d864bd07a5"
+dir="$(cd "$(dirname "$0")/.." && pwd)/vendor/ffmpeg"
+
+if [ -x "$dir/ffmpeg" ] && [ -x "$dir/ffprobe" ] && "$dir/ffmpeg" -version 2>/dev/null | grep -q "^ffmpeg version ${version}"; then
+  echo "ffmpeg ${version} already installed in ${dir}"
+  exit 0
+fi
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+echo "Downloading ffmpeg ${version}"
+curl --fail --silent --show-error --location --retry 3 --output "$tmp/ffmpeg.tar.xz" "$url"
+echo "${sha256}  $tmp/ffmpeg.tar.xz" | sha256sum --check --quiet
+tar -xJf "$tmp/ffmpeg.tar.xz" -C "$tmp" --strip-components=1 \
+  "ffmpeg-${version}-amd64-static/ffmpeg" "ffmpeg-${version}-amd64-static/ffprobe"
+
+mkdir -p "$dir"
+mv "$tmp/ffmpeg" "$tmp/ffprobe" "$dir/"
+"$dir/ffmpeg" -version | head -1

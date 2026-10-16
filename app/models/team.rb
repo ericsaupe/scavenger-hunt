@@ -64,6 +64,6 @@ class Team < ApplicationRecord
     end
 
     winning_photo ||= submissions.found.sample
-    winning_photo&.large_variant_url
+    winning_photo&.video? ? winning_photo.poster_url : winning_photo&.large_variant_url
   end
 end
