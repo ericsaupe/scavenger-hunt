@@ -444,12 +444,10 @@ canvas-confetti@^1.9.2:
   resolved "https://registry.yarnpkg.com/canvas-confetti/-/canvas-confetti-1.9.4.tgz#4412a5daa96afd0b4d70ecd66b65ce8db3022b2b"
   integrity sha512-yxQbJkAVrFXWNbTUjPqjF7G+g6pDotOUHGbkZq2NELZUMDpiJ85rIEazVb8GTaAptNW2miJAXbs1BtioA251Pw==
 
-compress.js@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/compress.js/-/compress.js-1.2.2.tgz#96c311d70b4dae991001c73de96a1869499b79d8"
-  integrity sha512-eIsMmzyBtPVDdPtpmPXTRB6uiLjgTXygYl0KCVVp0I/U/++YzZtEkhVTuWH97dzTxKvzAcZMFwYUHGC09BSUqg==
-  dependencies:
-    regenerator-runtime "^0.13.9"
+compress.js@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/compress.js/-/compress.js-2.1.2.tgz#982039a88a86762eba2cbab130a2ab8028fe587a"
+  integrity sha512-DBb6M4wwe0rRAPeiKQ8HJrWuocVppUw9Qte4rEXiDrc5X3TrzeRKLzpvSE9oZ0Nd4HTXSSFphj3/XWwuptkQqw==
 
 daisyui@^5.7.50:
   version "5.7.50"
@@ -658,11 +656,6 @@ picomatch@^2.3.1:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.2.tgz#5a942915e26b372dc0f0e6753149a16e6b1c5601"
   integrity sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==
-
-regenerator-runtime@^0.13.9:
-  version "0.13.11"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
-  integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
 
 source-map-js@^1.2.1:
   version "1.2.2"
