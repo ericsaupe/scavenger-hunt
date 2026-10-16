@@ -26,6 +26,13 @@ class Submission < ApplicationRecord
     !!photo&.blob&.content_type&.include?("video")
   end
 
+  def photo_extension
+    extensions = Marcel::Magic.new(photo.content_type).extensions
+    extension = photo.filename.extension_without_delimiter.downcase
+    extension = extensions.first unless extensions.include?(extension)
+    ".#{extension}" if extension
+  end
+
   def large_variant_url
     return nil unless photo.attached?
 

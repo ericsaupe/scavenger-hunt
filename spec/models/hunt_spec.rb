@@ -23,6 +23,25 @@ RSpec.describe Hunt do
     expect(hunt.code).to eq("TEST")
   end
 
+  describe "#create_archive_file" do
+    before { allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000") }
+
+    it "names each file after its item with an extension matching its type" do
+      hunt = create(:hunt)
+      team = create(:team, hunt:)
+      photo = create(:photo_submission, team:, item: hunt.items.first)
+      video = create(:video_submission, team:, item: hunt.items.second)
+
+      hunt.create_archive_file
+
+      names = hunt.archive.open { |file| Zip::File.open(file.path) { |zip| zip.map(&:name) } }
+      expect(names).to contain_exactly(
+        "#{hunt.name}/#{team.name}/#{photo.item.name}.jpg",
+        "#{hunt.name}/#{team.name}/#{video.item.name}.mp4"
+      )
+    end
+  end
+
   describe "#in_progress?" do
     let(:hunt) { create(:hunt) }
 
