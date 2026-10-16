@@ -88,9 +88,9 @@ class Hunt < ApplicationRecord
 
     Zip::File.open(zipfile_name, create: true) do |zipfile|
       teams.find_each do |team|
-        folder = [name, team.name].join("/")
+        folder = [archive_path_segment(name), archive_path_segment(team.name)].join("/")
         team.submissions.with_attached_photo.find_each do |submission|
-          filename = [submission.item.name, submission.photo_extension].join
+          filename = [archive_path_segment(submission.item.name), submission.photo_extension].join
 
           submission.photo.open(tmpdir: Rails.root.join("tmp")) do |file|
             filepath = file.path
@@ -124,5 +124,9 @@ class Hunt < ApplicationRecord
       new_code = ("A".."Z").to_a.sample(character_count).join
     end
     self.code = new_code
+  end
+
+  def archive_path_segment(name)
+    name.tr('"', "'").gsub(/[\/\\:*?<>|[:cntrl:]]/, "-").strip
   end
 end
