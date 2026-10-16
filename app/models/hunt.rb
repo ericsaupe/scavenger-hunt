@@ -62,7 +62,7 @@ class Hunt < ApplicationRecord
         score: team.score,
         total_score: team.total_score,
         deductions: team.total_score - team.score,
-        submissions: team.submissions.with_attached_photo.size,
+        submissions: team.submissions.found.size,
         victory_photo_url: team.victory_photo_url(victory_item_id:)
       }
     end.sort_by { |team| team[:score] }.reverse
@@ -89,7 +89,7 @@ class Hunt < ApplicationRecord
     Zip::OutputStream.open(zipfile_name) do |zip|
       teams.find_each do |team|
         folder = [archive_path_segment(name), archive_path_segment(team.name)].join("/")
-        team.submissions.with_attached_photo.includes(:item, photo_attachment: :blob).order(:id).each do |submission|
+        team.submissions.found.includes(:item, photo_attachment: :blob).order(:id).each do |submission|
           filename = [archive_path_segment(submission.item.name), submission.photo_extension].join
 
           zip.put_next_entry("#{folder}/#{filename}", "", Zip::ExtraField.new, Zip::Entry::STORED)

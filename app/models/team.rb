@@ -11,17 +11,17 @@ class Team < ApplicationRecord
   after_update_commit { broadcast_replace(partial: "teams/score") }
 
   def score
-    submissions.with_points.includes(item: :category).with_attached_photo.sum { |submission| submission.item.category.points }
+    submissions.with_points.found.joins(item: :category).sum("categories.points")
   end
 
   def total_score
-    submissions.includes(item: :category).with_attached_photo.sum { |submission| submission.item.category.points }
+    submissions.found.joins(item: :category).sum("categories.points")
   end
 
   def victory_photo_url(victory_item_id: nil)
     if victory_item_id.present?
       item = hunt.items.find_by(id: victory_item_id)
-      winning_photo = submissions.with_attached_photo.find_by(item:)
+      winning_photo = submissions.found.find_by(item:)
     end
 
     if Vote.loved.where(submission: submissions).count.positive?
@@ -33,7 +33,7 @@ class Team < ApplicationRecord
         .first
     end
 
-    winning_photo ||= submissions.with_attached_photo.sample
+    winning_photo ||= submissions.found.sample
     winning_photo&.large_variant_url
   end
 end

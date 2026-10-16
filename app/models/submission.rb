@@ -15,7 +15,7 @@ class Submission < ApplicationRecord
 
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
 
-  scope :with_attached_photo, -> { joins(:photo_attachment).where.not(active_storage_attachments: {id: nil}) }
+  scope :found, -> { joins(:photo_attachment) }
   scope :with_points, -> { where(denied_points: false) }
 
   def image?
