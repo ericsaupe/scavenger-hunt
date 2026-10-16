@@ -86,22 +86,21 @@ class Hunt < ApplicationRecord
     zipfile_name = Rails.root.join("tmp", "archive-#{id}.zip")
     FileUtils.rm_f(zipfile_name)
 
-    Zip::File.open(zipfile_name, create: true) do |zipfile|
+    Zip::OutputStream.open(zipfile_name) do |zip|
       teams.find_each do |team|
         folder = [archive_path_segment(name), archive_path_segment(team.name)].join("/")
-        team.submissions.with_attached_photo.find_each do |submission|
+        team.submissions.with_attached_photo.includes(:item, photo_attachment: :blob).order(:id).each do |submission|
           filename = [archive_path_segment(submission.item.name), submission.photo_extension].join
 
-          submission.photo.open(tmpdir: Rails.root.join("tmp")) do |file|
-            filepath = file.path
-            zipfile.add("#{folder}/#{filename}", filepath)
-            zipfile.commit
-          end
+          zip.put_next_entry("#{folder}/#{filename}", "", Zip::ExtraField.new, Zip::Entry::STORED)
+          submission.photo.download { |chunk| zip.write(chunk) }
         end
       end
     end
 
-    archive.attach(io: File.open(zipfile_name), filename: "#{name}.zip")
+    File.open(zipfile_name) { |file| archive.attach(io: file, filename: "#{name}.zip") }
+  ensure
+    FileUtils.rm_f(zipfile_name) if zipfile_name
   end
 
   def broadcast_presentation_update(submission)
