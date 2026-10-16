@@ -49,6 +49,8 @@ class DemoHunt
 
     items = hunt.items.order(:id).to_a
     teams = TEAMS.map { |name| hunt.start_a_new_team(name) }
+    @item_slots = items.each_with_index.to_h
+    @team_slots = teams.each_with_index.to_h
     plan = found_plan(items, teams)
     submissions = attach_media(hunt, plan)
     cast_votes(submissions)
@@ -90,7 +92,7 @@ class DemoHunt
   def photo_file(item, team, index)
     portrait = @random.rand < 0.35
     width, height = portrait ? [1200, 1600] : [1600, 1200]
-    seed = "#{@code}-#{item.id}-#{team.id}"
+    seed = "#{@code}-item#{@item_slots.fetch(item)}-team#{@team_slots.fetch(team)}-#{width}x#{height}"
     path = PHOTO_CACHE.join("#{seed}.jpg")
     download_photo(seed, width, height, path) unless path.exist?
     generate_photo(width, height, path) unless path.exist?
@@ -160,7 +162,7 @@ class DemoHunt
     puts "  #{hunt.items.count - submissions.map(&:item_id).uniq.size} items found by nobody"
     puts
     puts "Results:     http://localhost:3000/scavenger_hunts/#{hunt.code}/results"
-    puts "Big screen:  http://localhost:3000/scavenger_hunts/#{hunt.code}/presenter"
+    puts "Big screen:  http://localhost:3000/scavenger_hunts/#{hunt.code}/presenter?screen=big"
     puts "Remote:      http://localhost:3000/scavenger_hunts/#{hunt.code}/presenter/remote"
     puts "Checklist:   http://localhost:3000/scavenger_hunts/#{hunt.code}/teams/#{teams.first.id}"
   end

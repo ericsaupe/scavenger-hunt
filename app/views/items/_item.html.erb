@@ -20,7 +20,7 @@
               <% end %>
             </div>
             <figcaption class="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <span class="display min-w-0 grow basis-40 text-2xl leading-tight text-ink"><%= submission.team.name %></span>
+              <span class="display min-w-0 grow basis-40 wrap-anywhere text-2xl leading-tight text-ink"><%= submission.team.name %></span>
               <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
             </figcaption>
           </figure>
