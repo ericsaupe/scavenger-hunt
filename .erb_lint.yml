@@ -8,13 +8,16 @@ linters:
   ErbSafety:
     enabled: true
     exclude:
-      - '**/views/hunts/_hunt.html.erb'
       - '**/views/shared/_head.html.erb'
   Rubocop:
     enabled: true
     rubocop_config:
-      inherit_from:
-        - .rubocop.yml
+      plugins:
+        - standard-custom
+        - standard-performance
+        - standard-rails
+      inherit_gem:
+        standard: config/base.yml
       Layout/InitialIndentation:
         Enabled: false
       Layout/LineLength:

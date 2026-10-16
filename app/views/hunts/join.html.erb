@@ -9,12 +9,12 @@
           <fieldset class="fieldset w-full max-w-full">
             <%= form.label :code, "Hunt code", class: "fieldset-legend text-sm" %>
             <%= form.text_field :code,
-                                value: params[:code],
-                                class: "input w-full",
-                                required: true,
-                                oninput: "this.value = this.value.toUpperCase()",
-                                maxlength: 5,
-                                autofocus: true %>
+                  value: params[:code],
+                  class: "input w-full",
+                  required: true,
+                  oninput: "this.value = this.value.toUpperCase()",
+                  maxlength: 5,
+                  autofocus: true %>
           </fieldset>
           <%= form.submit "Let's go!", class: "btn btn-primary btn-block mt-4" %>
         <% end %>
@@ -29,10 +29,10 @@
         <%= form_with url: join_hunts_path, method: :get do |form| %>
           <fieldset class="fieldset w-full max-w-full">
             <%= form.label :hunt_select, "Scavenger hunts", class: "fieldset-legend text-sm" %>
-            <%= form.select :hunt_select, [], { include_blank: "Select a scavenger hunt" }, {
-              class: "select w-full max-w-full", data: { "past-hunts-target": "list" },
-              name: "code",
-              } %>
+            <%= form.select :hunt_select, [], {include_blank: "Select a scavenger hunt"}, {
+                  class: "select w-full max-w-full", data: {"past-hunts-target": "list"},
+                  name: "code"
+                } %>
           </fieldset>
           <%= form.submit "Rejoin the scavenger hunt!", class: "btn btn-primary btn-block mt-4" %>
         <% end %>
