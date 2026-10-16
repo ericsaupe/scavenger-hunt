@@ -1,7 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Bitter&family=Oswald&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Bitter&family=Oswald&display=swap') layer(base);
+@import 'tailwindcss' source(none);
+
+@source '../../views';
+@source '../../helpers';
+@source '../../javascript';
+@source '../../components';
+
+@plugin '@tailwindcss/forms';
+@plugin 'daisyui' {
+  themes: autumn --default, cmyk, halloween, dark --prefersdark, winter;
+}
+
+@theme {
+  --color-pantone: #BB2649;
+  --color-pantone-50: #EEABBA;
+  --color-pantone-100: #EA9AAD;
+  --color-pantone-200: #E47891;
+  --color-pantone-300: #DD5676;
+  --color-pantone-400: #D6345A;
+  --color-pantone-500: #BB2649;
+  --color-pantone-600: #8C1D37;
+  --color-pantone-700: #5E1325;
+  --color-pantone-800: #2F0A12;
+  --color-pantone-900: #000000;
+}
+
+/* Tailwind v4 defaults borders to currentcolor; keep the v3 gray default. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 * {
   color-adjust: exact !important;

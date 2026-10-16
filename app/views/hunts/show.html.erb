@@ -34,12 +34,10 @@
       <%= render(@hunt.teams) %>
     </div>
     <% unless @hunt.ended? %>
-      <div class="form-control w-full">
-        <%= f.label :name, class: "label" do %>
-          <span class="label-text">Start a team</span>
-        <% end %>
-        <%= f.text_field :name, class: "input input-bordered w-full" %>
-      </div>
+      <fieldset class="fieldset w-full">
+        <%= f.label :name, "Start a team", class: "fieldset-legend text-sm" %>
+        <%= f.text_field :name, class: "input w-full" %>
+      </fieldset>
     <% end %>
 
     <div class="flex mt-4">

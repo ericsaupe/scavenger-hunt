@@ -2,60 +2,52 @@
   <%= f.hidden_field :template, value: @hunt.name %>
   <%= f.hidden_field :timezone, data: { 'form-target': 'timezone' } %>
 
-  <div class="form-control w-full">
-    <%= f.label :name, class: "label" do %>
-      <span class="label-text">What do you want to call your scavenger hunt?</span>
-    <% end %>
-    <%= f.text_field :name, required: true, class: "input input-bordered w-full" %>
-  </div>
+  <fieldset class="fieldset w-full">
+    <%= f.label :name, "What do you want to call your scavenger hunt?", class: "fieldset-legend text-sm w-full" %>
+    <%= f.text_field :name, required: true, class: "input w-full" %>
+  </fieldset>
 
-  <div class="form-control w-full">
-    <%= f.label :starts_at, class: "label" do %>
-      <span class="label-text">When do you want to start your scavenger hunt?</span>
-      <span class="label-text-alt"><i>Optional</i></span>
+  <fieldset class="fieldset w-full">
+    <%= f.label :starts_at, class: "fieldset-legend text-sm w-full" do %>
+      When do you want to start your scavenger hunt?
+      <span class="label text-xs font-normal"><i>Optional</i></span>
     <% end %>
-    <%= f.text_field :starts_at, class: "datetime input input-bordered w-full" %>
-    <label class="label">
-      <span class="label-text-alt">Set this if you don't want participants to submit photos until this date and time.</span>
-    </label>
-  </div>
+    <%= f.text_field :starts_at, class: "datetime input w-full" %>
+    <p class="label whitespace-normal">Set this if you don't want participants to submit photos until this date and time.</p>
+  </fieldset>
 
-  <div class="form-control w-full">
-    <%= f.label :ends_at, class: "label" do %>
-      <span class="label-text">When do you want to end your scavenger hunt?</span>
-      <span class="label-text-alt"><i>Optional</i></span>
+  <fieldset class="fieldset w-full">
+    <%= f.label :ends_at, class: "fieldset-legend text-sm w-full" do %>
+      When do you want to end your scavenger hunt?
+      <span class="label text-xs font-normal"><i>Optional</i></span>
     <% end %>
-    <%= f.text_field :ends_at, class: "datetime input input-bordered w-full", data: { action: "change->form#toggleEndFields" } %>
-    <label class="label">
-      <span class="label-text-alt">Set this if you you want to stop accepting submissions at this date and time.</span>
-    </label>
-  </div>
+    <%= f.text_field :ends_at, class: "datetime input w-full", data: { action: "change->form#toggleEndFields" } %>
+    <p class="label whitespace-normal">Set this if you you want to stop accepting submissions at this date and time.</p>
+  </fieldset>
 
-  <div class="form-control hidden" data-form-target="endConfig">
-    <%= f.label :lock_results, class: "label cursor-pointer" do %>
-      <span class="label-text">Lock results until after the hunt ends?</span>
+  <div class="hidden" data-form-target="endConfig">
+    <%= f.label :lock_results, class: "flex items-center justify-between cursor-pointer py-2 px-1" do %>
+      <span class="text-sm">Lock results until after the hunt ends?</span>
       <%= f.check_box :lock_results, class: "checkbox", data: { test: "lock-results-switch" } %>
     <% end %>
   </div>
 
-  <div class="form-control w-full hidden" data-form-target="endConfig">
-    <%= f.label :lock_password, class: "label" do %>
-      <span class="label-text">Lock results with a password</span>
-      <span class="label-text-alt"><i>Optional</i></span>
+  <fieldset class="fieldset w-full hidden" data-form-target="endConfig">
+    <%= f.label :lock_password, class: "fieldset-legend text-sm w-full" do %>
+      Lock results with a password
+      <span class="label text-xs font-normal"><i>Optional</i></span>
     <% end %>
-    <%= f.text_field :lock_password, class: "input input-bordered w-full" %>
-    <label class="label">
-      <span class="label-text-alt">If you want to require a one-time password be entered before people can see the results.</span>
-    </label>
-  </div>
+    <%= f.text_field :lock_password, class: "input w-full" %>
+    <p class="label whitespace-normal">If you want to require a one-time password be entered before people can see the results.</p>
+  </fieldset>
 
-  <div class="form-control w-full">
-    <%= f.label :max_downvotes_to_lose_points, class: "label" do %>
-      <span class="label-text">How many downvotes are allowed before teams lose points for their submission?</span>
-      <span class="label-text-alt"><i>Optional</i></span>
+  <fieldset class="fieldset w-full">
+    <%= f.label :max_downvotes_to_lose_points, class: "fieldset-legend text-sm w-full" do %>
+      How many downvotes are allowed before teams lose points for their submission?
+      <span class="label text-xs font-normal"><i>Optional</i></span>
     <% end %>
-    <%= f.number_field :max_downvotes_to_lose_points, min: 1, step: 1, class: "input input-bordered w-full" %>
-  </div>
+    <%= f.number_field :max_downvotes_to_lose_points, min: 1, step: 1, class: "input w-full" %>
+  </fieldset>
 
   <%= f.button type: :submit, class: "btn btn-primary mt-4" do %>
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
