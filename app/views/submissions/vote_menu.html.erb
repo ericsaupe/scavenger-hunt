@@ -1,5 +1,3 @@
 <%= turbo_frame_tag "vote_menu" do %>
-  <%= render(partial: "items/vote_menu", locals: {
-        vote: @submission.votes.find_or_initialize_by(submission_id: @submission.id, user_id: cookies[:user_id])
-      }) %>
+  <%= render(partial: "items/vote_menu", locals: {vote: @submission.vote_for(cookies[:user_id])}) %>
 <% end %>

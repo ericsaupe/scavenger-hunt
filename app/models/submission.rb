@@ -48,6 +48,10 @@ class Submission < ApplicationRecord
     video? ? routes.rails_blob_path(photo, only_path: true) : routes.rails_representation_path(photo.variant(size), only_path: true)
   end
 
+  def vote_for(user_id)
+    votes.find { |vote| vote.user_id == user_id } || votes.build(user_id:)
+  end
+
   def calculate_denied_points
     return unless max_downvotes_to_lose_points&.positive?
 
