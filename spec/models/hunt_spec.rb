@@ -40,6 +40,22 @@ RSpec.describe Hunt do
       expect(names).to contain_exactly("Summer Hunt/Red Team/Sandcastle.jpg", "Summer Hunt/Red Team/Seagull.mp4")
     end
 
+    it "stores each file unchanged and cleans up the working file" do
+      hunt = create(:hunt)
+      team = create(:team, hunt:)
+      create(:photo_submission, team:, item: hunt.items.first)
+      create(:video_submission, team:, item: hunt.items.second)
+
+      hunt.create_archive_file
+
+      contents = hunt.archive.open { |file| Zip::File.open(file.path) { |zip| zip.map { |entry| zip.read(entry) } } }
+      expect(contents).to contain_exactly(
+        Rails.root.join("spec/fixtures/test.jpg").binread,
+        Rails.root.join("spec/fixtures/video.mp4").binread
+      )
+      expect(Rails.root.join("tmp", "archive-#{hunt.id}.zip")).not_to exist
+    end
+
     it "replaces characters that cannot be used in file names" do
       hunt = create(:hunt, name: "Bob's \"Big\" Hunt: Part 2")
       team = create(:team, hunt:, name: "Red/Blue")
