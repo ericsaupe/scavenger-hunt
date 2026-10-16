@@ -5,10 +5,24 @@ class Team < ApplicationRecord
   has_many :submissions, dependent: :destroy
   has_many :items, through: :submissions
 
+  PENDING_UPLOADS_TTL = 5.minutes
+
   validates :name, uniqueness: {scope: :hunt, case_sensitive: false}
 
   after_create_commit { broadcast_append_to("teams_#{hunt_id}") }
   after_update_commit { broadcast_replace(partial: "teams/score") }
+
+  def self.pending_uploads_for(teams)
+    Rails.cache.read_multi(*teams.map { |team| team.pending_uploads_cache_key }).values.sum
+  end
+
+  def pending_uploads=(count)
+    Rails.cache.write(pending_uploads_cache_key, count, expires_in: PENDING_UPLOADS_TTL)
+  end
+
+  def pending_uploads_cache_key
+    "teams/#{id}/pending_uploads"
+  end
 
   def score
     submissions.with_points.found.joins(item: :category).sum("categories.points")

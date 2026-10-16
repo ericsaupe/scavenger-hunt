@@ -1,0 +1,22 @@
+<div class="fixed inset-x-0 bottom-4 z-30 px-4" hidden data-controller="install" data-testid="install-prompt">
+  <div class="mx-auto max-w-md rounded-2xl bg-neutral p-4 text-neutral-content shadow-lg ring-1 ring-base-content/10">
+    <div hidden data-install-target="android">
+      <p class="font-semibold">Add Scavenger Hunt Party to your home screen</p>
+      <p class="mt-1 text-sm text-neutral-content/80">Opens straight to your checklist, even when the signal drops.</p>
+      <div class="mt-3 flex gap-2">
+        <button type="button" class="btn btn-sm btn-primary" data-action="install#install">Install</button>
+        <button type="button" class="btn btn-sm btn-ghost text-neutral-content" data-action="install#dismiss">Not now</button>
+      </div>
+    </div>
+    <div hidden data-install-target="ios">
+      <p class="font-semibold">Add Scavenger Hunt Party to your home screen</p>
+      <ol class="mt-2 space-y-1.5 text-sm text-neutral-content/80">
+        <li class="flex items-center gap-2"><span class="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-content/10"><%= icon :share, class: "size-4" %></span>Tap <strong>Share</strong> in Safari</li>
+        <li class="flex items-center gap-2"><span class="grid size-6 shrink-0 place-items-center rounded-md bg-neutral-content/10"><%= icon :plus_square, class: "size-4" %></span>Then <strong>Add to Home Screen</strong></li>
+      </ol>
+      <div class="mt-3">
+        <button type="button" class="btn btn-sm btn-ghost text-neutral-content" data-action="install#dismiss">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>

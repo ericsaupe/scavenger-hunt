@@ -3,7 +3,7 @@
 <% found = submission.photo.attached? %>
 <% field_id = "submission_#{submission.id || item.id}_photo" %>
 
-<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, found: (true if found), "submission-max-video-bytes-value": Submission::MAX_VIDEO_BYTES, "submission-max-video-seconds-value": Submission::MAX_VIDEO_SECONDS}.compact do %>
+<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, team: submission.team_id, submission_id: submission.id, found: (true if found), "submission-max-video-bytes-value": Submission::MAX_VIDEO_BYTES, "submission-max-video-seconds-value": Submission::MAX_VIDEO_SECONDS}.compact do %>
   <% unless submission.new_record? %>
     <%= form_with model: submission, authenticity_token: false, html: {class: "contents", data: {"submission-target": "form", action: "turbo:submit-end->submission#submitEnd"}} do |form| %>
       <%= form.hidden_field :captured_at, value: nil, data: {"submission-target": "capturedAt"} %>
@@ -36,7 +36,7 @@
     <label for="<%= field_id %>" class="row-tap cursor-pointer py-2">
       <span class="slot" data-submission-target="slot"><%= icon :camera, class: "size-5" %></span>
       <span class="grow font-semibold"><%= item.name %></span>
-      <span class="shrink-0 text-sm font-semibold text-ink-soft">+<%= item.category.points %></span>
+      <span class="shrink-0 text-right text-sm font-semibold text-ink-soft" data-submission-target="hint">+<%= item.category.points %></span>
     </label>
   <% end %>
 <% end %>

@@ -1,0 +1,55 @@
+# frozen_string_literal: true
+
+module NetworkHelpers
+  def go_offline
+    page.driver.browser.network_conditions = {offline: true, latency: 0, download_throughput: 0, upload_throughput: 0}
+  end
+
+  def go_online
+    page.driver.browser.delete_network_conditions
+  end
+
+  def wait_for_service_worker
+    page.evaluate_async_script(<<~JS)
+      const done = arguments[0]
+      navigator.serviceWorker.ready.then(() => {
+        if (navigator.serviceWorker.controller) return done(true)
+        navigator.serviceWorker.addEventListener("controllerchange", () => done(true), { once: true })
+      })
+    JS
+  end
+
+  def clear_upload_queue
+    page.evaluate_async_script(<<~JS)
+      const done = arguments[0]
+      const request = indexedDB.deleteDatabase("scavenger-hunt-party")
+      request.onsuccess = request.onerror = request.onblocked = () => done(true)
+    JS
+  end
+
+  def forget_service_worker
+    page.evaluate_async_script(<<~JS)
+      const done = arguments[0]
+      Promise.all([
+        navigator.serviceWorker.getRegistrations().then((registrations) => Promise.all(registrations.map((r) => r.unregister()))),
+        caches.keys().then((names) => Promise.all(names.map((name) => caches.delete(name))))
+      ]).then(() => done(true), () => done(false))
+    JS
+  end
+end
+
+RSpec.configure do |config|
+  config.include NetworkHelpers, type: :system
+
+  config.around(:each, :secure_origin) do |example|
+    original = Capybara.app_host
+    Capybara.app_host = "http://localhost"
+    example.run
+  ensure
+    Capybara.app_host = original
+  end
+
+  config.after(:each, type: :system) do
+    go_online if page.driver.browser.respond_to?(:delete_network_conditions)
+  end
+end

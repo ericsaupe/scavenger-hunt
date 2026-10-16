@@ -93,6 +93,38 @@ RSpec.describe "Submissions" do
     end
   end
 
+  describe "a photo queued while offline" do
+    it "keeps a teammate's photo that arrived first and drops the queued one" do
+      existing = ActiveStorage::Blob.create_and_upload!(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "teammate.jpg")
+      submission.photo.attach(existing)
+      queued = uploaded_photo
+
+      patch "/submissions/#{submission.id}", params: {submission: {photo: queued, captured_at: Time.current.iso8601, keep_existing: "1"}}, headers: headers
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(ERB::Util.html_escape("A teammate already found #{submission.item.name}"))
+      expect(submission.reload.photo.blob).to eq(existing)
+      expect(ActiveStorage::Blob.find_signed(queued)).to be_nil
+    end
+
+    it "lands normally when nobody found the item in the meantime" do
+      send_photo(uploaded_photo)
+      patch "/submissions/#{submission.id}", params: {submission: {photo: uploaded_photo, captured_at: Time.current.iso8601, keep_existing: "1"}}, headers: headers
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "replaces the team's own photo when the queued one was a retake" do
+      send_photo(uploaded_photo)
+      first_blob = submission.photo.blob
+
+      send_photo(uploaded_photo)
+
+      expect(response).to have_http_status(:ok)
+      expect(submission.reload.photo.blob).not_to eq(first_blob)
+    end
+  end
+
   describe "media limits" do
     it "accepts a video of fifty megabytes" do
       send_photo(direct_uploaded(content_type: "video/mp4", byte_size: 50.megabytes))

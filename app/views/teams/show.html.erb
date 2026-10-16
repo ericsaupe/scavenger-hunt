@@ -1,9 +1,6 @@
 <% description "#{@team.name} is working hard to find everything on their scavenger hunt list: '#{@hunt.name}'." %>
 <% title @hunt.name %>
 
-<%= turbo_stream_from "submissions_#{@team.id}" %>
-<%= turbo_stream_from @team %>
-
 <%= content_tag :div, nil, data: {
       controller: "past-hunts",
       "past-hunts-code-value": @hunt.code,
@@ -11,7 +8,10 @@
       "past-hunts-team-value": @team.name
     } %>
 
-<div data-controller="checklist">
+<div data-controller="checklist live queue" data-queue-team-id-value="<%= @team.id %>" data-queue-report-url-value="<%= pending_uploads_hunt_team_path(@hunt.code, @team) %>">
+  <%= turbo_stream_from "submissions_#{@team.id}" %>
+  <%= turbo_stream_from @team %>
+
   <div class="sticky top-14 z-20 border-b border-base-300 bg-base-100/95 backdrop-blur">
     <div class="page flex items-end justify-between gap-4 pt-3">
       <div class="min-w-0">
@@ -34,6 +34,12 @@
         <div class="h-full rounded-full bg-marigold transition-[width] duration-500" data-checklist-target="bar" style="width: 0%"></div>
       </div>
     </div>
+    <div data-controller="offline" data-offline-synced-at-value="<%= Time.current.to_i * 1000 %>">
+      <p class="page flex items-center gap-2 border-t border-base-300 bg-base-200 py-2 text-xs font-semibold text-ink-soft" role="status" hidden data-offline-target="banner">
+        <%= icon :cloud, class: "size-4 shrink-0" %>
+        <span>Offline, last synced at <span data-offline-target="time"></span></span>
+      </p>
+    </div>
   </div>
 
   <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or video. Found items tick off for the whole team.</p>
@@ -41,4 +47,10 @@
   <div data-checklist-target="list">
     <%= render partial: "hunts/checklist" %>
   </div>
+
+  <template id="queued_badge_template">
+    <span class="absolute bottom-0 right-0 grid size-5 place-items-center rounded-tl-lg bg-base-100 text-ink-soft" data-testid="queued-badge"><%= icon :cloud, class: "size-3.5" %></span>
+  </template>
+
+  <%= render partial: "teams/install_prompt" %>
 </div>

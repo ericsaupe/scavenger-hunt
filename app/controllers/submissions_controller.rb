@@ -6,14 +6,19 @@ class SubmissionsController < ApplicationController
   def update
     submission = Submission.find(params[:id])
     hunt = submission.hunt
-    submission.assign_attributes(submission_params)
 
-    if !hunt.accepts_photo_captured_at?(submission.captured_at)
-      reject(submission, "The hunt ended before this photo was sent")
-    elsif submission.save
-      accept(submission)
+    if keep_existing? && submission.photo.attached?
+      discard_queued_photo(submission)
     else
-      reject(submission, submission.errors[:photo].first)
+      submission.assign_attributes(submission_params)
+
+      if !hunt.accepts_photo_captured_at?(submission.captured_at)
+        reject(submission, "The hunt ended before this photo was sent")
+      elsif submission.save
+        accept(submission)
+      else
+        reject(submission, submission.errors[:photo].first)
+      end
     end
   end
 
@@ -27,10 +32,14 @@ class SubmissionsController < ApplicationController
     params.require(:submission).permit(:photo, :captured_at)
   end
 
+  def keep_existing?
+    params.dig(:submission, :keep_existing).present?
+  end
+
   def accept(submission)
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(:submissions, partial: "submissions/submission",
+        render turbo_stream: turbo_stream.replace(submission, partial: "submissions/submission",
           locals: {submission:})
       end
       format.js
@@ -55,6 +64,24 @@ class SubmissionsController < ApplicationController
       end
       format.html do
         flash[:error] = message
+        redirect_to hunt_team_path(submission.team.hunt.code, submission.team)
+      end
+    end
+  end
+
+  def discard_queued_photo(submission)
+    ActiveStorage::Blob.find_signed(params.dig(:submission, :photo).to_s)&.purge_later
+    message = "A teammate already found #{submission.item.name}, so your photo was skipped"
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace(submission, partial: "submissions/submission", locals: {submission:, animate: false}),
+          turbo_stream.append(:flash, partial: "banners/banner", locals: {message:})
+        ]
+      end
+      format.html do
+        flash[:notice] = message
         redirect_to hunt_team_path(submission.team.hunt.code, submission.team)
       end
     end

@@ -1,11 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
-import { DirectUpload } from "@rails/activestorage"
 import Compress from "compress.js"
+import { addBanner } from "../banners"
+import { uploadWithRetries } from "../uploads/direct_upload"
+import { enqueue } from "../uploads/queue"
+import { registerSync } from "../uploads/drain"
+import { showIdle, showPending, showQueued } from "../uploads/pending"
 
 const UPLOAD_FAILED = "Your photo couldn't be uploaded. Check your connection and try again."
 
 export default class extends Controller {
-  static targets = [ "field", "form", "slot", "capturedAt" ]
+  static targets = [ "field", "form", "slot", "hint", "capturedAt" ]
   static values = {
     submitting: { type: Boolean, default: false },
     maxVideoBytes: Number,
@@ -31,17 +35,26 @@ export default class extends Controller {
     if (problem) {
       this.submittingValue = false
       this.fieldTarget.value = ""
-      this.addBanner(problem)
+      addBanner(problem)
       return
     }
 
-    this.showUploading(file)
+    this.retake = !!this.element.dataset.found
+    showPending(this.element, file)
     this.pendingFile = await this.compressImage(file)
-    this.retryUpload()
+
+    if (navigator.onLine) {
+      this.retryUpload()
+    } else {
+      this.queue()
+    }
   }
 
   async upload() {
-    const blob = await this.uploadWithRetries(this.pendingFile)
+    const blob = await uploadWithRetries(this.pendingFile, this.fieldTarget.dataset.directUploadUrl, {
+      attempts: this.attemptsValue,
+      retryDelay: this.retryDelayValue
+    })
     this.setSignedId(blob.signed_id)
     this.fieldTarget.disabled = true
     this.formTarget.requestSubmit()
@@ -50,7 +63,7 @@ export default class extends Controller {
   retryUpload() {
     this.submittingValue = true
     this.element.dataset.uploading = "true"
-    this.upload().catch(() => this.uploadFailed(() => this.retryUpload()))
+    this.upload().catch(() => this.queue())
   }
 
   submitEnd(event) {
@@ -58,44 +71,40 @@ export default class extends Controller {
       return
     }
 
-    this.uploadFailed(() => {
-      this.submittingValue = true
-      this.element.dataset.uploading = "true"
-      this.formTarget.requestSubmit()
-    })
-  }
-
-  uploadFailed(retry) {
-    this.submittingValue = false
-    this.showIdle()
-    this.addBanner(UPLOAD_FAILED, { actionLabel: "Try again", onAction: retry })
-  }
-
-  async uploadWithRetries(file) {
-    const url = this.fieldTarget.dataset.directUploadUrl
-
-    for (let attempt = 1; ; attempt++) {
-      try {
-        return await this.directUpload(file, url)
-      } catch (e) {
-        if (attempt >= this.attemptsValue) {
-          throw e
-        }
-        await new Promise((resolve) => setTimeout(resolve, this.retryDelayValue * 2 ** (attempt - 1)))
-      }
+    if (!event.detail.fetchResponse) {
+      this.queue()
+      return
     }
+
+    this.submittingValue = false
+    showIdle(this.element)
+    addBanner(UPLOAD_FAILED, {
+      actionLabel: "Try again",
+      onAction: () => {
+        this.submittingValue = true
+        this.element.dataset.uploading = "true"
+        this.formTarget.requestSubmit()
+      }
+    })
   }
 
-  directUpload(file, url) {
-    return new Promise((resolve, reject) => {
-      new DirectUpload(file, url).create((error, blob) => {
-        if (error) {
-          reject(new Error(error))
-        } else {
-          resolve(blob)
-        }
-      })
+  async queue() {
+    const file = this.pendingFile
+    await enqueue({
+      submissionId: Number(this.element.dataset.submissionId),
+      itemId: Number(this.element.dataset.item),
+      teamId: Number(this.element.dataset.team),
+      capturedAt: this.capturedAtTarget.value,
+      file,
+      retake: this.retake,
+      directUploadUrl: this.fieldTarget.dataset.directUploadUrl,
+      updateUrl: this.formTarget.action
     })
+    this.submittingValue = false
+    this.fieldTarget.disabled = false
+    this.fieldTarget.value = ""
+    showQueued(this.element, file)
+    registerSync()
   }
 
   setSignedId(signedId) {
@@ -140,55 +149,6 @@ export default class extends Controller {
       video.onerror = () => finish(0)
       video.src = URL.createObjectURL(file)
     })
-  }
-
-  showUploading(file) {
-    this.element.dataset.uploading = "true"
-    if (!this.hasSlotTarget) {
-      return
-    }
-
-    this.slotTarget.replaceChildren()
-    this.slotTarget.classList.remove("border-dashed")
-    this.slotTarget.classList.add("overflow-hidden", "border-marigold", "relative")
-
-    if (file.type.startsWith("image/")) {
-      const img = document.createElement("img")
-      img.src = URL.createObjectURL(file)
-      img.alt = ""
-      img.className = "size-full object-cover animate-breathe"
-      img.onload = () => URL.revokeObjectURL(img.src)
-      this.slotTarget.appendChild(img)
-    } else {
-      const spinner = document.createElement("span")
-      spinner.className = "loading loading-spinner loading-sm text-marigold"
-      this.slotTarget.appendChild(spinner)
-    }
-  }
-
-  showIdle() {
-    delete this.element.dataset.uploading
-  }
-
-  addBanner(message, { actionLabel, onAction } = {}) {
-    const template = document.getElementById("banner_template")
-    const flash = document.getElementById("flash")
-    if (!template || !flash) {
-      return
-    }
-
-    const banner = template.content.firstElementChild.cloneNode(true)
-    banner.querySelector("[data-banner-message]").textContent = message
-    const action = banner.querySelector("[data-banner-action]")
-    if (actionLabel) {
-      action.textContent = actionLabel
-      action.addEventListener("click", onAction)
-      banner.dataset.flashStickyValue = "true"
-    } else {
-      action.remove()
-      banner.dataset.flashStickyValue = "false"
-    }
-    flash.appendChild(banner)
   }
 
   async compressImage(file) {

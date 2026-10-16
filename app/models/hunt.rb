@@ -60,6 +60,14 @@ class Hunt < ApplicationRecord
     captured_at.present? && captured_at <= ends_at && Time.current <= ends_at + LATE_UPLOAD_GRACE
   end
 
+  def in_grace_window?
+    ended? && Time.current <= ends_at + LATE_UPLOAD_GRACE
+  end
+
+  def pending_upload_count
+    Team.pending_uploads_for(teams)
+  end
+
   def timer?
     starts_at.present? || ends_at.present?
   end

@@ -23,6 +23,15 @@
     <%= render partial: "download_button" %>
   </div>
 
+  <% if @hunt.in_grace_window? && (pending = @hunt.pending_upload_count).positive? %>
+    <div class="page mt-6" data-controller="live" data-live-interval-value="30000">
+      <div class="flex items-start gap-3 rounded-2xl bg-base-200 px-4 py-3 text-sm" role="status" data-testid="pending-uploads">
+        <%= icon :cloud, class: "mt-0.5 size-5 shrink-0 text-ink-soft" %>
+        <span><strong><%= pluralize(pending, "photo") %> still uploading</strong> from teams with poor signal. Results update as they land.</span>
+      </div>
+    </div>
+  <% end %>
+
   <% if @hunt.lock_password.present? && !@hunt.password_entered_for_leaderboard %>
     <%= render(partial: "hunts/locked_leaderboard", locals: {hunt: @hunt}) %>
   <% else %>
