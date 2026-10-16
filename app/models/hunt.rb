@@ -90,8 +90,7 @@ class Hunt < ApplicationRecord
       teams.find_each do |team|
         folder = [name, team.name].join("/")
         team.submissions.with_attached_photo.find_each do |submission|
-          extension = Rack::Mime::MIME_TYPES.invert[submission.photo.content_type]
-          filename = [submission.item.name, extension].join
+          filename = [submission.item.name, submission.photo_extension].join
 
           submission.photo.open(tmpdir: Rails.root.join("tmp")) do |file|
             filepath = file.path
