@@ -115,40 +115,23 @@ RSpec.describe Submission do
     end
   end
 
-  describe "video length" do
-    let(:submission) { create(:submission) }
+  describe "retaking a converted video", :test_queue_adapter do
+    include Rails.application.routes.url_helpers
 
-    def video_blob(metadata = {})
-      ActiveStorage::Blob.create_and_upload!(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "clip.mp4",
-        content_type: "video/mp4", metadata:, identify: false)
-    end
+    it "broadcasts the row without the old playback and with the processing state" do
+      submission = create(:video_submission)
+      submission.playback.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "playback.mp4", content_type: "video/mp4")
+      old_playback = rails_blob_path(submission.playback)
+      broadcast_urls = []
+      allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to) do |_stream, **options|
+        broadcast_urls << options[:locals][:submission].media_url if options.dig(:locals, :submission)
+      end
 
-    it "probes the upload and refuses a video longer than thirty seconds", ffprobe_duration: 30.5 do
-      submission.photo.attach(video_blob)
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "retake.mp4")
 
-      expect(submission.errors[:photo]).to eq(["Videos must be 30 seconds or shorter"])
-      expect(submission.reload.photo).not_to be_attached
-    end
-
-    it "accepts a video of exactly thirty seconds", ffprobe_duration: 30 do
-      submission.photo.attach(video_blob)
-
-      expect(submission.errors).to be_empty
-      expect(submission.reload.photo).to be_attached
-      expect(submission.photo.blob.metadata).to include("analyzed" => true, "duration" => 30.0)
-    end
-
-    it "accepts a video whose length could not be read", ffprobe_duration: "none" do
-      submission.photo.attach(video_blob)
-
-      expect(submission.reload.photo).to be_attached
-    end
-
-    it "ignores length metadata the client sent with the direct upload", ffprobe_duration: 31 do
-      submission.photo.attach(video_blob(analyzed: true, duration: 1))
-
-      expect(submission.errors[:photo]).to eq(["Videos must be 30 seconds or shorter"])
-      expect(submission.reload.photo).not_to be_attached
+      expect(broadcast_urls).not_to be_empty
+      expect(broadcast_urls).to all(eq(rails_blob_path(submission.photo)))
+      expect(broadcast_urls).not_to include(old_playback)
     end
   end
 end

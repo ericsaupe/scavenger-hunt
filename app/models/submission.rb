@@ -24,9 +24,9 @@ class Submission < ApplicationRecord
     @photo_changed = attachment_changes.key?("photo")
     @leaderboard_changed = @photo_changed || saved_change_to_denied_points?
   end
+  after_commit :refresh_playback, on: [:create, :update], if: -> { @photo_changed }
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
   after_update_commit :announce_lead_change, if: -> { @leaderboard_changed }
-  after_commit :refresh_playback, on: [:create, :update], if: -> { @photo_changed }
 
   scope :found, -> { joins(:photo_attachment) }
   scope :with_points, -> { where(denied_points: false) }
@@ -113,28 +113,19 @@ class Submission < ApplicationRecord
 
   def refresh_playback
     @photo_changed = false
-    playback.purge_later if playback.attached?
+    if playback.attached?
+      stale = playback.blob
+      playback.detach
+      stale.purge_later
+    end
     TranscodeVideoJob.perform_later(self) if video?
   end
 
   def photo_within_limits
     if video?
-      if photo.byte_size > MAX_VIDEO_BYTES
-        errors.add(:photo, "Videos must be 50 MB or smaller")
-      elsif video_duration.to_f > MAX_VIDEO_SECONDS
-        errors.add(:photo, "Videos must be #{MAX_VIDEO_SECONDS} seconds or shorter")
-      end
+      errors.add(:photo, "Videos must be 50 MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
     elsif !image?
       errors.add(:photo, "Only photos and videos can be uploaded")
     end
-  end
-
-  def video_duration
-    blob = photo.blob
-    blob.analyze if blob.persisted?
-    blob.metadata[:duration]
-  rescue ActiveStorage::IntegrityError
-    errors.add(:photo, "The video didn't upload completely. Please try again")
-    nil
   end
 end

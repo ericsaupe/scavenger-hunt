@@ -12,12 +12,36 @@ RSpec.describe VideoTranscoder do
         "-protocol_whitelist", "file", "-format_whitelist", "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm",
         "-i", "/tmp/original.mov",
         "-t", "30",
-        "-vf", "scale=w='if(gt(a,1),min(1280,iw),min(720,iw))':h='if(gt(a,1),min(720,ih),min(1280,ih))':force_original_aspect_ratio=decrease:force_divisible_by=2",
+        "-vf", "scale=w='if(gt(a,1),min(1280,iw),min(720,iw))':h='if(gt(a,1),min(720,ih),min(1280,ih))':force_original_aspect_ratio=decrease:force_divisible_by=2,fps=fps='min(source_fps,60)'",
         "-c:v", "libx264", "-profile:v", "high", "-level", "4.0", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23",
         "-c:a", "aac", "-b:a", "128k",
         "-movflags", "+faststart",
         "/tmp/playback.mp4"
       ])
+    end
+  end
+
+  describe ".duration" do
+    let(:log) { Tempfile.new("ffprobe", Rails.root.join("tmp")) }
+
+    around do |example|
+      ENV["FAKE_FFPROBE_LOG"] = log.path
+      example.run
+    ensure
+      ENV.delete("FAKE_FFPROBE_LOG")
+      log.close!
+    end
+
+    it "probes the file with the same input restrictions as the conversion" do
+      expect(described_class.duration("/tmp/original.mov")).to eq(5.0)
+
+      log.rewind
+      expect(log.read.chomp.split("\t")).to eq(["-protocol_whitelist", "file", "-format_whitelist", "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm",
+        "-print_format", "json", "-show_streams", "-show_format", "-v", "error", "/tmp/original.mov"])
+    end
+
+    it "is nil when the probe reports no length", ffprobe_duration: "none" do
+      expect(described_class.duration("/tmp/original.mov")).to be_nil
     end
   end
 

@@ -66,6 +66,53 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     expect(submission.poster_url).to be_nil
   end
 
+  it "restricts the poster frame to plain video files too" do
+    described_class.perform_now(submission)
+
+    poster = ffmpeg_calls.find { |args| args.include?("image2") }
+    expect(poster.first(4)).to eq(VideoTranscoder::INPUT_OPTIONS)
+  end
+
+  it "probes every upload and takes back a video longer than thirty seconds", ffprobe_duration: 31 do
+    allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
+    submission.photo.blob.update!(metadata: {analyzed: true, duration: 1})
+    blob = submission.photo.blob
+
+    expect { described_class.perform_now(submission) }.to have_enqueued_job(LeadChangeJob).with(submission.hunt)
+
+    expect(submission.reload.photo).not_to be_attached
+    expect(ActiveStorage::Blob.exists?(blob.id)).to be(false)
+    expect(ffmpeg_calls).to be_empty
+    expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{submission.team_id}",
+      target: "flash", partial: "banners/banner", locals: {message: "Videos must be 30 seconds or shorter. Try a shorter clip."})
+  end
+
+  it "takes back a video whose upload did not match its checksum" do
+    allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
+    blob = ActiveStorage::Blob.create_before_direct_upload!(filename: "clip.mp4", content_type: "video/mp4", byte_size: 1.megabyte, checksum: "abc")
+    blob.service.upload(blob.key, Rails.root.join("spec/fixtures/video.mp4").open)
+    submission.photo.attach(blob)
+
+    described_class.perform_now(submission)
+
+    expect(submission.reload.photo).not_to be_attached
+    expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{submission.team_id}",
+      hash_including(locals: {message: "The video didn't upload completely. Please try again."}))
+  end
+
+  it "drops a conversion whose clip was retaken while it ran" do
+    retake = Rails.root.join("spec/fixtures/test.jpg")
+    allow(VideoTranscoder).to receive(:transcode).and_wrap_original do |original, *args|
+      Submission.find(submission.id).photo.attach(io: retake.open, filename: "retake.jpg")
+      original.call(*args)
+    end
+
+    described_class.perform_now(submission)
+
+    expect(submission.reload.playback).not_to be_attached
+    expect(submission.photo.blob.filename.to_s).to eq("retake.jpg")
+  end
+
   it "leaves photos and already converted videos alone" do
     photo = create(:photo_submission)
     submission.playback.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "playback.mp4", content_type: "video/mp4")

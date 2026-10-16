@@ -149,24 +149,28 @@ RSpec.describe "Submissions" do
       expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
     end
 
-    it "refuses a video longer than thirty seconds and discards it", ffprobe_duration: 31 do
+    it "accepts a video longer than thirty seconds and lets the worker take it back", ffprobe_duration: 31 do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
       signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 1.megabyte)
       send_photo(signed_id)
 
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("Videos must be 30 seconds or shorter")
+      expect(response).to have_http_status(:ok)
       expect(submission.photo).not_to be_attached
       expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{team.id}",
+        hash_including(target: "flash", locals: {message: "Videos must be 30 seconds or shorter. Try a shorter clip."}))
     end
 
-    it "refuses a video whose upload did not match its checksum" do
+    it "takes back a video whose upload did not match its checksum" do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
       signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 1.megabyte, checksum: "abc")
       send_photo(signed_id)
 
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("The video didn&#39;t upload completely. Please try again")
+      expect(response).to have_http_status(:ok)
       expect(submission.photo).not_to be_attached
       expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{team.id}",
+        hash_including(target: "flash", locals: {message: "The video didn't upload completely. Please try again."}))
     end
 
     it "queues the playable version of an accepted video", :test_queue_adapter do
