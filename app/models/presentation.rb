@@ -21,7 +21,7 @@ class Presentation
   def keys
     @keys ||= found.chunk_while { |(_, item_a), (_, item_b)| item_a == item_b }.flat_map do |group|
       [self.class.item_key(group.first.last), *group.map { |id, _| self.class.submission_key(id) }]
-    end.tap { |keys| keys << FINALE unless keys.empty? }
+    end.tap { |keys| keys << FINALE unless keys.empty? || hunt.leaderboard_locked? }
   end
 
   def empty?
@@ -63,6 +63,11 @@ class Presentation
 
   def current
     slide(current_key)
+  end
+
+  def next_submission(key = current_key)
+    next_key = keys.rotate(position(key)).find { |candidate| candidate.start_with?("submission:") }
+    hunt.submissions.includes(photo_attachment: :blob).find(next_key.delete_prefix("submission:")) if next_key
   end
 
   def presenting?(submission)
@@ -140,6 +145,11 @@ class Presentation
 
     def video?
       false
+    end
+
+    def preload_url
+      upcoming = presentation.next_submission(key)
+      upcoming.large_variant_url if upcoming&.image?
     end
   end
 

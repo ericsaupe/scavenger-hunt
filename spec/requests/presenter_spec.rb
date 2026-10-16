@@ -75,6 +75,42 @@ RSpec.describe "Presenter" do
       expect(response.body).to include("Item 1 of 3", "Next up", ERB::Util.html_escape(items.first.name))
     end
 
+    it "preloads the next photo and gives every print its own deterministic tilt" do
+      first = found(first_team, items.first)
+      second = found(second_team, items.first)
+      hunt.update!(presentation_slide: "submission:#{first.id}")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(<link rel="preload" as="image" href="#{second.large_variant_url}"))
+      expect(response.body).to match(/id="submission_#{first.id}_print"[^>]*style="--tilt: -?\d\.\ddeg"[^>]*data-print/)
+      expect(response.body).to include(%(id="print_overlay"), %(data-controller="transition"))
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+      tilt = response.body[/id="submission_#{first.id}_print"[^>]*style="(--tilt: [^"]+)"/, 1]
+      expect(tilt).to eq(response.body[/id="submission_#{first.id}_print"[^>]*style="(--tilt: [^"]+)"/, 1])
+
+      hunt.update!(presentation_slide: "item:#{items.first.id}")
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(<link rel="preload" as="image" href="#{first.large_variant_url}"), %(id="item_#{items.first.id}_card"))
+    end
+
+    it "leaves the finale out while the leaderboard is locked" do
+      found(first_team, items.first)
+      hunt.update!(lock_password: "hunter2")
+
+      expect(hunt.presentation.keys).not_to include("finale")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?slide=finale"
+
+      expect(response.body).to include("Live", "Item 1 of 2")
+      expect(response.body).not_to include("First place", "Browsing")
+
+      hunt.update!(password_entered: true, password_entered_for_leaderboard: true)
+      expect(Presentation.new(hunt.reload).keys).to include("finale")
+    end
+
     it "shows the item title card with who found it" do
       found(first_team, items.first)
       found(second_team, items.first)
@@ -158,12 +194,13 @@ RSpec.describe "Presenter" do
 
     it "renders with the same number of queries however many photos there are" do
       hunt.update!(presentation_slide: "submission:#{found(first_team, items.first).id}")
+      found(first_team, items.second)
       path = "/scavenger_hunts/#{hunt.code}/presenter"
       get path
       few = queries_for(path)
 
       found(second_team, items.first)
-      found(first_team, items.second)
+      found(second_team, items.second)
       found(second_team, items.third)
       many = queries_for(path)
 

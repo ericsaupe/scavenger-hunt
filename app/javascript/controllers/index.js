@@ -22,6 +22,9 @@ application.register("code", CodeController)
 import DownloadController from "./download_controller"
 application.register("download", DownloadController)
 
+import FinaleController from "./finale_controller"
+application.register("finale", FinaleController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
@@ -63,6 +66,9 @@ application.register("submission", SubmissionController)
 
 import TimerController from "./timer_controller"
 application.register("timer", TimerController)
+
+import TransitionController from "./transition_controller"
+application.register("transition", TransitionController)
 
 import VoteController from "./vote_controller"
 application.register("vote", VoteController)

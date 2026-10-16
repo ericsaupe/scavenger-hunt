@@ -73,6 +73,16 @@ RSpec.describe "Presentations" do
       expect(hunt.reload).to have_attributes(presentation_slide: "item:#{items.second.id}", presentation_playback: "paused", playback_started_at: nil)
     end
 
+    it "refuses the finale while the leaderboard is locked" do
+      hunt.update!(lock_password: "hunter2", presentation_slide: "submission:#{third.id}")
+
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "finale"}, as: :json
+      expect(response).to have_http_status(:unprocessable_content)
+
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "next"}, as: :json
+      expect(hunt.reload.presentation_slide).to eq("item:#{items.first.id}")
+    end
+
     it "ignores a slide that is not part of the show" do
       patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "submission:#{third.id + 100}"}, as: :json
 

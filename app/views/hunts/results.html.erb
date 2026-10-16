@@ -36,7 +36,7 @@
     </div>
   <% end %>
 
-  <% if @hunt.lock_password.present? && !@hunt.password_entered_for_leaderboard %>
+  <% if @hunt.leaderboard_locked? %>
     <%= render(partial: "hunts/locked_leaderboard", locals: {hunt: @hunt}) %>
   <% else %>
     <%= render(partial: "hunts/leaderboard", locals: {results: @results}) %>

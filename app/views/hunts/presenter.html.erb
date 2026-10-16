@@ -1,10 +1,17 @@
 <% title "#{@hunt.name} on the big screen" %>
 <%= render partial: "hunts/presenter_head" %>
+<% if (preload_url = @slide.preload_url) %>
+  <% content_for :head do %>
+    <link rel="preload" as="image" href="<%= preload_url %>" data-testid="preload-next">
+  <% end %>
+<% end %>
 
 <div class="flex min-h-dvh flex-col sm:h-dvh sm:flex-row" data-controller="live">
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
-  <% browse = @big_screen ? {} : {controller: "browse", browse_next_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), browse_previous_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.previous_key)} %>
-  <%= tag.div class: "relative flex min-h-dvh grow flex-col sm:min-h-0", data: browse do %>
+  <% stage = {controller: "transition"} %>
+  <% stage = stage.merge(controller: "browse transition", browse_next_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), browse_previous_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.previous_key)) unless @big_screen %>
+  <%= tag.div class: "relative flex min-h-dvh grow flex-col sm:min-h-0", data: stage do %>
+    <div id="print_overlay" class="pointer-events-none absolute inset-0 z-10 overflow-hidden" data-turbo-permanent data-transition-target="overlay"></div>
     <div class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-3 pt-3">
       <%= link_to hunt_results_path(@hunt.code.upcase), class: "btn btn-ghost btn-sm text-white/70 hover:text-white" do %>
         <%= icon :arrow_left, class: "size-4" %>

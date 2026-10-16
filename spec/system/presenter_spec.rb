@@ -138,19 +138,22 @@ RSpec.describe "Presenter" do
     expect(page).to have_css("[data-testid='progress']", text: "Video 2 of 5")
     using_session(:big_screen) do
       expect(page).to have_css("[data-testid='progress']", text: "Video 2 of 5")
-      expect(page).to have_css("video")
+      expect(page).to have_css("figure#submission_#{@video.id}_print.print-enter video")
+      expect(page).to have_css("link[rel='preload'][as='image'][href='#{@photo.large_variant_url}']", visible: false)
     end
 
     click_on "Next"
     expect(page).to have_css("[data-testid='progress']", text: "Item 3 of 5")
     using_session(:big_screen) do
-      expect(page).to have_css("[data-testid='title-card']", text: hunt.items.second.name)
+      expect(page).to have_css("#item_#{hunt.items.second.id}_card.print-enter", text: hunt.items.second.name)
+      expect(page).to have_css("link[rel='preload'][as='image'][href='#{@photo.large_variant_url}']", visible: false)
     end
 
     click_on "Next"
     expect(page).to have_css("[data-testid='progress']", text: "Photo 4 of 5")
     using_session(:big_screen) do
-      expect(page).to have_css("img#submission_#{@photo.id}_photo")
+      expect(page).to have_css("figure#submission_#{@photo.id}_print.print-enter img#submission_#{@photo.id}_photo")
+      expect(page).to have_no_css(".print-pending")
       expect(page).to have_css("[data-testid='love-count']", text: "1 love")
       expect(page).to have_css("[data-testid='flag-count']", text: "0 of 1 flags")
     end
@@ -181,7 +184,7 @@ RSpec.describe "Presenter" do
     expect(page).to have_css("[data-testid='progress']", text: "Finale 5 of 5")
     expect(page).to have_css("[data-testid='current-item']", text: "First place")
     using_session(:big_screen) do
-      expect(page).to have_css("[data-testid='finale']", text: /first place/i)
+      expect(page).to have_css("#finale_card.print-enter", text: /first place/i)
       expect(page).to have_css("[data-testid='winner-name']", text: team.name)
       expect(page).to have_css("[data-testid='finale']", text: "#{team.score} points")
       expect(page).to have_css("[data-testid='most-loved']", text: "1 love")

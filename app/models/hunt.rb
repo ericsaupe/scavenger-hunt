@@ -92,6 +92,10 @@ class Hunt < ApplicationRecord
     (lock_results && ends_at && ends_at > Time.current) || (lock_password.present? && !password_entered)
   end
 
+  def leaderboard_locked?
+    results_locked? || (lock_password.present? && !password_entered_for_leaderboard)
+  end
+
   def password
     @password ||= lock_password
   end
