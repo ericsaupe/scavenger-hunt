@@ -14,7 +14,7 @@
             <% image_url = submission_attachment_url(submission, variant_size: :large) %>
             <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
               <% if submission.video? %>
-                <%= video_tag(image_url, controls: true, playsinline: true, preload: "metadata", class: "max-h-[60dvh] w-full") %>
+                <%= video_tag(submission.media_url, controls: true, playsinline: true, preload: "metadata", poster: submission.poster_url, class: "max-h-[60dvh] w-full") %>
               <% else %>
                 <%= image_tag(image_url, class: "max-h-[60dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
               <% end %>

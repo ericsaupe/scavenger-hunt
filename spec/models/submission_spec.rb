@@ -49,14 +49,107 @@ RSpec.describe Submission do
       expect(ActiveStorage::VariantRecord.count).to eq(0)
     end
 
-    it "links videos to the original file" do
+    it "links videos to the playable version" do
       submission = create(:video_submission)
 
+      expect(submission.large_variant_url).to eq(submission.media_url)
       expect(submission.large_variant_url).to start_with("/rails/active_storage/blobs/redirect/")
     end
 
     it "is nil without a photo" do
       expect(create(:submission).small_variant_url).to be_nil
+    end
+  end
+
+  describe "#media_url" do
+    include Rails.application.routes.url_helpers
+
+    it "serves the original video until the playable version exists", :test_queue_adapter do
+      submission = create(:video_submission)
+
+      expect(submission.media_url).to eq(rails_blob_path(submission.photo))
+      expect(submission.poster_url).to be_nil
+      expect(submission).to be_processing_video
+    end
+
+    it "serves the playable version with its poster once the job has made them" do
+      submission = create(:video_submission).reload
+
+      expect(submission.playback).to be_attached
+      expect(submission.media_url).to eq(rails_blob_path(submission.playback))
+      expect(submission.media_url).not_to eq(rails_blob_path(submission.photo))
+      expect(submission.poster_url).to start_with("/rails/active_storage/representations/redirect/")
+      expect(submission.poster_url(:small)).not_to eq(submission.poster_url(:large))
+      expect(submission).not_to be_processing_video
+    end
+
+    it "serves photos as variants" do
+      submission = create(:photo_submission)
+
+      expect(submission.media_url).to eq(rails_blob_path(submission.photo))
+      expect(submission.large_variant_url).to start_with("/rails/active_storage/representations/redirect/")
+      expect(submission.playback).not_to be_attached
+    end
+
+    it "drops the playable version and makes a new one when the video is retaken", :test_queue_adapter do
+      submission = create(:video_submission)
+      submission.playback.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "playback.mp4", content_type: "video/mp4")
+      old_playback = submission.playback.blob
+
+      expect {
+        submission.photo.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "retake.mp4")
+      }.to have_enqueued_job(TranscodeVideoJob).with(submission).and have_enqueued_job(ActiveStorage::PurgeJob).with(old_playback)
+      expect(submission.reload.playback).not_to be_attached
+      expect(submission.media_url).to eq(rails_blob_path(submission.photo))
+    end
+
+    it "drops the playable version when a photo replaces the video", :test_queue_adapter do
+      submission = create(:video_submission)
+      submission.playback.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "playback.mp4", content_type: "video/mp4")
+
+      expect {
+        submission.photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
+      }.not_to have_enqueued_job(TranscodeVideoJob)
+      expect(submission.reload.playback).not_to be_attached
+      expect(submission.media_url).to start_with("/rails/active_storage/blobs/redirect/")
+    end
+  end
+
+  describe "video length" do
+    let(:submission) { create(:submission) }
+
+    def video_blob(metadata = {})
+      ActiveStorage::Blob.create_and_upload!(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "clip.mp4",
+        content_type: "video/mp4", metadata:, identify: false)
+    end
+
+    it "refuses a video longer than thirty seconds" do
+      submission.photo.attach(video_blob(analyzed: true, duration: 30.5))
+
+      expect(submission.errors[:photo]).to eq(["Videos must be 30 seconds or shorter"])
+      expect(submission.reload.photo).not_to be_attached
+    end
+
+    it "accepts a video of exactly thirty seconds" do
+      submission.photo.attach(video_blob(analyzed: true, duration: 30.0))
+
+      expect(submission.errors).to be_empty
+      expect(submission.reload.photo).to be_attached
+    end
+
+    it "accepts a video whose length could not be read" do
+      submission.photo.attach(video_blob(analyzed: true))
+
+      expect(submission.reload.photo).to be_attached
+    end
+
+    it "probes an unanalyzed upload before judging it", ffprobe_duration: 31 do
+      blob = video_blob
+
+      submission.photo.attach(blob)
+
+      expect(submission.errors[:photo]).to eq(["Videos must be 30 seconds or shorter"])
+      expect(submission.reload.photo).not_to be_attached
     end
   end
 end

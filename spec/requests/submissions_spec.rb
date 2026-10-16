@@ -12,8 +12,9 @@ RSpec.describe "Submissions" do
     ActiveStorage::Blob.create_and_upload!(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg").signed_id
   end
 
-  def direct_uploaded(content_type:, byte_size:, io: Rails.root.join("spec/fixtures/video.mp4").open)
-    blob = ActiveStorage::Blob.create_before_direct_upload!(filename: "clip", content_type:, byte_size:, checksum: "abc")
+  def direct_uploaded(content_type:, byte_size:, io: Rails.root.join("spec/fixtures/video.mp4").open, checksum: OpenSSL::Digest::MD5.base64digest(io.read))
+    io.rewind
+    blob = ActiveStorage::Blob.create_before_direct_upload!(filename: "clip", content_type:, byte_size:, checksum:)
     blob.service.upload(blob.key, io)
     blob.signed_id
   end
@@ -146,6 +147,32 @@ RSpec.describe "Submissions" do
       send_photo(signed_id)
 
       expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
+    end
+
+    it "refuses a video longer than thirty seconds and discards it", ffprobe_duration: 31 do
+      signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 1.megabyte)
+      send_photo(signed_id)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("Videos must be 30 seconds or shorter")
+      expect(submission.photo).not_to be_attached
+      expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
+    end
+
+    it "refuses a video whose upload did not match its checksum" do
+      signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 1.megabyte, checksum: "abc")
+      send_photo(signed_id)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("The video didn&#39;t upload completely. Please try again")
+      expect(submission.photo).not_to be_attached
+      expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
+    end
+
+    it "queues the playable version of an accepted video", :test_queue_adapter do
+      expect { send_photo(direct_uploaded(content_type: "video/mp4", byte_size: 1.megabyte)) }
+        .to have_enqueued_job(TranscodeVideoJob).with(submission)
+      expect(response.body).to include("Processing video")
     end
 
     it "refuses a file that is neither a photo nor a video" do

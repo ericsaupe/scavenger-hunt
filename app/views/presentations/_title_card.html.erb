@@ -10,8 +10,8 @@
         <figure class="polaroid w-20 p-1 pb-3 sm:w-28 sm:p-1.5 sm:pb-4" style="--tilt: <%= [-6, 4, -3, 5, -5, 3][i % 6] %>deg">
           <div class="grid aspect-square place-items-center overflow-hidden bg-black">
             <% if submission.video? %>
-              <% if submission.poster_url %>
-                <%= image_tag submission.poster_url, class: "size-full object-cover", alt: "" %>
+              <% if (poster = submission.poster_url(:small)) %>
+                <%= image_tag poster, class: "size-full object-cover", alt: "" %>
               <% else %>
                 <%= icon :play, solid: true, class: "size-6 text-white/80" %>
               <% end %>

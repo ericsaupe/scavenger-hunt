@@ -3,11 +3,13 @@
 class Submission < ApplicationRecord
   MAX_VIDEO_BYTES = 50.megabytes
   MAX_VIDEO_SECONDS = 30
+  POSTER_SIZES = {small: [500, 500], large: [1500, 1500]}.freeze
 
   has_one_attached :photo do |attachable|
     attachable.variant :small, resize_to_fit: [500, 500]
     attachable.variant :large, resize_to_fit: [1500, 1500]
   end
+  has_one_attached :playback
 
   belongs_to :item
   belongs_to :team, touch: true
@@ -18,9 +20,13 @@ class Submission < ApplicationRecord
 
   validate :photo_within_limits, if: -> { attachment_changes["photo"] }
 
-  after_save { @leaderboard_changed = attachment_changes.key?("photo") || saved_change_to_denied_points? }
+  after_save do
+    @photo_changed = attachment_changes.key?("photo")
+    @leaderboard_changed = @photo_changed || saved_change_to_denied_points?
+  end
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
   after_update_commit :announce_lead_change, if: -> { @leaderboard_changed }
+  after_commit :refresh_playback, on: [:create, :update], if: -> { @photo_changed }
 
   scope :found, -> { joins(:photo_attachment) }
   scope :with_points, -> { where(denied_points: false) }
@@ -31,6 +37,10 @@ class Submission < ApplicationRecord
 
   def video?
     !!photo&.blob&.content_type&.include?("video")
+  end
+
+  def processing_video?
+    video? && !playback.attached?
   end
 
   def photo_extension
@@ -50,15 +60,25 @@ class Submission < ApplicationRecord
 
   def variant_url(size)
     return nil unless photo.attached?
+    return media_url if video?
 
-    routes = Rails.application.routes.url_helpers
-    video? ? routes.rails_blob_path(photo, only_path: true) : routes.rails_representation_path(photo.variant(size), only_path: true)
+    routes.rails_representation_path(photo.variant(size), only_path: true)
   end
 
-  def poster_url
-    return nil unless video? && photo.previewable?
+  def media_url
+    return nil unless photo.attached?
 
-    Rails.application.routes.url_helpers.rails_representation_path(photo.preview(resize_to_limit: [1500, 1500]), only_path: true)
+    routes.rails_blob_path(playback.attached? ? playback : photo, only_path: true)
+  end
+
+  def poster(size)
+    photo.preview(resize_to_limit: POSTER_SIZES.fetch(size))
+  end
+
+  def poster_url(size = :large)
+    return nil unless video? && playback.attached? && photo.previewable?
+
+    routes.rails_representation_path(poster(size), only_path: true)
   end
 
   def vote_for(user_id)
@@ -82,16 +102,39 @@ class Submission < ApplicationRecord
 
   private
 
+  def routes
+    Rails.application.routes.url_helpers
+  end
+
   def announce_lead_change
     @leaderboard_changed = false
     LeadChangeJob.perform_later(hunt)
   end
 
+  def refresh_playback
+    @photo_changed = false
+    playback.purge_later if playback.attached?
+    TranscodeVideoJob.perform_later(self) if video?
+  end
+
   def photo_within_limits
     if video?
-      errors.add(:photo, "Videos must be 50 MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
+      if photo.byte_size > MAX_VIDEO_BYTES
+        errors.add(:photo, "Videos must be 50 MB or smaller")
+      elsif video_duration.to_f > MAX_VIDEO_SECONDS
+        errors.add(:photo, "Videos must be #{MAX_VIDEO_SECONDS} seconds or shorter")
+      end
     elsif !image?
       errors.add(:photo, "Only photos and videos can be uploaded")
     end
+  end
+
+  def video_duration
+    blob = photo.blob
+    blob.analyze if blob.persisted? && !blob.analyzed?
+    blob.metadata[:duration]
+  rescue ActiveStorage::IntegrityError
+    errors.add(:photo, "The video didn't upload completely. Please try again")
+    nil
   end
 end
