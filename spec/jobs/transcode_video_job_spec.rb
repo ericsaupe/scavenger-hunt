@@ -28,7 +28,7 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     conversion = ffmpeg_calls.find { |args| args.last.end_with?("/playback.mp4") }
     original = conversion[conversion.index("-i") + 1]
     expect(original).to end_with(".mp4")
-    expect(conversion).to eq(VideoTranscoder.new(original, conversion.last).command.drop(1))
+    expect(conversion).to eq(VideoTranscoder.new(original, conversion.last).command.drop(VideoTranscoder::NICE.size + 1))
     expect(conversion).to include("-t", "30", "-c:v", "libx264", "-movflags", "+faststart")
     expect(submission.reload.playback).to be_attached
     expect(submission.playback.blob).to have_attributes(filename: have_attributes(to_s: "playback.mp4"), content_type: "video/mp4", byte_size: Rails.root.join("spec/fixtures/video.mp4").size)
@@ -71,6 +71,7 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
 
     poster = ffmpeg_calls.find { |args| args.include?("image2") }
     expect(poster.first(4)).to eq(VideoTranscoder::INPUT_OPTIONS)
+    expect(ffmpeg_calls.find { |args| args.last.end_with?("/playback.mp4") }).not_to include("nice")
   end
 
   it "probes every upload and takes back a video longer than thirty seconds", ffprobe_duration: 31 do

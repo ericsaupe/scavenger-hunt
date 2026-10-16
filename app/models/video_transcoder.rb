@@ -10,6 +10,8 @@ class VideoTranscoder
   MAX_FPS = 60
   LEVEL = "4.2"
   CRF = "22"
+  THREADS = "1"
+  NICE = ["nice", "-n", "19"].freeze
   TIMEOUT = 10.minutes
   INPUT_OPTIONS = ["-protocol_whitelist", "file", "-format_whitelist", "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm"].freeze
   SCALE = "scale=w='if(gt(a,1),min(#{MAX_WIDTH},iw),min(#{MAX_HEIGHT},iw))':" \
@@ -44,7 +46,7 @@ class VideoTranscoder
     Float(duration) if duration
   end
 
-  def self.run(command, into: StringIO.new)
+  def self.run(command, into: StringIO.new, program: File.basename(command.first))
     Open3.popen3(*command, pgroup: true) do |stdin, stdout, stderr, process|
       stdin.close
       drain = Thread.new { IO.copy_stream(stdout, into) }
@@ -54,7 +56,6 @@ class VideoTranscoder
       kill(process.pid) unless finished
       drain.join
       complaint = errors.value.strip
-      program = File.basename(command.first)
 
       raise Error, "#{program} gave up after #{TIMEOUT.inspect}" unless finished
       raise Error, "#{program} failed (status #{process.value.exitstatus}): #{complaint}" unless process.value.success?
@@ -77,10 +78,10 @@ class VideoTranscoder
   end
 
   def command
-    [self.class.ffmpeg_path, "-nostdin", "-y", "-loglevel", "error",
-      *INPUT_OPTIONS, "-i", input,
+    [*NICE, self.class.ffmpeg_path, "-nostdin", "-y", "-loglevel", "error",
+      *INPUT_OPTIONS, "-threads", THREADS, "-i", input,
       "-t", Submission::MAX_VIDEO_SECONDS.to_s,
-      "-vf", FILTERS,
+      "-vf", FILTERS, "-threads", THREADS,
       "-c:v", "libx264", "-profile:v", "high", "-level", LEVEL, "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", CRF,
       "-c:a", "aac", "-b:a", "128k",
       "-movflags", "+faststart",
@@ -88,7 +89,7 @@ class VideoTranscoder
   end
 
   def transcode
-    self.class.run(command, into: File::NULL.then { |null| File.open(null, "w") })
+    self.class.run(command, into: File.open(File::NULL, "w"), program: "ffmpeg")
     output
   end
 end
