@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { prompt as pushPrompt } from "../push/client"
 
 const DISMISSED_KEY = "installPromptDismissed"
 
@@ -31,8 +32,12 @@ export default class extends Controller {
     }
     window.deferredInstallPrompt = null
     prompt.prompt()
-    await prompt.userChoice.catch(() => {})
+    const choice = await prompt.userChoice.catch(() => null)
     this.dismiss()
+    if (choice?.outcome === "accepted") {
+      pushPrompt.markPending()
+      window.dispatchEvent(new CustomEvent("install:accepted"))
+    }
   }
 
   dismiss() {

@@ -44,6 +44,16 @@ RSpec.describe "PWA" do
       )
     end
 
+    it "shows pushes as notifications that open their url" do
+      get "/service-worker.js"
+
+      expect(response.body).to include('addEventListener("push"')
+      expect(response.body).to include("showNotification(")
+      expect(response.body).to include('addEventListener("notificationclick"')
+      expect(response.body).to include("clients.openWindow(")
+      expect(response.body).to include("/android-chrome-192x192.png")
+    end
+
     it "serves the offline page" do
       get "/offline"
 

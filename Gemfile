@@ -54,3 +54,5 @@ group :test do
   gem "selenium-webdriver"
   gem "shoulda-matchers", "~> 8.0"
 end
+
+gem "web-push", "~> 3.1"

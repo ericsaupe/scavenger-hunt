@@ -44,8 +44,19 @@ module NetworkHelpers
   def clear_upload_queue
     page.evaluate_async_script(<<~JS)
       const done = arguments[0]
-      const request = indexedDB.deleteDatabase("scavenger-hunt-party")
-      request.onsuccess = request.onerror = request.onblocked = () => done(true)
+      const request = indexedDB.open("scavenger-hunt-party")
+      request.onerror = () => done(false)
+      request.onsuccess = () => {
+        const db = request.result
+        if (!db.objectStoreNames.contains("queued_uploads")) {
+          db.close()
+          return done(true)
+        }
+        const transaction = db.transaction("queued_uploads", "readwrite")
+        transaction.objectStore("queued_uploads").clear()
+        transaction.oncomplete = () => { db.close(); done(true) }
+        transaction.onerror = () => { db.close(); done(false) }
+      }
     JS
   end
 

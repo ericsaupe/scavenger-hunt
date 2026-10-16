@@ -21,7 +21,7 @@ class Presentation
   def keys
     @keys ||= found.chunk_while { |(_, item_a), (_, item_b)| item_a == item_b }.flat_map do |group|
       [self.class.item_key(group.first.last), *group.map { |id, _| self.class.submission_key(id) }]
-    end.tap { |keys| keys << FINALE unless keys.empty? || hunt.leaderboard_locked? }
+    end.tap { |keys| keys << FINALE unless keys.empty? || !hunt.leaderboard_visible? }
   end
 
   def empty?
