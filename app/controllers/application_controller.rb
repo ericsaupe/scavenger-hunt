@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::Base
   include ActiveStorage::SetCurrent
+
   before_action :set_user_id
 
   private
