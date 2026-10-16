@@ -11,6 +11,10 @@ export default class extends Controller {
     const submissionId = this.submissionIdValue
     const currentValue = this.valueValue
     const button = event.currentTarget
+    if (button.disabled) {
+      return
+    }
+    button.disabled = true
     const value = button.dataset.value
     const csrfToken = this.getMetaValue("csrf-token")
     const rect = button.getBoundingClientRect()
@@ -34,8 +38,12 @@ export default class extends Controller {
 
         return r.text()
       })
-      .then(html => Turbo.renderStreamMessage(html))
-      .then(() => {
+      .then(html => {
+        if (!this.element.isConnected || this.submissionIdValue !== submissionId) {
+          return
+        }
+
+        Turbo.renderStreamMessage(html)
         if (currentValue === value) {
           return
         }
@@ -74,7 +82,10 @@ export default class extends Controller {
         }
       })
       .catch(error => {
-        console.log(error)
+        console.error(error)
+      })
+      .finally(() => {
+        button.disabled = false
       })
   }
 

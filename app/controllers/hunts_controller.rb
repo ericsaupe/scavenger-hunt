@@ -75,29 +75,14 @@ class HuntsController < ApplicationController
 
   def presenter
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
-    ordered_ids = @hunt.submissions.found.order(:item_id, :team_id).ids
-    if ordered_ids.empty?
+    @presentation = @hunt.presentation
+    if @presentation.empty?
       flash[:warning] = "No submissions yet!"
       return redirect_to hunt_path(code: @hunt.code.upcase)
     end
 
-    if ActiveModel::Type::Boolean.new.cast(params[:become_presenter]) && !@hunt.owner?(cookies[:user_id])
-      @hunt.update(owner_id: cookies[:user_id])
-    end
-
-    submissions = @hunt.submissions.found.includes(:item, :team, photo_attachment: :blob)
-    if params[:submission_id].present? && @hunt.owner?(cookies[:user_id])
-      @submission = submissions.find(params[:submission_id])
-      @hunt.update(presentation_submission: @submission)
-    elsif @hunt.presentation_submission_id.present?
-      @submission = submissions.find_by(id: @hunt.presentation_submission_id)
-    end
-    @submission ||= submissions.find(ordered_ids.first)
-
-    index = ordered_ids.index(@submission.id)
-    @previous_submission_id = ordered_ids[index - 1]
-    @next_submission_id = ordered_ids[(index + 1) % ordered_ids.size]
-    @hunt.broadcast_presentation_update(@submission) if @hunt.owner?(cookies[:user_id])
+    @submission = @presentation.current
+    @big_screen = params[:screen] == "big"
     @presenter_mode = true
   end
 

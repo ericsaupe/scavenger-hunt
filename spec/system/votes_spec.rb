@@ -27,6 +27,16 @@ RSpec.describe "Results" do
         expect(page).to have_text("0 / 1")
       end
 
+      it "counts a double tap once" do
+        visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
+        find("[data-testid='vote-menu-love-button']").double_click
+        expect(page).to have_selector("[data-vote-value-value='love']")
+        sleep 1
+        expect(page).to have_selector("[data-vote-value-value='love']")
+        expect(Vote.count).to eq(1)
+        expect(Vote.last).to be_loved
+      end
+
       it "unrecords a vote if it is the same" do
         visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
         find("[data-testid='vote-menu-love-button']").click

@@ -1,12 +1,7 @@
 class VotesController < ApplicationController
   def create
-    vote = submission.votes.find_or_initialize_by(user_id: vote_params[:user_id])
-    if vote.value == vote_params[:value]
-      vote.value = nil
-    else
-      vote.attributes = vote_params
-    end
-    vote.save!
+    vote = submission.votes.find_by(user_id:) || submission.votes.create_or_find_by!(user_id:)
+    vote.update!(value: (vote.value == vote_params[:value]) ? nil : vote_params[:value])
     submission.calculate_denied_points
     respond_to do |format|
       format.turbo_stream do
@@ -20,7 +15,11 @@ class VotesController < ApplicationController
   private
 
   def vote_params
-    params.require(:vote).permit(:value).merge(user_id: cookies[:user_id])
+    params.require(:vote).permit(:value)
+  end
+
+  def user_id
+    cookies[:user_id]
   end
 
   def submission
