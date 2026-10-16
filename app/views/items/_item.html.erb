@@ -1,54 +1,60 @@
-<div class="grid grid-cols-3 gap-2 mx-auto my-4 font-sans text-center uppercase font-bold">
-  <%= link_to hunt_item_path(hunt.code, previous_item), class: "btn btn-ghost my-auto text-ellipsis" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-    </svg>
-    <span class="hidden sm:block"><%= previous_item.name %></span>
-  <% end %>
-  <h2 class="text-2xl sm:text-2xl sm:tracking-tight lg:text-3xl"><%= title item.name %></h2>
-  <%= link_to hunt_item_path(hunt.code, next_item), class: "btn btn-ghost my-auto text-ellipsis" do %>
-    <span class="hidden sm:block"><%= next_item.name %></span>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-    </svg>
-  <% end %>
-</div>
-
 <% if submissions.empty? %>
-  <div class="container grid grid-cols-1 gap-2 mx-auto">
-    <h3 class="text-2xl sm:text-2xl sm:tracking-tight lg:text-3xl text-center">Huh, I guess nobody found this one.</h2>
-    <div class="w-2/4 mx-auto rounded-sm shadow-xl animate__animated animate__fadeIn">
-      <%= image_tag "nothing.png" %>
+  <div class="page">
+    <div class="rounded-3xl bg-base-200 p-6 text-center">
+      <%= image_tag "nothing.png", class: "mx-auto w-40 rounded-2xl", alt: "" %>
+      <h3 class="display mt-4 text-2xl">Nobody found this one.</h3>
     </div>
   </div>
 <% else %>
-  <div id="items" class="flex flex-col sm:flex-row items-center">
-    <div class="w-full h-1/2 min-h-[75vh] sm:h-[90vh]">
-      <div class="carousel w-full h-1/2 min-h-[70vh] sm:h-[85vh]">
-        <% submissions.each do |submission| %>
-          <div id="submission_<%= submission.id %>" class="carousel-item w-full justify-center relative">
-            <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+  <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8">
+    <% submissions.each do |submission| %>
+      <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center justify-center">
+        <figure class="polaroid-lg w-full max-w-md pb-5!" style="transform: rotate(0)">
+          <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+          <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
             <% if submission.video? %>
-              <%= video_tag(image_url, controls: true, class: "w-full object-contain") %>
+              <%= video_tag(image_url, controls: true, playsinline: true, preload: "metadata", class: "max-h-[60dvh] w-full") %>
             <% else %>
-              <%= image_tag(image_url, class: "object-contain") %>
+              <%= image_tag(image_url, class: "max-h-[60dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
             <% end %>
-
+          </div>
+          <figcaption class="mt-4 flex items-center justify-between gap-3">
+            <span class="display min-w-0 truncate text-2xl text-ink"><%= submission.team.name %></span>
             <%= render(partial: "items/vote_menu", locals: {
                   vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
                 }) %>
+          </figcaption>
+        </figure>
+      </div>
+    <% end %>
+  </div>
 
-            <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300/70 font-bold">
-              <%= submission.team.name %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-      <div id="pages" class="flex justify-center w-full py-2 gap-2">
-        <% submissions.each_with_index do |submission, i| %>
-          <a href="#submission_<%= submission.id %>" class="btn btn-xs"><%= i + 1 %></a>
-        <% end %>
-      </div>
+  <% if submissions.size > 1 %>
+    <div id="pages" class="mt-5 flex justify-center gap-2">
+      <% submissions.each_with_index do |submission, i| %>
+        <a href="#submission_<%= submission.id %>" class="btn btn-circle btn-sm" aria-label="Show submission <%= i + 1 %>"><%= i + 1 %></a>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<% content_for :bottom_bar do %>
+  <div class="bottom-bar">
+    <div class="page grid grid-cols-2 gap-3 pt-3">
+      <%= link_to hunt_item_path(hunt.code, previous_item), class: "btn btn-lg btn-outline h-auto justify-start gap-2 overflow-hidden py-2" do %>
+        <%= icon :chevron_left, class: "size-5 shrink-0" %>
+        <span class="min-w-0 text-left">
+          <span class="block text-xs font-semibold text-ink-soft">Previous</span>
+          <span class="block truncate"><%= previous_item.name %></span>
+        </span>
+      <% end %>
+      <%= link_to hunt_item_path(hunt.code, next_item), class: "btn btn-lg btn-outline h-auto justify-end gap-2 overflow-hidden py-2" do %>
+        <span class="min-w-0 text-right">
+          <span class="block text-xs font-semibold text-ink-soft">Next</span>
+          <span class="block truncate"><%= next_item.name %></span>
+        </span>
+        <%= icon :chevron_right, class: "size-5 shrink-0" %>
+      <% end %>
     </div>
   </div>
 <% end %>

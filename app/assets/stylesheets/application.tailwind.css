@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bitter&family=Oswald&display=swap') layer(base);
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap') layer(base);
 @import 'tailwindcss' source(none);
 
 @source '../../views';
@@ -6,75 +6,430 @@
 @source '../../javascript';
 @source '../../components';
 
+@import 'flatpickr/dist/flatpickr.css' layer(components);
+
 @plugin '@tailwindcss/forms';
 @plugin 'daisyui' {
-  themes: autumn --default, cmyk, halloween, dark --prefersdark, winter;
+  themes: false;
+}
+
+@plugin 'daisyui/theme' {
+  name: "party";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f3f4f1;
+  --color-base-300: #e2e4df;
+  --color-base-content: #1b1f24;
+  --color-primary: #2452e0;
+  --color-primary-content: #ffffff;
+  --color-secondary: #ffb703;
+  --color-secondary-content: #1b1f24;
+  --color-accent: #1f9d55;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1b1f24;
+  --color-neutral-content: #f3f4f1;
+  --color-info: #2452e0;
+  --color-info-content: #ffffff;
+  --color-success: #1f9d55;
+  --color-success-content: #ffffff;
+  --color-warning: #ffb703;
+  --color-warning-content: #1b1f24;
+  --color-error: #d7263d;
+  --color-error-content: #ffffff;
+  --radius-selector: 1rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.3125rem;
+  --border: 1.5px;
+  --depth: 0;
+  --noise: 0;
+  --ink: #1b1f24;
+  --ink-soft: #5b6470;
+  --mark: #ffb703;
+  --mark-content: #1b1f24;
+  --field: #1f9d55;
+}
+
+/* October: violet actions, pumpkin highlights. */
+@plugin 'daisyui/theme' {
+  name: "halloween";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f5f1ec;
+  --color-base-300: #e6dfd6;
+  --color-base-content: #1d1a24;
+  --color-primary: #6d28d9;
+  --color-primary-content: #ffffff;
+  --color-secondary: #f0691f;
+  --color-secondary-content: #1d1a24;
+  --color-accent: #1f9d55;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1d1a24;
+  --color-neutral-content: #f5f1ec;
+  --color-info: #6d28d9;
+  --color-info-content: #ffffff;
+  --color-success: #1f9d55;
+  --color-success-content: #ffffff;
+  --color-warning: #f0691f;
+  --color-warning-content: #1d1a24;
+  --color-error: #d7263d;
+  --color-error-content: #ffffff;
+  --radius-selector: 1rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.3125rem;
+  --border: 1.5px;
+  --depth: 0;
+  --noise: 0;
+  --ink: #1d1a24;
+  --ink-soft: #645c70;
+  --mark: #f0691f;
+  --mark-content: #1d1a24;
+  --field: #1f9d55;
+}
+
+/* November and December: cranberry actions, gold highlights, spruce for found items. */
+@plugin 'daisyui/theme' {
+  name: "autumn";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f5f2ec;
+  --color-base-300: #e6e0d6;
+  --color-base-content: #22201c;
+  --color-primary: #b42332;
+  --color-primary-content: #ffffff;
+  --color-secondary: #d9a419;
+  --color-secondary-content: #22201c;
+  --color-accent: #2e7d4f;
+  --color-accent-content: #ffffff;
+  --color-neutral: #22201c;
+  --color-neutral-content: #f5f2ec;
+  --color-info: #1f6f8b;
+  --color-info-content: #ffffff;
+  --color-success: #2e7d4f;
+  --color-success-content: #ffffff;
+  --color-warning: #d9a419;
+  --color-warning-content: #22201c;
+  --color-error: #b42332;
+  --color-error-content: #ffffff;
+  --radius-selector: 1rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.3125rem;
+  --border: 1.5px;
+  --depth: 0;
+  --noise: 0;
+  --ink: #22201c;
+  --ink-soft: #6b625a;
+  --mark: #d9a419;
+  --mark-content: #22201c;
+  --field: #2e7d4f;
+}
+
+/* Dark variants follow the device setting. Each keeps its season's action and highlight hues, lifted for a dark ground. */
+@media (prefers-color-scheme: dark) {
+  html[data-theme="party"] {
+    color-scheme: dark;
+    --color-base-100: #15181c;
+    --color-base-200: #1f2328;
+    --color-base-300: #2d3238;
+    --color-base-content: #f3f4f1;
+    --color-primary: #7a9bff;
+    --color-primary-content: #0b1230;
+    --color-secondary: #ffc533;
+    --color-secondary-content: #1b1f24;
+    --color-accent: #3ec27a;
+    --color-accent-content: #06130b;
+    --color-neutral: #f3f4f1;
+    --color-neutral-content: #1b1f24;
+    --color-info: #7a9bff;
+    --color-info-content: #0b1230;
+    --color-success: #3ec27a;
+    --color-success-content: #06130b;
+    --color-warning: #ffc533;
+    --color-warning-content: #1b1f24;
+    --color-error: #ff6b7a;
+    --color-error-content: #2a0509;
+    --ink: #f3f4f1;
+    --ink-soft: #a2a9b3;
+    --mark: #ffc533;
+    --mark-content: #1b1f24;
+    --field: #3ec27a;
+  }
+
+  html[data-theme="halloween"] {
+    color-scheme: dark;
+    --color-base-100: #16131c;
+    --color-base-200: #211c2b;
+    --color-base-300: #30293a;
+    --color-base-content: #f4f0f7;
+    --color-primary: #a78bfa;
+    --color-primary-content: #1a0b3d;
+    --color-secondary: #ff8a3d;
+    --color-secondary-content: #1d1a24;
+    --color-accent: #3ec27a;
+    --color-accent-content: #06130b;
+    --color-neutral: #f4f0f7;
+    --color-neutral-content: #1d1a24;
+    --color-info: #a78bfa;
+    --color-info-content: #1a0b3d;
+    --color-success: #3ec27a;
+    --color-success-content: #06130b;
+    --color-warning: #ff8a3d;
+    --color-warning-content: #1d1a24;
+    --color-error: #ff6b7a;
+    --color-error-content: #2a0509;
+    --ink: #f4f0f7;
+    --ink-soft: #b3a9c2;
+    --mark: #ff8a3d;
+    --mark-content: #1d1a24;
+    --field: #3ec27a;
+  }
+
+  html[data-theme="autumn"] {
+    color-scheme: dark;
+    --color-base-100: #1a1714;
+    --color-base-200: #25211c;
+    --color-base-300: #352f29;
+    --color-base-content: #f5f2ec;
+    --color-primary: #f26b78;
+    --color-primary-content: #3a0a10;
+    --color-secondary: #f0c04a;
+    --color-secondary-content: #22201c;
+    --color-accent: #5fcf8f;
+    --color-accent-content: #06130b;
+    --color-neutral: #f5f2ec;
+    --color-neutral-content: #22201c;
+    --color-info: #5fb0cc;
+    --color-info-content: #04202a;
+    --color-success: #5fcf8f;
+    --color-success-content: #06130b;
+    --color-warning: #f0c04a;
+    --color-warning-content: #22201c;
+    --color-error: #f26b78;
+    --color-error-content: #3a0a10;
+    --ink: #f5f2ec;
+    --ink-soft: #b5aca0;
+    --mark: #f0c04a;
+    --mark-content: #22201c;
+    --field: #5fcf8f;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-marigold: var(--mark);
+  --color-marigold-content: var(--mark-content);
+  --color-field: var(--field);
+  --color-cobalt: var(--color-primary);
 }
 
 @theme {
-  --color-pantone: #BB2649;
-  --color-pantone-50: #EEABBA;
-  --color-pantone-100: #EA9AAD;
-  --color-pantone-200: #E47891;
-  --color-pantone-300: #DD5676;
-  --color-pantone-400: #D6345A;
-  --color-pantone-500: #BB2649;
-  --color-pantone-600: #8C1D37;
-  --color-pantone-700: #5E1325;
-  --color-pantone-800: #2F0A12;
-  --color-pantone-900: #000000;
+  --font-sans: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --animate-pop: pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+  --animate-toast-in: toast-in 0.3s ease-out both;
+  --animate-breathe: breathe 1.4s ease-in-out infinite;
+
+  @keyframes pop {
+    0% { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+    100% { transform: scale(1) rotate(var(--tilt, -2deg)); opacity: 1; }
+  }
+  @keyframes toast-in {
+    0% { transform: translateY(-12px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 1; }
+  }
 }
 
-/* Tailwind v4 defaults borders to currentcolor; keep the v3 gray default. */
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-base-300, currentcolor);
+  }
+
+  html {
+    font-optical-sizing: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-cobalt);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-* {
-  color-adjust: exact !important;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
+@layer components {
+  .page {
+    @apply mx-auto w-full max-w-2xl px-5;
+  }
+
+  .display {
+    @apply font-extrabold leading-[1.02] tracking-[-0.03em];
+  }
+
+  .bottom-bar {
+    @apply fixed inset-x-0 bottom-0 z-30 border-t border-base-300 bg-base-100/95 backdrop-blur;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  /* A print is paper: it stays white with dark ink in every theme. */
+  .polaroid,
+  .polaroid-lg {
+    --color-base-100: #ffffff;
+    --color-base-200: #f3f4f1;
+    --color-base-300: #e2e4df;
+    --color-base-content: #1b1f24;
+    --ink: #1b1f24;
+    --ink-soft: #5b6470;
+    color: #1b1f24;
+  }
+
+  .polaroid {
+    --tilt: -2deg;
+    @apply inline-block bg-white p-1.5 pb-5 shadow-[0_6px_18px_-6px_rgba(27,31,36,0.45)];
+    transform: rotate(var(--tilt));
+  }
+
+  .polaroid-lg {
+    @apply bg-white p-3 pb-14 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)];
+  }
+
+  .slot {
+    @apply grid size-12 shrink-0 place-items-center rounded-xl border-2 border-dashed border-base-300 text-ink-soft;
+  }
+
+  .row-tap {
+    @apply flex min-h-16 w-full items-center gap-3 px-3 text-left transition active:bg-base-200;
+  }
+
+  .code-field {
+    @apply w-full rounded-2xl border-2 border-base-300 bg-base-100 px-4 py-3 text-center font-mono text-3xl font-bold uppercase tracking-[0.45em] text-ink;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold tabular-nums;
+  }
+  .status-pill[data-state="upcoming"] { @apply bg-info/10 text-info; }
+  .status-pill[data-state="live"] { @apply bg-success/10 text-success; }
+  .status-pill[data-state="ended"] { @apply bg-error/10 text-error; }
+
+  .stage {
+    @apply bg-[#111317] text-white;
+  }
 }
 
-ion-icon {
-  --ionicon-stroke-width: 48px;
+@layer components {
+  .flatpickr-calendar {
+    @apply rounded-2xl border border-base-300 bg-base-100 font-sans text-base-content shadow-xl;
+  }
+  .flatpickr-calendar.arrowTop::before,
+  .flatpickr-calendar.arrowTop::after {
+    border-bottom-color: var(--color-base-100);
+  }
+  .flatpickr-calendar.arrowBottom::before,
+  .flatpickr-calendar.arrowBottom::after {
+    border-top-color: var(--color-base-100);
+  }
+  .flatpickr-day,
+  .flatpickr-time input,
+  .flatpickr-time .flatpickr-am-pm,
+  .flatpickr-time .flatpickr-time-separator,
+  .flatpickr-current-month input.cur-year,
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    color: var(--color-base-content);
+    fill: var(--color-base-content);
+  }
+  .flatpickr-day.prevMonthDay,
+  .flatpickr-day.nextMonthDay,
+  .flatpickr-day.flatpickr-disabled,
+  .flatpickr-day.flatpickr-disabled:hover {
+    color: color-mix(in oklab, var(--color-base-content) 35%, transparent);
+  }
+  .flatpickr-day:hover,
+  .flatpickr-day.prevMonthDay:hover,
+  .flatpickr-day.nextMonthDay:hover,
+  .flatpickr-time input:hover,
+  .flatpickr-time .flatpickr-am-pm:hover,
+  .flatpickr-time input:focus,
+  .flatpickr-time .flatpickr-am-pm:focus {
+    background: var(--color-base-200);
+    border-color: var(--color-base-200);
+  }
+  .flatpickr-time,
+  .flatpickr-time input,
+  .flatpickr-time .flatpickr-am-pm {
+    background: var(--color-base-100);
+  }
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: var(--color-base-content);
+    background: var(--color-base-100);
+  }
+  .flatpickr-innerContainer,
+  .flatpickr-time {
+    border-color: var(--color-base-300);
+  }
+  .flatpickr-day.selected,
+  .flatpickr-day.selected:hover,
+  .flatpickr-day.startRange,
+  .flatpickr-day.endRange {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-primary-content);
+  }
+  .flatpickr-day.today {
+    border-color: var(--color-primary);
+  }
+  .flatpickr-day.today:hover {
+    background: var(--color-base-200);
+    color: var(--color-base-content);
+  }
+  .flatpickr-months .flatpickr-month,
+  .flatpickr-current-month,
+  .flatpickr-weekdays,
+  span.flatpickr-weekday {
+    color: var(--color-base-content);
+  }
 }
 
-.spinning {
-  animation-name: spin;
-  animation-duration: 3s;
-  animation-iteration-count: infinite;
-  transform-origin: 50% 50%;
-}
-
-@keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-}
-
-.video-docker video {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.video-docker::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1;
+@media print {
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }

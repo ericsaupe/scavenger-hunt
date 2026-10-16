@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "container", "list" ]
+  static targets = [ "list", "empty" ]
   static values = {
     code: String,
     name: String,
@@ -9,32 +9,52 @@ export default class extends Controller {
   }
 
   connect() {
-    // Initialize localStorage
-    if (localStorage.pastHunts === undefined) {
-      localStorage.pastHunts = JSON.stringify({})
+    let pastHunts = {}
+    try {
+      pastHunts = JSON.parse(localStorage.pastHunts || "{}")
+    } catch (e) {
+      pastHunts = {}
     }
 
-    let pastHunts = JSON.parse(localStorage.pastHunts)
-    // Handle the list of past hunts
-    if (this.hasListTarget && Object.keys(pastHunts).length !== 0) {
-      Object.keys(pastHunts).forEach(hunt => {
-        // skip empty hunts or hunts that are already on the list
-        if (!hunt || this.listTarget.querySelector(`[value="${hunt}"]`)) {
-          return
-        }
-        let opt = document.createElement('option')
-        opt.value = hunt
-        opt.innerHTML = pastHunts[hunt]
-        this.listTarget.appendChild(opt)
-      })
-    } else {
-      // Handle storing joined hunts
+    if (this.hasListTarget) {
+      this.renderList(pastHunts)
+    } else if (this.codeValue) {
       if (this.teamValue) {
         pastHunts[this.codeValue] = `${this.teamValue} - ${this.nameValue}`
-      } else if(this.nameValue) {
+      } else if (this.nameValue) {
         pastHunts[this.codeValue] = this.nameValue
       }
-      localStorage.pastHunts = JSON.stringify(pastHunts)
+      try {
+        localStorage.pastHunts = JSON.stringify(pastHunts)
+      } catch (e) {
+        return
+      }
+    }
+  }
+
+  renderList(pastHunts) {
+    const codes = Object.keys(pastHunts).filter(code => /^[A-Z]{1,5}$/.test(code))
+    if (codes.length === 0) {
+      return
+    }
+
+    codes.reverse().forEach(code => {
+      if (this.listTarget.querySelector(`[data-code="${code}"]`)) {
+        return
+      }
+      const item = document.createElement("li")
+      item.innerHTML = `
+        <a href="/scavenger_hunts/${code}" class="row-tap" data-code="${code}">
+          <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-base-200 font-mono text-xs font-bold tracking-widest">${code}</span>
+          <span class="grow truncate font-semibold"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-5 shrink-0 text-ink-soft" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        </a>`
+      item.querySelector("span.grow").textContent = pastHunts[code]
+      this.listTarget.appendChild(item)
+    })
+
+    if (this.hasEmptyTarget) {
+      this.emptyTarget.classList.add("hidden")
     }
   }
 }

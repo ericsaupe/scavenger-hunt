@@ -1,12 +1,19 @@
-<h1 class="mt-2 px-2 text-center uppercase text-xl font-extrabold sm:text-2xl sm:tracking-tight lg:text-3xl">
-  <% if @link_to %>
-    <%= link_to @link_to do %>
+<div class="page pt-6 pb-4">
+  <% if @back_to %>
+    <%= link_to @back_to, class: "mb-3 inline-flex items-center gap-1 text-sm font-semibold text-ink-soft hover:text-ink" do %>
+      <%= helpers.icon :arrow_left, class: "size-4" %>
+      <%= @back_label %>
+    <% end %>
+  <% end %>
+  <h1 class="display text-3xl sm:text-4xl">
+    <% if @link_to %>
+      <%= link_to @title, @link_to %>
+    <% else %>
       <%= @title %>
     <% end %>
-  <% else %>
-    <%= @title %>
+  </h1>
+  <% if @subtitle %>
+    <p class="mt-2 max-w-prose text-base text-ink-soft"><%= @subtitle %></p>
   <% end %>
-</h1>
-<% if @subtitle %>
-  <p class="text-center text-md sm:text-lg sm:tracking-tight lg:text-xl"><%= @subtitle %></p>
-<% end %>
+  <%= content %>
+</div>

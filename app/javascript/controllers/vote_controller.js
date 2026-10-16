@@ -10,9 +10,10 @@ export default class extends Controller {
   vote(event) {
     const submissionId = this.submissionIdValue
     const currentValue = this.valueValue
-    const value = event.target.dataset.value || event.target.parentElement.dataset.value
+    const button = event.currentTarget
+    const value = button.dataset.value
     const csrfToken = this.getMetaValue("csrf-token")
-    const button = event.target.closest("details") // it's actually a details element, not a button
+    const rect = button.getBoundingClientRect()
 
     fetch(`/submissions/${submissionId}/votes`, {
       method: 'POST',
@@ -39,8 +40,6 @@ export default class extends Controller {
           return
         }
 
-        const x = (button.getBoundingClientRect().left + button.getBoundingClientRect().width / 2) / window.innerWidth
-        const y = button.getBoundingClientRect().top / window.innerHeight
         const defaults = {
           spread: 80,
           ticks: 75,
@@ -48,8 +47,8 @@ export default class extends Controller {
           decay: 0.94,
           startVelocity: 12,
           origin: {
-            x: x,
-            y: y
+            x: (rect.left + rect.width / 2) / window.innerWidth,
+            y: rect.top / window.innerHeight
           },
           particleCount: Math.floor(Math.random() * 10) + 10,
           scalar: 4,

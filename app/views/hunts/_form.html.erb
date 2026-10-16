@@ -1,58 +1,68 @@
-<%= form_with model: hunt, url: hunts_path, method: :post, data: {controller: "form"}, class: "sm:w-1/2 mx-auto" do |f| %>
+<%= form_with model: hunt, url: hunts_path, method: :post, id: "hunt_form", data: {controller: "form"}, class: "space-y-10" do |f| %>
   <%= f.hidden_field :template, value: @hunt.name %>
   <%= f.hidden_field :timezone, data: {"form-target": "timezone"} %>
 
-  <fieldset class="fieldset w-full">
-    <%= f.label :name, "What do you want to call your scavenger hunt?", class: "fieldset-legend text-sm w-full" %>
-    <%= f.text_field :name, required: true, class: "input w-full" %>
-  </fieldset>
-
-  <fieldset class="fieldset w-full">
-    <%= f.label :starts_at, class: "fieldset-legend text-sm w-full" do %>
-      When do you want to start your scavenger hunt?
-      <span class="label text-xs font-normal"><i>Optional</i></span>
-    <% end %>
-    <%= f.text_field :starts_at, class: "datetime input w-full" %>
-    <p class="label whitespace-normal">Set this if you don't want participants to submit photos until this date and time.</p>
-  </fieldset>
-
-  <fieldset class="fieldset w-full">
-    <%= f.label :ends_at, class: "fieldset-legend text-sm w-full" do %>
-      When do you want to end your scavenger hunt?
-      <span class="label text-xs font-normal"><i>Optional</i></span>
-    <% end %>
-    <%= f.text_field :ends_at, class: "datetime input w-full", data: {action: "change->form#toggleEndFields"} %>
-    <p class="label whitespace-normal">Set this if you you want to stop accepting submissions at this date and time.</p>
-  </fieldset>
-
-  <div class="hidden" data-form-target="endConfig">
-    <%= f.label :lock_results, class: "flex items-center justify-between cursor-pointer py-2 px-1" do %>
-      <span class="text-sm">Lock results until after the hunt ends?</span>
-      <%= f.check_box :lock_results, class: "checkbox", data: {test: "lock-results-switch"} %>
-    <% end %>
+  <div>
+    <%= f.label :name, "Hunt name", class: "mb-1.5 block text-sm font-semibold" %>
+    <%= f.text_field :name, required: true, autocomplete: "off", class: "input input-lg w-full text-xl font-bold" %>
   </div>
 
-  <fieldset class="fieldset w-full hidden" data-form-target="endConfig">
-    <%= f.label :lock_password, class: "fieldset-legend text-sm w-full" do %>
-      Lock results with a password
-      <span class="label text-xs font-normal"><i>Optional</i></span>
-    <% end %>
-    <%= f.text_field :lock_password, class: "input w-full" %>
-    <p class="label whitespace-normal">If you want to require a one-time password be entered before people can see the results.</p>
-  </fieldset>
+  <section>
+    <h2 class="text-lg font-bold">Timer</h2>
+    <p class="mt-1 text-sm text-ink-soft">Optional. Without times, teams can submit photos whenever they open the list.</p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div>
+        <%= f.label :starts_at, "Starts", class: "mb-1.5 block text-sm font-semibold" %>
+        <%= f.datetime_local_field :starts_at, class: "input input-lg w-full", data: {"form-target": "datetime"} %>
+        <p class="mt-1.5 text-xs text-ink-soft">Photos can't be submitted before this.</p>
+      </div>
+      <div>
+        <%= f.label :ends_at, "Ends", class: "mb-1.5 block text-sm font-semibold" %>
+        <%= f.datetime_local_field :ends_at, class: "input input-lg w-full", data: {"form-target": "datetime", action: "change->form#toggleEndFields"} %>
+        <p class="mt-1.5 text-xs text-ink-soft">Submissions stop at this time.</p>
+      </div>
+    </div>
+  </section>
 
-  <fieldset class="fieldset w-full">
-    <%= f.label :max_downvotes_to_lose_points, class: "fieldset-legend text-sm w-full" do %>
-      How many downvotes are allowed before teams lose points for their submission?
-      <span class="label text-xs font-normal"><i>Optional</i></span>
-    <% end %>
-    <%= f.number_field :max_downvotes_to_lose_points, min: 1, step: 1, class: "input w-full" %>
-  </fieldset>
+  <section>
+    <h2 class="text-lg font-bold">Results</h2>
+    <p class="mt-1 text-sm text-ink-soft">Decide who sees the leaderboard and photos, and when.</p>
+    <div class="mt-4 space-y-4">
+      <div class="hidden" data-form-target="endConfig">
+        <%= f.label :lock_results, class: "flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-base-300 px-4 py-3" do %>
+          <span>
+            <span class="block font-semibold">Hide results until the hunt ends</span>
+            <span class="block text-sm text-ink-soft">Nobody can peek at the leaderboard while they're still hunting.</span>
+          </span>
+          <%= f.check_box :lock_results, class: "toggle toggle-primary", data: {test: "lock-results-switch"} %>
+        <% end %>
+      </div>
+      <div>
+        <%= f.label :lock_password, "Results password", class: "mb-1.5 block text-sm font-semibold" %>
+        <%= f.text_field :lock_password, class: "input input-lg w-full", autocomplete: "off", placeholder: "Optional" %>
+        <p class="mt-1.5 text-xs text-ink-soft">If set, someone has to type this once before results are shown.</p>
+      </div>
+    </div>
+  </section>
 
-  <%= f.button type: :submit, class: "btn btn-primary mt-4" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-    </svg>
-    Start!
-  <% end %>
+  <section>
+    <h2 class="text-lg font-bold">Fair play</h2>
+    <p class="mt-1 text-sm text-ink-soft">While reviewing photos, anyone can flag one that doesn't count.</p>
+    <div class="mt-4">
+      <%= f.label :max_downvotes_to_lose_points, "Flags needed to reject a photo", class: "mb-1.5 block text-sm font-semibold" %>
+      <%= f.number_field :max_downvotes_to_lose_points, min: 1, step: 1, inputmode: "numeric", class: "input input-lg w-full sm:w-40", placeholder: "Off" %>
+      <p class="mt-1.5 text-xs text-ink-soft">Leave empty to turn flagging off.</p>
+    </div>
+  </section>
+<% end %>
+
+<% content_for :bottom_bar do %>
+  <div class="bottom-bar">
+    <div class="page flex items-center gap-3 pt-3">
+      <%= button_tag type: :submit, form: "hunt_form", class: "btn btn-primary btn-lg grow" do %>
+        <%= icon :flag, class: "size-5" %>
+        Create hunt
+      <% end %>
+    </div>
+  </div>
 <% end %>

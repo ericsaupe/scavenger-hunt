@@ -6,38 +6,32 @@ RSpec.describe "Hunts" do
   context "creating a hunt" do
     it "creates a new hunt" do
       visit "/"
-      click_on "Start"
+      click_on "Start a hunt", match: :first
       expect(page).to have_current_path(hunts_path)
-      within("#content") do
-        click_link "Start", match: :first
-      end
-      fill_in("What do you want to call your scavenger hunt?", with: "My Fun Scavenger Hunt")
-      find("input#hunt_starts_at", visible: false).execute_script("this.value = '2020-01-01 12:00'")
-      find("input#hunt_ends_at", visible: false).execute_script("this.value = '2020-02-01 12:00'")
-      click_on "Start!"
-      expect(page).to have_text("My Fun Scavenger Hunt".upcase)
-      expect(page).to have_text("Pick a team".upcase)
-      expect(page).to have_text("Print List")
+      first("[data-testid='template']").click
+      fill_in("Hunt name", with: "My Fun Scavenger Hunt")
+      find("input#hunt_starts_at", visible: false).execute_script("this.value = '2030-01-01 12:00'")
+      find("input#hunt_ends_at", visible: false).execute_script("this.value = '2030-02-01 12:00'")
+      click_on "Create hunt"
+      expect(page).to have_text("My Fun Scavenger Hunt")
+      expect(page).to have_text("Pick your team")
+      expect(page).to have_text("Print list")
     end
 
     it "supports locking" do
       visit "/"
-      click_on "Start"
+      click_on "Start a hunt", match: :first
       expect(page).to have_current_path(hunts_path)
-      within("#content") do
-        click_link "Start", match: :first
-      end
-      fill_in("What do you want to call your scavenger hunt?", with: "My Fun Scavenger Hunt")
-      # TODO: this is a hack to get around the fact that the datepicker is not visible
-      find("input#hunt_starts_at", visible: false).execute_script("this.value = '2020-01-01 12:00'")
-      find("input#hunt_ends_at", visible: false).execute_script("this.value = '2020-02-01 12:00'")
-      # TODO: this is a hack to fill in hidden fields
+      first("[data-testid='template']").click
+      fill_in("Hunt name", with: "My Fun Scavenger Hunt")
+      find("input#hunt_starts_at", visible: false).execute_script("this.value = '2030-01-01 12:00'")
+      find("input#hunt_ends_at", visible: false).execute_script("this.value = '2030-02-01 12:00'")
       find("input#hunt_lock_results", visible: false).execute_script("this.checked = true")
-      find("input#hunt_lock_password", visible: false).execute_script("this.value = 'hunter2'")
-      click_on "Start!"
-      expect(page).to have_text("My Fun Scavenger Hunt".upcase)
-      expect(page).to have_text("Pick a team".upcase)
-      expect(page).to have_text("Print List")
+      fill_in("Results password", with: "hunter2")
+      click_on "Create hunt"
+      expect(page).to have_text("My Fun Scavenger Hunt")
+      expect(page).to have_text("Pick your team")
+      expect(page).to have_text("Print list")
       hunt = Hunt.last
       expect(hunt.lock_results).to be_truthy
       expect(hunt.lock_password).to be_present
@@ -50,15 +44,15 @@ RSpec.describe "Hunts" do
 
     it "creates a team" do
       visit "/scavenger_hunts/#{hunt.code.upcase}"
-      fill_in "Start a team", with: "Test"
-      click_on "Start!"
-      expect(page).to have_text("Test".upcase)
-      expect(page).to have_text("Find the following items to earn points for your team. Take a picture or video for evidence!")
+      fill_in "Or start a new team", with: "Test"
+      click_on "Join the hunt"
+      expect(page).to have_text("Test")
+      expect(page).to have_text("Tap an item to take a photo or video.")
     end
 
     it "requires a name to start a team" do
       visit "/scavenger_hunts/#{hunt.code.upcase}"
-      click_on "Start!"
+      click_on "Join the hunt"
       expect(page).to have_text("Please select a team or enter a team name")
     end
 
@@ -66,9 +60,9 @@ RSpec.describe "Hunts" do
       team_name = team.name
       visit "/scavenger_hunts/#{hunt.code.upcase}"
       choose(team_name)
-      click_on "Start!"
-      expect(page).to have_text(team_name.upcase)
-      expect(page).to have_text("Find the following items to earn points for your team. Take a picture or video for evidence!")
+      click_on "Join the hunt"
+      expect(page).to have_text(team_name)
+      expect(page).to have_text("Tap an item to take a photo or video.")
     end
 
     it "crosses off an item" do
@@ -76,7 +70,7 @@ RSpec.describe "Hunts" do
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
         find(:label, text: hunt.items.first.name).click
       end
-      expect(page).to have_css('ion-icon[name="checkbox"]')
+      expect(page).to have_css("li[data-found]")
     end
 
     it "supports video" do
@@ -84,7 +78,7 @@ RSpec.describe "Hunts" do
       attach_file(Rails.root.join("spec/fixtures/video.mp4")) do
         find(:label, text: hunt.items.first.name).click
       end
-      expect(page).to have_css('ion-icon[name="checkbox"]')
+      expect(page).to have_css("li[data-found]")
     end
 
     it "does not cross off if hunt ended" do
@@ -93,7 +87,7 @@ RSpec.describe "Hunts" do
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
         find(:label, text: hunt.items.first.name).click
       end
-      expect(page).not_to have_css('ion-icon[name="checkbox"]')
+      expect(page).not_to have_css("li[data-found]")
     end
 
     it "changes the image" do
@@ -101,14 +95,14 @@ RSpec.describe "Hunts" do
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
         find(:label, text: hunt.items.first.name).click
       end
-      expect(page).to have_css('ion-icon[name="checkbox"]')
+      expect(page).to have_css("li[data-found]")
 
-      find(".cursor-pointer", text: hunt.items.first.name).click
-      expect(page).to have_text("Change")
+      find("[data-testid='preview']", text: hunt.items.first.name).click
+      expect(page).to have_button("Retake")
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:button, text: "Change").click
+        find(:button, text: "Retake").click
       end
-      expect(page).to have_css('ion-icon[name="checkbox"]')
+      expect(page).to have_css("li[data-found]")
     end
 
     it "closes the modal" do
@@ -116,23 +110,23 @@ RSpec.describe "Hunts" do
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
         find(:label, text: hunt.items.first.name).click
       end
-      expect(page).to have_css('ion-icon[name="checkbox"]')
+      expect(page).to have_css("li[data-found]")
 
-      find(".cursor-pointer", text: hunt.items.first.name).click
-      expect(page).to have_text("Close")
-      click_on "Close"
-      expect(page).not_to have_text("Close")
+      find("[data-testid='preview']", text: hunt.items.first.name).click
+      expect(page).to have_button("Done")
+      click_on "Done"
+      expect(page).not_to have_button("Done")
     end
 
     it "updates the score" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
-      expect(page).to have_text("Score: 0")
+      expect(page).to have_css("#team_#{team.id}", exact_text: "0")
       item = hunt.items.first
       points = item.category.points
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
         find(:label, text: item.name).click
       end
-      expect(page).to have_text("Score: #{points}")
+      expect(page).to have_css("#team_#{team.id}", exact_text: points.to_s)
     end
 
     it "prints" do
@@ -144,19 +138,15 @@ RSpec.describe "Hunts" do
     context "when remembering" do
       it "remembers past hunts" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        visit "/"
-        click_on "Join"
-        select(hunt.name, from: "hunt_select")
-        click_on "Rejoin the scavenger hunt"
-        expect(page).to have_text("Pick a team".upcase)
+        visit "/scavenger_hunts/join"
+        click_on hunt.name
+        expect(page).to have_text("Pick your team")
 
         second_hunt = create(:hunt)
         visit "/scavenger_hunts/#{second_hunt.code.upcase}"
-        visit "/"
-        click_on "Join"
-        select(second_hunt.name, from: "hunt_select")
-        click_on "Rejoin the scavenger hunt"
-        expect(page).to have_text("Pick a team".upcase)
+        visit "/scavenger_hunts/join"
+        click_on second_hunt.name
+        expect(page).to have_text("Pick your team")
       end
     end
   end
@@ -177,7 +167,7 @@ RSpec.describe "Hunts" do
 
       it "does not show the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).not_to have_text("View Results!")
+        expect(page).not_to have_text("View results")
       end
     end
 
@@ -193,7 +183,7 @@ RSpec.describe "Hunts" do
 
       it "does not show the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).not_to have_text("View Results!")
+        expect(page).not_to have_text("View results")
       end
     end
 
@@ -204,12 +194,12 @@ RSpec.describe "Hunts" do
 
       it "shows the timer" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).to have_text("This scavenger hunt has ended. No more submissions will be accepted.")
+        expect(page).to have_text("Hunt over. No more submissions.")
       end
 
       it "shows the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
-        expect(page).to have_text("View Results!")
+        expect(page).to have_text("View results")
       end
     end
   end
@@ -220,7 +210,7 @@ RSpec.describe "Hunts" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/results"
       expect(page).to have_text("Results are not yet available!")
       fill_in "Password", with: "password"
-      click_on "Unlock Results!"
+      click_on "Unlock results"
       expect(page).to have_text("Let's see how everyone did!")
     end
 
@@ -229,7 +219,7 @@ RSpec.describe "Hunts" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/results"
       expect(page).to have_text("Results are not yet available!")
       fill_in "Password", with: "wrong"
-      click_on "Unlock Results!"
+      click_on "Unlock results"
       expect(page).to have_text("Incorrect password")
     end
   end

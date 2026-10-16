@@ -1,5 +1,11 @@
 <% description "#{@item.name} was found #{pluralize(@submissions.size, "times")} during #{@hunt.name}." %>
+<% title @item.name %>
 
-<%= render(PageHeaderComponent.new(title: @hunt.name, link_to: hunt_results_path(code: @hunt.code))) %>
+<%= render(PageHeaderComponent.new(
+      title: @item.name,
+      subtitle: "Found by #{pluralize(@submissions.size, "team")}. Swipe to see each one.",
+      back_to: hunt_results_path(code: @hunt.code),
+      back_label: "#{@hunt.name} results"
+    )) %>
 
 <%= render(partial: "item", locals: {item: @item, hunt: @hunt, previous_item: @previous, next_item: @next, submissions: @submissions}) %>

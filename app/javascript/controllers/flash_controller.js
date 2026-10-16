@@ -2,15 +2,15 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   connect() {
-    setTimeout(() => {
-      this.close()
-    }, 5000)
+    this.timeout = setTimeout(() => this.close(), 5000)
+  }
+
+  disconnect() {
+    clearTimeout(this.timeout)
   }
 
   close() {
-    this.element.classList.add('animate__animated', 'animate__fadeOutUp')
-    setTimeout(() => {
-      this.element.remove()
-    }, 1000)
+    this.element.classList.add("opacity-0", "-translate-y-2")
+    setTimeout(() => this.element.remove(), 300)
   }
 }

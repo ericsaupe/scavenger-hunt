@@ -1,0 +1,33 @@
+<% @hunt.categories.each do |category| %>
+  <section class="mx-auto max-w-2xl pt-8">
+    <div class="flex items-baseline justify-between gap-3 px-5">
+      <h3 class="text-xl font-bold"><%= category.name %></h3>
+      <span class="shrink-0 text-sm font-semibold text-ink-soft"><%= pluralize(category.points, "point") %> each</span>
+    </div>
+    <ul class="mt-3 divide-y divide-base-300 border-y border-base-300 sm:overflow-hidden sm:rounded-2xl sm:border">
+      <% category.items.each do |item| %>
+        <% found_by = item.submissions.count { |submission| submission.photo.attached? } %>
+        <li id="<%= dom_id item %>">
+          <% if found_by.positive? %>
+            <%= link_to hunt_item_path(@hunt.code, item), class: "row-tap py-2" do %>
+              <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-field/10 text-field"><%= icon :check, class: "size-5" %></span>
+              <span class="min-w-0 grow">
+                <span class="block font-semibold"><%= item.name %></span>
+                <span class="block text-sm text-ink-soft">Found by <%= pluralize(found_by, "team") %></span>
+              </span>
+              <%= icon :chevron_right, class: "size-5 shrink-0 text-ink-soft" %>
+            <% end %>
+          <% else %>
+            <div class="row-tap py-2 text-ink-soft">
+              <span class="slot size-10 rounded-xl"></span>
+              <span class="min-w-0 grow">
+                <span class="block font-semibold"><%= item.name %></span>
+                <span class="block text-sm">Nobody found this one</span>
+              </span>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

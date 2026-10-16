@@ -8,68 +8,57 @@ export default class extends Controller {
   }
 
   connect() {
-    this.startCountdown()
+    this.tick()
+    this.interval = setInterval(() => this.tick(), 1000)
   }
 
-  startCountdown() {
-    const countdownTarget = this.countdownTarget
-    const startsAt = this.startsAtValue
-    const endsAt = this.endsAtValue
-    const enableFieldsets = this.enableFieldsets.bind(this)
-    const disableFieldsets = this.disableFieldsets.bind(this)
-    const toggleBackgroundClasses = this.toggleBackgroundClasses.bind(this)
-
-    // Update the count down every 1 second
-    let x = setInterval(function() {
-      // Pick which date is the upcoming one. If we are before the start date we use that, otherwise we use the end date.
-      let countdownDate = new Date(startsAt > Date.now() ? startsAt : endsAt)
-      let explanation
-      if (startsAt && startsAt > Date.now()) {
-        explanation = "Starts in "
-        toggleBackgroundClasses("bg-pantone-500")
-        disableFieldsets()
-      } else if (endsAt && endsAt > Date.now()) {
-        explanation = "Ends in "
-        toggleBackgroundClasses("bg-green-500")
-        enableFieldsets()
-      }
-      // Get today's date and time
-      let now = new Date().getTime()
-      // Find the distance between now and the count down date
-      let distance = countdownDate - now
-      // Time calculations for days, hours, minutes and seconds
-      let days = Math.floor(distance / (1000 * 60 * 60 * 24))
-      let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-      let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-      let seconds = Math.floor((distance % (1000 * 60)) / 1000)
-      countdownTarget.innerHTML = `${explanation}${days}d ${hours}h ${minutes}m ${seconds}s`
-      // If the count down is finished let's clean it all up
-      if (distance < 0) {
-        clearInterval(x)
-        countdownTarget.innerHTML = "This scavenger hunt has ended. No more submissions will be accepted."
-        toggleBackgroundClasses("bg-red-500")
-        disableFieldsets()
-      }
-    }, 1000)
+  disconnect() {
+    clearInterval(this.interval)
   }
 
-  enableFieldsets() {
-    this.toggleFieldsets(false)
+  tick() {
+    const now = Date.now()
+    const upcoming = this.startsAtValue && this.startsAtValue > now
+    const target = upcoming ? this.startsAtValue : this.endsAtValue
+
+    if (upcoming) {
+      this.setState("upcoming")
+      this.countdownTarget.textContent = `Starts in ${this.format(target - now)}`
+      this.toggleFieldsets(true)
+    } else if (target && target > now) {
+      this.setState("live")
+      this.countdownTarget.textContent = `Ends in ${this.format(target - now)}`
+      this.toggleFieldsets(false)
+    } else if (target) {
+      this.setState("ended")
+      this.countdownTarget.textContent = "Hunt over. No more submissions."
+      this.toggleFieldsets(true)
+      clearInterval(this.interval)
+    }
   }
 
-  disableFieldsets() {
-    this.toggleFieldsets(true)
+  format(distance) {
+    const days = Math.floor(distance / 86400000)
+    const hours = Math.floor((distance % 86400000) / 3600000)
+    const minutes = Math.floor((distance % 3600000) / 60000)
+    const seconds = Math.floor((distance % 60000) / 1000)
+    const pad = (n) => String(n).padStart(2, "0")
+    if (days > 0) {
+      return `${days}d ${hours}h ${pad(minutes)}m`
+    }
+    if (hours > 0) {
+      return `${hours}h ${pad(minutes)}m ${pad(seconds)}s`
+    }
+    return `${minutes}m ${pad(seconds)}s`
+  }
+
+  setState(state) {
+    this.containerTarget.dataset.state = state
   }
 
   toggleFieldsets(disabled) {
-    document.querySelectorAll('fieldset.submission-fieldset').forEach(fieldset => {
+    document.querySelectorAll("fieldset.submission-fieldset").forEach(fieldset => {
       fieldset.disabled = disabled
     })
-  }
-
-  toggleBackgroundClasses(color) {
-    const colors = ["bg-pantone-500", "bg-green-500", "bg-red-500"]
-    this.containerTarget.classList.add(color)
-    this.containerTarget.classList.remove(...colors.filter(item => item !== color))
   }
 }
