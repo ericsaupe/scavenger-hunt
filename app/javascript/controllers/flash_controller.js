@@ -1,8 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static values = { sticky: Boolean }
+
   connect() {
-    this.timeout = setTimeout(() => this.close(), 5000)
+    if (!this.stickyValue) {
+      this.timeout = setTimeout(() => this.close(), 5000)
+    }
   }
 
   disconnect() {

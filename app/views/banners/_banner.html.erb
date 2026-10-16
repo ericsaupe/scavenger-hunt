@@ -1,6 +1,9 @@
-<div class="pointer-events-auto flex items-start gap-3 rounded-2xl bg-neutral px-4 py-3 text-sm font-medium text-neutral-content shadow-lg ring-1 ring-base-content/10 animate-toast-in transition duration-300" role="status" data-controller="flash">
+<div class="pointer-events-auto flex items-start gap-3 rounded-2xl bg-neutral px-4 py-3 text-sm font-medium text-neutral-content shadow-lg ring-1 ring-base-content/10 animate-toast-in transition duration-300" role="status" data-controller="flash" data-flash-sticky-value="<%= local_assigns[:action_label].present? %>">
   <%= icon :info, class: "mt-0.5 size-5 shrink-0 text-marigold" %>
-  <span class="grow"><%= message %></span>
+  <span class="grow" data-banner-message><%= message %></span>
+  <% if local_assigns.key?(:action_label) %>
+    <button type="button" class="btn btn-xs btn-primary shrink-0" data-banner-action data-action="flash#close"><%= action_label %></button>
+  <% end %>
   <button type="button" class="-m-1 rounded-full p-1 text-neutral-content/70 hover:text-neutral-content" aria-label="Dismiss" data-action="flash#close">
     <%= icon :x_mark, class: "size-4" %>
   </button>

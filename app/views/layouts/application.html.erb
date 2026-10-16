@@ -48,6 +48,7 @@
     <div id="flash" class="pointer-events-none fixed inset-x-0 top-16 z-40 mx-auto flex max-w-md flex-col gap-2 px-4">
       <%= render partial: "shared/flash" %>
     </div>
+    <template id="banner_template"><%= render partial: "banners/banner", locals: {message: "", action_label: ""} %></template>
 
     <main id="content" class="<%= "pb-32" unless @presenter_mode %>">
       <%= yield %>

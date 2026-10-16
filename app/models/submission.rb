@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Submission < ApplicationRecord
+  MAX_VIDEO_BYTES = 50.megabytes
+  MAX_VIDEO_SECONDS = 30
+
   has_one_attached :photo do |attachable|
     attachable.variant :small, resize_to_fit: [500, 500]
     attachable.variant :large, resize_to_fit: [1500, 1500]
@@ -12,6 +15,8 @@ class Submission < ApplicationRecord
 
   delegate :hunt, to: :team
   delegate :max_downvotes_to_lose_points, to: :hunt
+
+  validate :photo_within_limits, if: -> { attachment_changes["photo"] }
 
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
 
@@ -71,5 +76,15 @@ class Submission < ApplicationRecord
       target: "submission_#{id}_downvote_counter",
       partial: "items/downvote_counter",
       locals: {submission: self, disable_turbo_stream: true})
+  end
+
+  private
+
+  def photo_within_limits
+    if video?
+      errors.add(:photo, "Videos must be 50 MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
+    elsif !image?
+      errors.add(:photo, "Only photos and videos can be uploaded")
+    end
   end
 end

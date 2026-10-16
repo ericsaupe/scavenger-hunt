@@ -5,6 +5,7 @@ require "zip"
 class Hunt < ApplicationRecord
   include BCrypt
 
+  LATE_UPLOAD_GRACE = 15.minutes
   PLAYBACK_COMMANDS = %w[play pause replay mute unmute].freeze
 
   has_many :categories, dependent: :destroy
@@ -51,6 +52,12 @@ class Hunt < ApplicationRecord
 
   def ended?
     ends_at && ends_at < Time.current
+  end
+
+  def accepts_photo_captured_at?(captured_at)
+    return true unless ended?
+
+    captured_at.present? && captured_at <= ends_at && Time.current <= ends_at + LATE_UPLOAD_GRACE
   end
 
   def timer?
