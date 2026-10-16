@@ -12,11 +12,11 @@
     <% if @hunt.owner?(cookies[:user_id]) %>
       <div class="sticky bottom-0 z-10 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:absolute sm:inset-x-0">
         <div class="flex items-center gap-1 rounded-full bg-white/10 p-1 backdrop-blur">
-          <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "btn btn-circle btn-ghost text-white text-xl", data: {turbo_prefetch: false, "presenter-target": "previous"}, "aria-label": "Previous photo") do %>
+          <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission_id), class: "btn btn-circle btn-ghost text-white text-xl", data: {turbo_prefetch: false, "presenter-target": "previous"}, "aria-label": "Previous photo") do %>
             «
           <% end %>
           <span class="max-w-48 truncate px-2 text-sm font-semibold text-white"><%= @submission.item.name %></span>
-          <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "btn btn-circle btn-ghost text-white text-xl", data: {turbo_prefetch: false, "presenter-target": "next"}, "aria-label": "Next photo") do %>
+          <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission_id), class: "btn btn-circle btn-ghost text-white text-xl", data: {turbo_prefetch: false, "presenter-target": "next"}, "aria-label": "Next photo") do %>
             »
           <% end %>
         </div>
