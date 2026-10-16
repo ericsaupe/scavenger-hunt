@@ -48,20 +48,19 @@ export default class extends Controller {
     const fileListItems = this.fileListItems.bind(this)
     return new Promise(function(resolve, reject) {
       try {
-        const compress = new Compress()
+        const compress = new Compress({ maxWidth: 1920, maxHeight: 1920, quality: 0.75 })
         const files = [...fieldTarget.files]
         if (!files.every((file) => file && file['type'].split('/')[0] === 'image')) {
           return resolve()
         }
-        compress.compress(files, {}).then((results) => {
+        // compress.js re-encodes to the input's type, so label the input as JPEG to always upload JPEG
+        const image = files[0]
+        const jpeg = new File([image], image.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" })
+        compress.compress(jpeg).then((file) => {
           event.stopImmediatePropagation()
-          const img = results[0]
-          const base64str = img.data
-          const imgExt = img.ext
-          const file = new File([Compress.convertBase64ToFile(base64str, imgExt)], img.name)
           fieldTarget.files = fileListItems([file])
           resolve()
-        })
+        }).catch(reject)
       } catch (e) {
         reject(e)
       }
