@@ -3,7 +3,7 @@
 <% found = submission.photo.attached? %>
 <% field_id = "submission_#{submission.id || item.id}_photo" %>
 
-<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, found: (true if found), "submission-max-video-bytes-value": Submission::MAX_VIDEO_BYTES, "submission-max-video-seconds-value": Submission::MAX_VIDEO_SECONDS}.compact do %>
+<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, team: submission.team_id, submission_id: submission.id, found: (true if found), "submission-max-video-bytes-value": Submission::MAX_VIDEO_BYTES, "submission-max-video-seconds-value": Submission::MAX_VIDEO_SECONDS}.compact do %>
   <% unless submission.new_record? %>
     <%= form_with model: submission, authenticity_token: false, html: {class: "contents", data: {"submission-target": "form", action: "turbo:submit-end->submission#submitEnd"}} do |form| %>
       <%= form.hidden_field :captured_at, value: nil, data: {"submission-target": "capturedAt"} %>
@@ -30,13 +30,14 @@
         <% end %>
       </span>
       <span class="grow font-semibold"><%= item.name %></span>
-      <%= icon :check_circle, solid: true, class: "size-6 shrink-0 text-field" %>
+      <span class="hidden shrink-0 text-right text-xs font-semibold" data-submission-target="hint"></span>
+      <%= icon :check_circle, solid: true, class: "size-6 shrink-0 text-field", data: {submission_target: "check"} %>
     </button>
   <% else %>
     <label for="<%= field_id %>" class="row-tap cursor-pointer py-2">
       <span class="slot" data-submission-target="slot"><%= icon :camera, class: "size-5" %></span>
       <span class="grow font-semibold"><%= item.name %></span>
-      <span class="shrink-0 text-sm font-semibold text-ink-soft">+<%= item.category.points %></span>
+      <span class="shrink-0 text-right text-sm font-semibold text-ink-soft" data-submission-target="hint">+<%= item.category.points %></span>
     </label>
   <% end %>
 <% end %>

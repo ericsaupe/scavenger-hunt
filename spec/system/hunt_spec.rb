@@ -140,6 +140,15 @@ RSpec.describe "Hunts" do
         click_on second_hunt.name
         expect(page).to have_text("Pick your team")
       end
+
+      it "takes you straight back to your team's checklist" do
+        visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        visit "/scavenger_hunts/join"
+        click_on "#{team.name} - #{hunt.name}"
+        expect(page).to have_current_path("/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}")
+        expect(page).to have_text("Tap an item to take a photo or video.")
+      end
     end
   end
 

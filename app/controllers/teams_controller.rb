@@ -20,6 +20,14 @@ class TeamsController < ApplicationController
     redirect_to hunt_team_path(hunt.code, team)
   end
 
+  def pending_uploads
+    return head :bad_request if params[:client].blank?
+
+    team = hunt.teams.find(params[:id])
+    team.report_pending_uploads(params[:client].to_s.first(64), params[:count].to_i)
+    head :no_content
+  end
+
   private
 
   def hunt

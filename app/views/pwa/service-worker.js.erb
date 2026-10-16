@@ -1,0 +1,135 @@
+<%
+  precache = [
+    asset_path("application.css"),
+    asset_path("application.js"),
+    offline_path,
+    "/android-chrome-192x192.png",
+    "/android-chrome-512x512.png",
+    "/apple-touch-icon.png",
+    "/favicon-32x32.png",
+    "/icon.svg"
+  ]
+  fonts = ["https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"]
+  version = Digest::SHA256.hexdigest(precache.join("\n"))[0, 12]
+%>
+const VERSION = "<%= version %>"
+const PRECACHE = <%= raw precache.to_json %>
+const FONTS = <%= raw fonts.to_json %>
+const OFFLINE_PAGE = "<%= offline_path %>"
+const CACHES = {
+  precache: `precache-${VERSION}`,
+  pages: `pages-${VERSION}`,
+  runtime: `runtime-${VERSION}`
+}
+const MAX_PAGES = 40
+const PRECACHED = new Set(PRECACHE.map((path) => new URL(path, self.location.origin).href))
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHES.precache).then(async (cache) => {
+      await cache.addAll(PRECACHE)
+      await Promise.allSettled(FONTS.map((url) => cache.add(url)))
+    }).then(() => self.skipWaiting())
+  )
+})
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((names) => Promise.all(
+      names.filter((name) => !Object.values(CACHES).includes(name)).map((name) => caches.delete(name))
+    )).then(() => self.clients.claim())
+  )
+})
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event
+  if (request.method !== "GET") return
+
+  const url = new URL(request.url)
+  if (bypasses(request, url)) return
+
+  if (PRECACHED.has(url.href) || FONTS.includes(url.href)) {
+    event.respondWith(cacheFirst(request, CACHES.precache))
+  } else if (url.hostname === "fonts.gstatic.com" || (url.origin === self.location.origin && url.pathname.startsWith("/assets/"))) {
+    event.respondWith(cacheFirst(request, CACHES.runtime))
+  } else if (url.origin === self.location.origin && wantsHTML(request)) {
+    event.respondWith(networkFirst(event))
+  }
+})
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === "upload-queue") {
+    event.waitUntil(broadcast({ type: "drain-queue" }))
+  }
+})
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "drain-queue") {
+    event.waitUntil(broadcast(event.data))
+  }
+})
+
+function bypasses(request, url) {
+  if (url.origin !== self.location.origin) {
+    return url.hostname !== "fonts.googleapis.com" && url.hostname !== "fonts.gstatic.com"
+  }
+  return url.pathname === "/cable" ||
+    url.pathname === "/service-worker.js" ||
+    url.pathname.startsWith("/rails/") ||
+    (request.headers.get("Accept") || "").includes("text/vnd.turbo-stream.html")
+}
+
+function wantsHTML(request) {
+  return request.mode === "navigate" || (request.headers.get("Accept") || "").includes("text/html")
+}
+
+async function cacheFirst(request, cacheName) {
+  const cache = await caches.open(cacheName)
+  const cached = await cache.match(request, { ignoreVary: true })
+  if (cached) return cached
+
+  const response = await fetch(request)
+  if (response.ok) {
+    await cache.put(request, response.clone())
+  }
+  return response
+}
+
+async function networkFirst(event) {
+  const { request } = event
+  const cache = await caches.open(CACHES.pages)
+  try {
+    const response = await fetch(request)
+    if (response.ok && !response.redirected) {
+      event.waitUntil(storePage(cache, request.url, response.clone()))
+    }
+    return response
+  } catch (error) {
+    const cached = await cache.match(request.url, { ignoreVary: true })
+    if (cached) {
+      event.waitUntil(notify(event, { type: "offline-page", url: request.url }))
+      return cached
+    }
+    if (request.mode === "navigate") {
+      const offline = await caches.match(OFFLINE_PAGE, { ignoreVary: true })
+      if (offline) return offline
+    }
+    throw error
+  }
+}
+
+async function storePage(cache, url, response) {
+  await cache.put(url, response)
+  const keys = await cache.keys()
+  await Promise.all(keys.slice(0, Math.max(0, keys.length - MAX_PAGES)).map((key) => cache.delete(key)))
+}
+
+async function notify(event, message) {
+  const client = await self.clients.get(event.resultingClientId || event.clientId)
+  client?.postMessage(message)
+}
+
+async function broadcast(message) {
+  const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true })
+  clients.forEach((client) => client.postMessage(message))
+}

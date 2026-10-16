@@ -3,9 +3,15 @@
 Rails.application.routes.draw do
   root "home#index"
 
+  get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker", to: "rails/pwa#service_worker", as: :pwa_service_worker
+  get "offline", to: "pwa#offline"
+
   resources :hunts, only: %i[index new create show], param: :code, path: "scavenger_hunts" do
     get :join, on: :collection
-    resources :teams, only: %i[create show]
+    resources :teams, only: %i[create show] do
+      post :pending_uploads, on: :member
+    end
     resources :items, only: %i[show]
     resources :messages, only: %i[create]
     get :results

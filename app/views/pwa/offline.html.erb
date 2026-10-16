@@ -1,0 +1,8 @@
+<% title "You're offline" %>
+
+<div class="page pt-16 text-center">
+  <span class="mx-auto grid size-16 place-items-center rounded-2xl bg-base-200 text-ink-soft"><%= icon :cloud, class: "size-8" %></span>
+  <h1 class="display mt-6 text-3xl">You're offline</h1>
+  <p class="mt-3 text-ink-soft">This page hasn't been saved on your phone yet. Your team's checklist is saved once you've opened it with signal, and photos you take without signal upload themselves when it comes back.</p>
+  <%= link_to "Try again", request.referer.presence || root_path, class: "btn btn-primary btn-lg mt-8", data: {turbo: false} %>
+</div>

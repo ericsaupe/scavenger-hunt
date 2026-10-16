@@ -7,7 +7,10 @@ RSpec.describe "Uploads" do
   let(:team) { create(:team, hunt:) }
   let(:item) { hunt.items.first }
 
-  before { visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}" }
+  before do
+    visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+    clear_upload_queue
+  end
 
   def choose_photo
     attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
@@ -32,23 +35,24 @@ RSpec.describe "Uploads" do
     expect(team.submissions.find_by(item:).photo).to be_attached
   end
 
-  it "keeps the pending print while retrying and offers to try again when the upload keeps failing" do
+  it "keeps the photo queued when the upload keeps failing and sends it at the next chance" do
     set_direct_upload_url("/rails/active_storage/direct_uploads/unreachable")
 
     choose_photo
 
     expect(page).to have_css("li[data-uploading] img")
-    expect(page).to have_button("Try again", wait: 10)
-    expect(page).to have_text("couldn't be uploaded")
+    expect(page).to have_css("li[data-queued] img", wait: 10)
+    expect(page).to have_text("Will upload when you have signal")
     expect(page).not_to have_css("li[data-found]")
 
     set_direct_upload_url("/rails/active_storage/direct_uploads")
-    click_on "Try again"
+    page.execute_script("window.dispatchEvent(new Event('online'))")
 
     expect(page).to have_css("li[data-found]", wait: 10)
+    expect(page).not_to have_text("Will upload when you have signal")
   end
 
-  it "offers to try again when the final save does not reach the server" do
+  it "queues the photo when the final save does not reach the server" do
     page.execute_script(<<~JS)
       window.realFetch = window.fetch
       window.fetch = (url, options) => String(url).includes("/submissions/") ? Promise.reject(new TypeError("Failed to fetch")) : window.realFetch(url, options)
@@ -56,11 +60,11 @@ RSpec.describe "Uploads" do
 
     choose_photo
 
-    expect(page).to have_button("Try again", wait: 10)
+    expect(page).to have_css("li[data-queued] img", wait: 10)
     expect(page).not_to have_css("li[data-found]")
 
     page.execute_script("window.fetch = window.realFetch")
-    click_on "Try again"
+    page.execute_script("window.dispatchEvent(new Event('online'))")
 
     expect(page).to have_css("li[data-found]", wait: 10)
   end
