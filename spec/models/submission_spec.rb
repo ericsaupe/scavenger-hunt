@@ -37,4 +37,26 @@ RSpec.describe Submission do
       expect(submission.photo_extension).to eq(".jpg")
     end
   end
+
+  describe "#variant_url" do
+    before { allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000") }
+
+    it "links images to a permanent URL that processes the variant when first requested" do
+      submission = create(:photo_submission)
+
+      expect(submission.small_variant_url).to start_with("/rails/active_storage/representations/redirect/")
+      expect(submission.large_variant_url).to start_with("/rails/active_storage/representations/redirect/")
+      expect(ActiveStorage::VariantRecord.count).to eq(0)
+    end
+
+    it "links videos to the original file" do
+      submission = create(:video_submission)
+
+      expect(submission.large_variant_url).to start_with("/rails/active_storage/blobs/redirect/")
+    end
+
+    it "is nil without a photo" do
+      expect(create(:submission).small_variant_url).to be_nil
+    end
+  end
 end

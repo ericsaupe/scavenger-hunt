@@ -44,7 +44,8 @@ class Submission < ApplicationRecord
   def variant_url(size)
     return nil unless photo.attached?
 
-    video? ? Rails.application.routes.url_helpers.url_for(photo) : photo.variant(size).processed.url
+    routes = Rails.application.routes.url_helpers
+    video? ? routes.rails_blob_path(photo, only_path: true) : routes.rails_representation_path(photo.variant(size), only_path: true)
   end
 
   def calculate_denied_points
