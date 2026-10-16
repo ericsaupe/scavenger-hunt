@@ -16,6 +16,7 @@ const VERSION = "<%= version %>"
 const PRECACHE = <%= raw precache.to_json %>
 const FONTS = <%= raw fonts.to_json %>
 const OFFLINE_PAGE = "<%= offline_path %>"
+const NOTIFICATION_ICON = "<%= PushSubscription::ICON %>"
 const CACHES = {
   precache: `precache-${VERSION}`,
   pages: `pages-${VERSION}`,
@@ -68,6 +69,45 @@ self.addEventListener("message", (event) => {
     event.waitUntil(broadcast(event.data))
   }
 })
+
+self.addEventListener("push", (event) => {
+  const payload = parsePush(event.data)
+  event.waitUntil(self.registration.showNotification(payload.title || "Scavenger Hunt Party", {
+    body: payload.body,
+    icon: payload.icon || NOTIFICATION_ICON,
+    badge: payload.icon || NOTIFICATION_ICON,
+    tag: payload.tag,
+    renotify: Boolean(payload.tag),
+    data: { url: payload.url || "/" }
+  }))
+})
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close()
+  const url = new URL(event.notification.data?.url || "/", self.location.origin).href
+  event.waitUntil(openOrFocus(url))
+})
+
+function parsePush(data) {
+  if (!data) return {}
+  try {
+    return data.json() || {}
+  } catch (error) {
+    return { body: data.text() }
+  }
+}
+
+async function openOrFocus(url) {
+  const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true })
+  const client = windows.find((candidate) => candidate.url === url) || windows[0]
+  if (!client) {
+    return self.clients.openWindow(url)
+  }
+  await client.focus()
+  if (client.url !== url && "navigate" in client) {
+    await client.navigate(url)
+  }
+}
 
 function bypasses(request, url) {
   if (url.origin !== self.location.origin) {

@@ -1,0 +1,31 @@
+<% subscription = current_push_subscription || PushSubscription.new %>
+<section class="page mt-8" hidden data-controller="push-settings" data-testid="notification-settings"
+  data-push-settings-url-value="<%= hunt_push_subscription_path(hunt.code) %>"
+  data-push-settings-public-key-value="<%= PushSubscription.vapid[:public_key] %>"
+  data-push-settings-code-value="<%= hunt.code %>"
+  data-push-settings-subscribed-value="<%= subscription.persisted? %>">
+  <div class="rounded-3xl border border-base-300 p-5">
+    <h2 class="flex items-center gap-2 text-lg font-bold"><%= icon :bell, class: "size-5" %>Notifications</h2>
+    <div hidden data-push-settings-target="toggles">
+      <p class="mt-1 text-sm text-ink-soft">Pick what this phone gets told about.</p>
+      <ul class="mt-4 divide-y divide-base-300">
+        <% push_preference_options.each do |preference, (label, hint)| %>
+          <li>
+            <label class="flex cursor-pointer items-center justify-between gap-4 py-3">
+              <span>
+                <span class="block font-semibold"><%= label %></span>
+                <span class="block text-sm text-ink-soft"><%= hint %></span>
+              </span>
+              <%= check_box_tag preference, "1", subscription.public_send(preference), class: "toggle toggle-primary", data: {"push-settings-target": "preference", action: "push-settings#update"} %>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+      <button type="button" class="btn btn-sm mt-3" data-action="push-settings#disable">Turn off notifications</button>
+    </div>
+    <div hidden data-push-settings-target="enable">
+      <p class="mt-1 text-sm text-ink-soft">Notifications are off for this hunt on this phone.</p>
+      <button type="button" class="btn btn-sm btn-primary mt-3" data-action="push-settings#enable">Turn on notifications</button>
+    </div>
+  </div>
+</section>

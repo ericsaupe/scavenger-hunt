@@ -29,6 +29,10 @@
   <% end %>
 <% end %>
 
+<% if PushSubscription.configured? %>
+  <%= render partial: "notification_settings", locals: {hunt: @hunt} %>
+<% end %>
+
 <section class="page mt-12">
   <div class="rounded-3xl bg-base-200 p-5">
     <h2 class="text-lg font-bold">Invite others</h2>

@@ -6,6 +6,8 @@ class Hunt < ApplicationRecord
   include BCrypt
 
   LATE_UPLOAD_GRACE = 15.minutes
+  STARTING_SOON_LEAD = 5.minutes
+  LEAD_CHANGE_INTERVAL = 5.minutes
   PLAYBACK_COMMANDS = %w[play pause replay mute unmute].freeze
 
   has_many :categories, dependent: :destroy
@@ -13,12 +15,15 @@ class Hunt < ApplicationRecord
   has_many :submissions, through: :items
   has_many :messages, dependent: :destroy
   has_many :teams, dependent: :destroy
+  has_many :push_subscriptions, dependent: :destroy
   belongs_to :presentation_submission, class_name: "Submission", optional: true
   belongs_to :victory_item, class_name: "Item", optional: true
 
   has_one_attached :archive
 
   before_save :generate_code, if: :new_record?
+  after_commit :schedule_starting_soon_notification, if: :saved_change_to_starts_at?
+  after_commit :schedule_results_notification, if: :saved_change_to_ends_at?
 
   def start_a_new_team(team_name)
     ActiveRecord::Base.transaction do
@@ -81,7 +86,7 @@ class Hunt < ApplicationRecord
     ranked = teams.map do |team|
       score = scores.fetch(team.id, 0)
       total_score = total_scores.fetch(team.id, 0)
-      [team, {name: team.name, score:, total_score:, deductions: total_score - score, submissions: found_counts.fetch(team.id, 0)}]
+      [team, {team_id: team.id, name: team.name, score:, total_score:, deductions: total_score - score, submissions: found_counts.fetch(team.id, 0)}]
     end.sort_by { |_, result| result[:score] }.reverse
 
     winner, winning_result = ranked.first
@@ -89,8 +94,20 @@ class Hunt < ApplicationRecord
     ranked.map(&:last)
   end
 
+  def leader
+    ranked = results
+    top, runner_up = ranked.first(2)
+    return if top.nil? || top[:score].zero? || runner_up&.dig(:score) == top[:score]
+
+    [teams.find(top[:team_id]), top[:score]]
+  end
+
   def results_locked?
     (lock_results && ends_at && ends_at > Time.current) || (lock_password.present? && !password_entered)
+  end
+
+  def leaderboard_visible?
+    !results_locked? && (lock_password.blank? || password_entered_for_leaderboard)
   end
 
   def password
@@ -135,6 +152,7 @@ class Hunt < ApplicationRecord
   def present!(submission_id)
     update!(presentation_submission_id: submission_id, presentation_playback: "paused", playback_started_at: nil)
     broadcast_presentation_update
+    announce_show!
   end
 
   def playback!(command)
@@ -153,6 +171,23 @@ class Hunt < ApplicationRecord
   def hand_remote_to!(user_id)
     update!(owner_id: user_id)
     broadcast_presentation_update
+    announce_show!
+  end
+
+  def schedule_notifications
+    schedule_starting_soon_notification
+    schedule_results_notification
+  end
+
+  def announce_show!
+    return if show_announced_at
+
+    announced = with_lock do
+      next false if show_announced_at
+
+      update!(show_announced_at: Time.current)
+    end
+    ShowStartingJob.perform_later(self) if announced
   end
 
   def playing?
@@ -172,6 +207,18 @@ class Hunt < ApplicationRecord
   end
 
   private
+
+  def schedule_starting_soon_notification
+    return if starts_at.nil? || starts_at - STARTING_SOON_LEAD <= Time.current
+
+    HuntStartingSoonJob.set(wait_until: starts_at - STARTING_SOON_LEAD).perform_later(self, starts_at)
+  end
+
+  def schedule_results_notification
+    return if ends_at.nil? || ends_at + LATE_UPLOAD_GRACE <= Time.current
+
+    HuntResultsReadyJob.set(wait_until: ends_at + LATE_UPLOAD_GRACE).perform_later(self, ends_at)
+  end
 
   ##
   # Generate a code to be used for better UX. If one is already set double check that it is unique

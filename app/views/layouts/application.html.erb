@@ -57,5 +57,6 @@
 
     <%= yield :bottom_bar %>
     <%= render partial: "shared/install_prompt" unless @presenter_mode || content_for?(:bottom_bar) %>
+    <%= render partial: "shared/push_prompt" if @hunt&.persisted? && !@presenter_mode && PushSubscription.configured? %>
   </body>
 </html>

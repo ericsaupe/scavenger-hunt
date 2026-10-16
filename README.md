@@ -38,6 +38,27 @@ Add every origin the app is served from (staging, custom domains) to `AllowedOri
 
 Videos are limited to 50 MB and 30 seconds (`Submission::MAX_VIDEO_BYTES`, `Submission::MAX_VIDEO_SECONDS`); the browser checks both before uploading and the server checks the size again. Photos are compressed in the browser before upload. A photo captured before the hunt ended is still accepted for 15 minutes after the end (`Hunt::LATE_UPLOAD_GRACE`) so slow connections do not lose last-minute finds.
 
+### Push notifications
+
+Phones that installed the app and allowed notifications get a push when a hunt is five minutes from starting, when it is over and the results are up, when the photo show starts and when a new team takes the lead. Pushes are signed with VAPID keys from the Rails credentials. Generate a pair once:
+
+```bash
+bin/rails runner 'key = WebPush.generate_key; puts "public_key: #{key.public_key}", "private_key: #{key.private_key}"'
+```
+
+Then add them with `bin/rails credentials:edit`:
+
+```yaml
+vapid:
+  subject: mailto:you@example.com
+  public_key: <public key>
+  private_key: <private key>
+```
+
+`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` environment variables work too. Without keys the opt-in sheet and the notification settings stay hidden and nothing is sent. The test environment generates a throwaway pair at boot. Rotating the keys invalidates every existing subscription, so phones have to allow notifications again.
+
+Subscriptions live in `push_subscriptions`, one per phone and hunt, keyed by the viewer's `user_id` cookie. Only endpoints on the browsers' own push services (Google, Mozilla, Apple, Microsoft; see `PushSubscription::PUSH_SERVICES`) are accepted, so the worker never posts to an address a viewer made up; add a browser's service there if its subscriptions are refused. Push services answer 404 or 410 for a phone that revoked its subscription; those rows are deleted the next time a notification goes out.
+
 ## Adding New Scavenger Hunt Templates
 
 One of the features of Scavenger Hunt is ready made hunt templates. These are loaded in during app boot from `app/templates`. To create a new scavenger hunt template just make a new YAML file in `app/templates` that is structured like a `Hunt` model with associated `Category`s and `Item`s.

@@ -25,6 +25,15 @@ module HuntHelper
     "live"
   end
 
+  def push_preference_options
+    {
+      notify_starting_soon: ["Hunt starting soon", "Five minutes before the start"],
+      notify_results: ["Results are up", "When the hunt ends"],
+      notify_show: ["The show is starting", "When photos go up on the big screen"],
+      notify_lead_change: ["Lead changes", "When a new team takes the top spot"]
+    }
+  end
+
   def template_item_count(template)
     template[:categories].sum { |category| category[:items].size }
   end
