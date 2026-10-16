@@ -2,15 +2,10 @@
 
 module ApplicationHelper
   def daisy_theme
-    Rails.cache.fetch("daisy_theme", expires_in: 1.day) do
-      current_time = Time.zone.now
-      if current_time.month == 10 # October
-        "halloween"
-      elsif current_time.month == 11 || current_time.month == 12 # November/December
-        "autumn"
-      else
-        "party"
-      end
+    case Time.zone.now.month
+    when 10 then "halloween"
+    when 11, 12 then "autumn"
+    else "party"
     end
   end
 end
