@@ -30,6 +30,13 @@ RSpec.describe "Presenter" do
         expect(page).to have_content("«")
         expect(page).to have_content("»")
       end
+
+      it "does not change the current submission when hovering the next link" do
+        visit "/scavenger_hunts/#{hunt.code}/presenter"
+        find("a", text: "»").hover
+        sleep 1
+        expect(hunt.reload.presentation_submission_id).to be_nil
+      end
     end
 
     context "not as hunt owner" do
