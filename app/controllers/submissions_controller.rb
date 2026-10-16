@@ -5,14 +5,29 @@ class SubmissionsController < ApplicationController
 
   def update
     submission = Submission.find(params[:id])
+    hunt = submission.hunt
+    submission.assign_attributes(submission_params)
 
-    if submission.hunt.ended?
-      # If the hunt is ended, let's just touch it to get an updated object
-      submission.touch # rubocop:disable Rails/SkipsModelValidations
+    if !hunt.accepts_photo_captured_at?(submission.captured_at)
+      reject(submission, "The hunt ended before this photo was sent")
+    elsif submission.save
+      accept(submission)
     else
-      submission.update!(submission_params)
+      reject(submission, submission.errors[:photo].first)
     end
+  end
 
+  def vote_menu
+    @submission = Submission.find(params[:submission_id])
+  end
+
+  private
+
+  def submission_params
+    params.require(:submission).permit(:photo, :captured_at)
+  end
+
+  def accept(submission)
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(:submissions, partial: "submissions/submission",
@@ -26,13 +41,22 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  def vote_menu
-    @submission = Submission.find(params[:submission_id])
-  end
+  def reject(submission, message)
+    blob = submission.attachment_changes["photo"]&.blob
+    blob.purge_later if blob&.persisted?
+    submission.reload
 
-  private
-
-  def submission_params
-    params.require(:submission).permit(:item_id, :team_id, :photo)
+    respond_to do |format|
+      format.turbo_stream do
+        render status: :unprocessable_content, turbo_stream: [
+          turbo_stream.replace(submission, partial: "submissions/submission", locals: {submission:, animate: false}),
+          turbo_stream.append(:flash, partial: "banners/banner", locals: {message:})
+        ]
+      end
+      format.html do
+        flash[:error] = message
+        redirect_to hunt_team_path(submission.team.hunt.code, submission.team)
+      end
+    end
   end
 end

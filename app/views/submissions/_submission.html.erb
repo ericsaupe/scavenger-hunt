@@ -3,13 +3,12 @@
 <% found = submission.photo.attached? %>
 <% field_id = "submission_#{submission.id || item.id}_photo" %>
 
-<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, found: (true if found)}.compact do %>
+<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, found: (true if found), "submission-max-video-bytes-value": Submission::MAX_VIDEO_BYTES, "submission-max-video-seconds-value": Submission::MAX_VIDEO_SECONDS}.compact do %>
   <% unless submission.new_record? %>
-    <%= form_with model: submission, authenticity_token: false, html: {class: "contents", data: {"submission-target": "form"}} do |form| %>
+    <%= form_with model: submission, authenticity_token: false, html: {class: "contents", data: {"submission-target": "form", action: "turbo:submit-end->submission#submitEnd"}} do |form| %>
       <%= field_set_tag(nil, class: "submission-fieldset contents", disabled: !submission.hunt.in_progress?) do %>
-        <%= form.hidden_field :item_id %>
-        <%= form.hidden_field :team_id %>
-        <%= form.file_field :photo, id: field_id, class: "sr-only", accept: "image/*,video/*", data: {action: "change->submission#submitForm change->hunt#closeModal", "submission-target": "field"} %>
+        <%= form.hidden_field :captured_at, value: nil, data: {"submission-target": "capturedAt"} %>
+        <%= form.file_field :photo, id: field_id, class: "sr-only", accept: "image/*,video/*", data: {action: "change->submission#submitForm change->hunt#closeModal", "submission-target": "field", direct_upload_url: rails_direct_uploads_path} %>
       <% end %>
     <% end %>
   <% end %>

@@ -5,6 +5,8 @@ require "zip"
 class Hunt < ApplicationRecord
   include BCrypt
 
+  LATE_UPLOAD_GRACE = 15.minutes
+
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
   has_many :submissions, through: :items
@@ -49,6 +51,12 @@ class Hunt < ApplicationRecord
 
   def ended?
     ends_at && ends_at < Time.current
+  end
+
+  def accepts_photo_captured_at?(captured_at)
+    return true unless ended?
+
+    captured_at.present? && captured_at <= ends_at && Time.current <= ends_at + LATE_UPLOAD_GRACE
   end
 
   def timer?

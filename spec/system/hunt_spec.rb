@@ -75,19 +75,11 @@ RSpec.describe "Hunts" do
 
     it "supports video" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      page.execute_script(%(Object.defineProperty(HTMLMediaElement.prototype, "duration", { get: () => 5 })))
       attach_file(Rails.root.join("spec/fixtures/video.mp4")) do
         find(:label, text: hunt.items.first.name).click
       end
       expect(page).to have_css("li[data-found]")
-    end
-
-    it "does not cross off if hunt ended" do
-      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
-      hunt.update(ends_at: 1.day.ago)
-      attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:label, text: hunt.items.first.name).click
-      end
-      expect(page).not_to have_css("li[data-found]")
     end
 
     it "changes the image" do

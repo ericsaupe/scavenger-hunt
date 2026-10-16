@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_10_16_023759) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -238,6 +238,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_10_16_023759) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "denied_points", default: false, null: false
+    t.datetime "captured_at"
     t.index ["item_id", "team_id"], name: "index_submissions_on_item_id_and_team_id"
     t.index ["item_id"], name: "index_submissions_on_item_id"
     t.index ["team_id"], name: "index_submissions_on_team_id"
