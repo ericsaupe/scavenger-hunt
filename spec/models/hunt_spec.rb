@@ -27,17 +27,33 @@ RSpec.describe Hunt do
     before { allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000") }
 
     it "names each file after its item with an extension matching its type" do
-      hunt = create(:hunt)
-      team = create(:team, hunt:)
-      photo = create(:photo_submission, team:, item: hunt.items.first)
-      video = create(:video_submission, team:, item: hunt.items.second)
+      hunt = create(:hunt, name: "Summer Hunt")
+      team = create(:team, hunt:, name: "Red Team")
+      hunt.items.first.update!(name: "Sandcastle")
+      hunt.items.second.update!(name: "Seagull")
+      create(:photo_submission, team:, item: hunt.items.first)
+      create(:video_submission, team:, item: hunt.items.second)
+
+      hunt.create_archive_file
+
+      names = hunt.archive.open { |file| Zip::File.open(file.path) { |zip| zip.map(&:name) } }
+      expect(names).to contain_exactly("Summer Hunt/Red Team/Sandcastle.jpg", "Summer Hunt/Red Team/Seagull.mp4")
+    end
+
+    it "replaces characters that cannot be used in file names" do
+      hunt = create(:hunt, name: "Bob's \"Big\" Hunt: Part 2")
+      team = create(:team, hunt:, name: "Red/Blue")
+      hunt.items.first.update!(name: "Camper / RV")
+      hunt.items.second.update!(name: "The word \"Boo\"?")
+      create(:photo_submission, team:, item: hunt.items.first)
+      create(:video_submission, team:, item: hunt.items.second)
 
       hunt.create_archive_file
 
       names = hunt.archive.open { |file| Zip::File.open(file.path) { |zip| zip.map(&:name) } }
       expect(names).to contain_exactly(
-        "#{hunt.name}/#{team.name}/#{photo.item.name}.jpg",
-        "#{hunt.name}/#{team.name}/#{video.item.name}.mp4"
+        "Bob's 'Big' Hunt- Part 2/Red-Blue/Camper - RV.jpg",
+        "Bob's 'Big' Hunt- Part 2/Red-Blue/The word 'Boo'-.mp4"
       )
     end
   end
