@@ -38,7 +38,7 @@ class PresentationsController < ApplicationController
 
   def claim
     if @hunt.owner_password_matches?(params[:password])
-      @hunt.update!(owner_id: cookies[:user_id])
+      @hunt.hand_remote_to!(cookies[:user_id])
       redirect_to hunt_presenter_remote_path(@hunt.code.upcase)
     else
       flash[:warning] = "Incorrect password"

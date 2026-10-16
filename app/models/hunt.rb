@@ -135,6 +135,11 @@ class Hunt < ApplicationRecord
     broadcast_presentation_update
   end
 
+  def hand_remote_to!(user_id)
+    update!(owner_id: user_id)
+    broadcast_presentation_update
+  end
+
   def playing?
     presentation_playback == "playing"
   end

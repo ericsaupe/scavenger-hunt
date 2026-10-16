@@ -91,6 +91,16 @@ RSpec.describe "Presenter" do
       expect(response.body).not_to include(%(id="submission_vote_), "submission_#{submission.id}_video")
     end
 
+    it "keeps a hidden sound button on a big-screen video slide for browsers that block audio" do
+      video = create(:video_submission, item: items.first, team: first_team)
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(id="submission_#{video.id}_sound_button"), "Tap to enable sound")
+      expect(response.body).to match(/id="submission_#{video.id}_sound_button"[^>]*\shidden\s[^>]*data-turbo-permanent/)
+      expect(response.body).not_to include(%(id="submission_#{video.id}_play_button"))
+    end
+
     it "renders with the same number of queries however many photos there are" do
       found(first_team, items.first)
       path = "/scavenger_hunts/#{hunt.code}/presenter"
@@ -110,13 +120,15 @@ RSpec.describe "Presenter" do
   describe "POST /presentation/claim" do
     before { found(first_team, items.first) }
 
-    it "hands the remote to the viewer and sends them to it" do
+    it "hands the remote to the viewer, tells every screen and sends them to it" do
       cookies[:user_id] = "viewer"
+      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
 
       post "/scavenger_hunts/#{hunt.code}/presentation/claim"
 
       expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/presenter/remote")
       expect(hunt.reload.owner_id).to eq("viewer")
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with("hunt_presenter_#{hunt.id}", request_id: nil).once
     end
 
     context "when the results are locked with a password" do

@@ -11,8 +11,10 @@
     <div class="relative grid place-items-center overflow-hidden bg-black">
       <% if submission.video? %>
         <%= video_tag(media_url, id: "submission_#{submission.id}_video", preload: "metadata", playsinline: true, muted: true, controls: !big_screen, poster: submission.poster_url, class: "max-h-[64dvh] min-h-48 w-full", data: {playback_target: "video"}) %>
-        <% unless big_screen %>
-          <button type="button" class="absolute inset-0 grid place-items-center bg-black/20" data-action="playback#playLocally" data-playback-target="playButton" aria-label="Play video">
+        <% if big_screen %>
+          <button type="button" id="submission_<%= submission.id %>_sound_button" class="btn btn-sm absolute bottom-3 right-3 bg-white/90 text-[#1b1f24]" hidden data-turbo-permanent data-action="playback#enableSound" data-playback-target="soundButton">Tap to enable sound</button>
+        <% else %>
+          <button type="button" id="submission_<%= submission.id %>_play_button" class="absolute inset-0 grid place-items-center bg-black/20" data-turbo-permanent data-action="playback#playLocally" data-playback-target="playButton" aria-label="Play video">
             <span class="grid size-16 place-items-center rounded-full bg-white/90 text-[#1b1f24] shadow-lg"><%= icon :play, solid: true, class: "size-8 translate-x-0.5" %></span>
           </button>
         <% end %>

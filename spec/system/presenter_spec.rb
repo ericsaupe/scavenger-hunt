@@ -44,6 +44,37 @@ RSpec.describe "Presenter" do
     expect(page).to have_css("img#submission_#{@photo.id}_photo")
   end
 
+  it "offers a tap to enable sound when the browser blocks audible playback" do
+    visit "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+    page.execute_script(<<~JS)
+      const play = HTMLMediaElement.prototype.play
+      HTMLMediaElement.prototype.play = function () {
+        if (!this.muted && !window.userGestureSeen) {
+          return Promise.reject(new DOMException("blocked", "NotAllowedError"))
+        }
+        return play.call(this)
+      }
+      document.addEventListener("click", () => { window.userGestureSeen = true }, true)
+    JS
+    expect(page).not_to have_button("Tap to enable sound")
+
+    hunt.reload.playback!("play")
+    hunt.reload.playback!("unmute")
+    expect(page).to have_button("Tap to enable sound")
+    expect(page.evaluate_script("document.querySelector('video').muted")).to be(true)
+    expect(video_paused?).to be(false)
+
+    click_on "Tap to enable sound"
+    expect(page).not_to have_button("Tap to enable sound")
+    expect(page.evaluate_script("document.querySelector('video').muted")).to be(false)
+    expect(video_paused?).to be(false)
+
+    hunt.reload.playback!("pause")
+    expect(page).to have_css("[data-playback-state-value='paused']")
+    expect(video_paused?).to be(true)
+  end
+
   it "never starts the video on a watcher's phone" do
     hunt.update!(presentation_playback: "playing", playback_started_at: Time.current)
 
@@ -53,6 +84,16 @@ RSpec.describe "Presenter" do
     expect(page).to have_css("button[aria-label='Play video']")
     expect(page).to have_css("[data-testid='vote-menu']")
     expect(video_paused?).to be(true)
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+
+    find("button[aria-label='Play video']").click
+    expect(page).not_to have_css("button[aria-label='Play video']")
+    expect(video_paused?).to be(false)
+
+    hunt.reload.playback!("replay")
+    expect(page).to have_css("[data-playback-version-value='1']")
+    expect(page).not_to have_css("button[aria-label='Play video']")
+    expect(video_paused?).to be(false)
   end
 
   it "hands the remote to whoever takes it" do
