@@ -80,7 +80,7 @@ class VideoTranscoder
   def command
     [*NICE, self.class.ffmpeg_path, "-nostdin", "-y", "-loglevel", "error",
       *INPUT_OPTIONS, "-threads", THREADS, "-i", input,
-      "-t", Submission::MAX_VIDEO_SECONDS.to_s,
+      "-t", (Submission::MAX_VIDEO_SECONDS + 1).to_s,
       "-vf", FILTERS, "-threads", THREADS,
       "-c:v", "libx264", "-profile:v", "high", "-level", LEVEL, "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", CRF,
       "-c:a", "aac", "-b:a", "128k",

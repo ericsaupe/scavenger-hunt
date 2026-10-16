@@ -16,12 +16,15 @@ class TranscodeVideoJob < ApplicationJob
 
     source = submission.photo.blob
     source.analyze
-    return refuse(submission, source, TOO_LONG) if source.metadata[:duration].to_f > Submission::MAX_VIDEO_SECONDS
+    probed_duration = source.metadata[:duration]
+    return refuse(submission, source, TOO_LONG) if probed_duration.to_f > Submission::MAX_VIDEO_SECONDS
 
     Submission::POSTER_SIZES.each_key { |size| submission.poster(size).processed }
     source.open do |original|
       Dir.mktmpdir("transcode") do |dir|
         playback = VideoTranscoder.transcode(original.path, File.join(dir, "playback.mp4"))
+        return refuse(submission, source, TOO_LONG) if probed_duration.nil? && too_long?(playback)
+
         File.open(playback, "rb") do |io|
           submission.with_lock do
             submission.playback.attach(io:, filename: "playback.mp4", content_type: "video/mp4", identify: false) if submission.photo.blob == source
@@ -33,9 +36,14 @@ class TranscodeVideoJob < ApplicationJob
     refuse(submission, source, INCOMPLETE)
   rescue => error
     Rails.error.report(error, handled: true, context: {submission_id: submission.id})
+    give_up(submission, source)
   end
 
   private
+
+  def too_long?(playback)
+    VideoTranscoder.duration(playback).to_f > Submission::MAX_VIDEO_SECONDS + 0.1
+  end
 
   def refuse(submission, source, message)
     refused = submission.with_lock do
@@ -49,5 +57,10 @@ class TranscodeVideoJob < ApplicationJob
     LeadChangeJob.perform_later(submission.hunt)
     Turbo::StreamsChannel.broadcast_append_to("submissions_#{submission.team_id}",
       target: "flash", partial: "banners/banner", locals: {message:})
+  end
+
+  def give_up(submission, source)
+    source.update!(metadata: source.metadata.merge(playback_failed: true))
+    submission.touch if submission.photo.blob == source
   end
 end

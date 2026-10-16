@@ -6,8 +6,8 @@ module RestrictedVideoPreview
   def draw_relevant_frame_from(file)
     open_tempfile do |frame|
       frame.binmode
-      VideoTranscoder.run([self.class.ffmpeg_path, *VideoTranscoder::INPUT_OPTIONS, "-i", file.path,
-        *Shellwords.split(ActiveStorage.video_preview_arguments), "-"], into: frame)
+      VideoTranscoder.run([self.class.ffmpeg_path, *VideoTranscoder::INPUT_OPTIONS, "-threads", VideoTranscoder::THREADS, "-i", file.path,
+        *Shellwords.split(ActiveStorage.video_preview_arguments), "-threads", VideoTranscoder::THREADS, "-"], into: frame)
       frame.rewind
       yield frame
     end

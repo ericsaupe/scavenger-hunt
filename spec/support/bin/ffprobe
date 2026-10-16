@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 duration="${FAKE_FFPROBE_DURATION:-5.0}"
+case "${@: -1}" in
+  */playback.mp4) duration="${FAKE_FFPROBE_PLAYBACK_DURATION:-$duration}" ;;
+esac
 if [ -n "${FAKE_FFPROBE_LOG:-}" ]; then
   printf '%s\t' "$@" >> "$FAKE_FFPROBE_LOG"
   echo >> "$FAKE_FFPROBE_LOG"

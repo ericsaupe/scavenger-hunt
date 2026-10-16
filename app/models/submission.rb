@@ -40,7 +40,7 @@ class Submission < ApplicationRecord
   end
 
   def processing_video?
-    video? && !playback.attached?
+    video? && !playback.attached? && !photo.blob.metadata[:playback_failed]
   end
 
   def photo_extension

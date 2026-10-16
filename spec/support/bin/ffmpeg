@@ -9,7 +9,7 @@ fi
 
 case " $* " in
   *" -version "*) echo "ffmpeg version fake" ;;
-  *" image2 - "*) cat "$fixtures/poster.jpg" ;;
+  *" image2 "*) cat "$fixtures/poster.jpg" ;;
   *)
     if [ -n "${FAKE_FFMPEG_FAIL:-}" ]; then
       echo "Conversion failed!" >&2
