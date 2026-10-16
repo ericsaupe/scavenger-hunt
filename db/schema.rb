@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_10_16_023759) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_100000) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -200,6 +200,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_10_16_023759) do
     t.integer "victory_item_id"
     t.boolean "password_entered_for_leaderboard", default: false, null: false
     t.integer "presentation_submission_id"
+    t.string "presentation_playback", default: "paused", null: false
+    t.boolean "presentation_muted", default: true, null: false
+    t.integer "playback_version", default: 0, null: false
+    t.datetime "playback_started_at"
     t.index ["code"], name: "index_hunts_on_code"
     t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end

@@ -1,11 +1,23 @@
-<div id="current_submission" class="flex grow flex-col items-center justify-center px-4 pb-24 pt-14 sm:px-10 sm:py-10">
-  <figure class="polaroid-lg w-full max-w-md pb-5! sm:w-auto sm:max-w-[min(92vw,calc((100dvh-10rem)*0.9))]" style="transform: rotate(-0.75deg)">
-    <% image_url = submission_attachment_url(submission, variant_size: :large) %>
-    <div class="grid place-items-center overflow-hidden bg-black">
+<div id="current_submission" class="flex grow flex-col items-center justify-center px-4 pb-28 pt-14 sm:px-10 sm:py-10">
+  <figure id="submission_<%= submission.id %>_print"
+    class="polaroid-lg w-full max-w-md pb-5! sm:w-auto sm:max-w-[min(92vw,calc((100dvh-10rem)*0.9))]"
+    style="transform: rotate(-0.75deg)"
+    data-controller="playback"
+    data-playback-follow-value="<%= big_screen %>"
+    data-playback-state-value="<%= hunt.presentation_playback %>"
+    data-playback-muted-value="<%= hunt.presentation_muted %>"
+    data-playback-version-value="<%= hunt.playback_version %>">
+    <% media_url = submission_attachment_url(submission, variant_size: :large) %>
+    <div class="relative grid place-items-center overflow-hidden bg-black">
       <% if submission.video? %>
-        <%= video_tag(image_url, controls: true, playsinline: true, autoplay: true, class: "max-h-[64dvh] w-full") %>
+        <%= video_tag(media_url, id: "submission_#{submission.id}_video", preload: "metadata", playsinline: true, muted: true, controls: !big_screen, poster: submission.poster_url, class: "max-h-[64dvh] min-h-48 w-full", data: {playback_target: "video"}) %>
+        <% unless big_screen %>
+          <button type="button" class="absolute inset-0 grid place-items-center bg-black/20" data-action="playback#playLocally" data-playback-target="playButton" aria-label="Play video">
+            <span class="grid size-16 place-items-center rounded-full bg-white/90 text-[#1b1f24] shadow-lg"><%= icon :play, solid: true, class: "size-8 translate-x-0.5" %></span>
+          </button>
+        <% end %>
       <% else %>
-        <%= image_tag(image_url, class: "max-h-[64dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
+        <%= image_tag(media_url, id: "submission_#{submission.id}_photo", class: "max-h-[64dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
       <% end %>
     </div>
     <figcaption class="mt-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-1">
@@ -13,7 +25,9 @@
         <p class="display text-3xl text-ink sm:text-4xl"><%= submission.item.name %></p>
         <p class="mt-1 text-lg font-semibold text-ink-soft"><%= submission.team.name %></p>
       </div>
-      <%= turbo_frame_tag "vote_menu", src: submission_vote_menu_path(submission), class: "shrink-0" %>
+      <% unless big_screen %>
+        <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
+      <% end %>
     </figcaption>
   </figure>
 </div>

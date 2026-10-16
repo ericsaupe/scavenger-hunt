@@ -1,0 +1,83 @@
+<% title "#{@hunt.name} remote" %>
+<%= render partial: "hunts/presenter_head" %>
+
+<div class="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4"
+  data-controller="remote live"
+  data-remote-url-value="<%= hunt_presentation_path(@hunt.code.upcase) %>"
+  data-remote-playback-url-value="<%= playback_hunt_presentation_path(@hunt.code.upcase) %>"
+  data-remote-playing-value="<%= @hunt.playing? %>"
+  data-remote-video-value="<%= @submission.video? %>">
+  <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
+
+  <div class="flex items-center justify-between">
+    <%= link_to hunt_results_path(@hunt.code.upcase), class: "btn btn-ghost btn-sm text-white/70 hover:text-white" do %>
+      <%= icon :arrow_left, class: "size-4" %>
+      Results
+    <% end %>
+    <%= link_to hunt_presenter_path(@hunt.code.upcase, screen: "big"), target: "_blank", rel: "noopener", class: "btn btn-ghost btn-sm text-white/70 hover:text-white" do %>
+      <%= icon :tv, class: "size-4" %>
+      Open the big screen
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <figure class="polaroid w-24 shrink-0" style="--tilt: -2deg">
+      <div class="grid aspect-square place-items-center overflow-hidden bg-black">
+        <% if @submission.video? %>
+          <% if @submission.poster_url %>
+            <%= image_tag @submission.poster_url, class: "size-full object-cover", alt: "" %>
+          <% else %>
+            <%= icon :video, class: "size-8 text-white/70" %>
+          <% end %>
+        <% else %>
+          <%= image_tag submission_attachment_url(@submission), class: "size-full object-cover", alt: "" %>
+        <% end %>
+      </div>
+    </figure>
+    <div class="min-w-0">
+      <p class="text-sm font-semibold text-white/60" data-testid="progress"><%= @submission.video? ? "Video" : "Photo" %> <%= @presentation.position %> of <%= @presentation.count %></p>
+      <p class="display mt-1 truncate text-2xl" data-testid="current-item"><%= @submission.item.name %></p>
+      <p class="mt-1 truncate font-semibold text-white/70"><%= @submission.team.name %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <button type="button" class="btn btn-lg bg-white/10 text-white hover:bg-white/20" data-action="remote#previous" data-remote-target="button">
+      <%= icon :chevron_left, class: "size-5" %>
+      Previous
+    </button>
+    <button type="button" class="btn btn-lg btn-primary" data-action="remote#next" data-remote-target="button">
+      Next
+      <%= icon :chevron_right, class: "size-5" %>
+    </button>
+  </div>
+
+  <% if @submission.video? %>
+    <div class="rounded-3xl bg-white/5 p-4">
+      <p class="mb-3 text-sm font-semibold text-white/60">Video on the big screen</p>
+      <div class="grid gap-3">
+        <% if @hunt.playing? %>
+          <button type="button" class="btn btn-lg btn-block bg-white text-[#1b1f24]" data-action="remote#pause" data-remote-target="button" data-testid="pause">Pause</button>
+        <% else %>
+          <button type="button" class="btn btn-lg btn-block bg-white text-[#1b1f24]" data-action="remote#play" data-remote-target="button" data-testid="play">
+            <%= icon :play, solid: true, class: "size-5" %>
+            Play on the big screen
+          </button>
+        <% end %>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button" class="btn bg-white/10 text-white hover:bg-white/20" data-action="remote#replay" data-remote-target="button" data-testid="replay">
+            <%= icon :retake, class: "size-5" %>
+            Replay
+          </button>
+          <% if @hunt.presentation_muted %>
+            <button type="button" class="btn bg-white/10 text-white hover:bg-white/20" data-action="remote#unmute" data-remote-target="button" data-testid="sound">Sound on</button>
+          <% else %>
+            <button type="button" class="btn bg-white/10 text-white hover:bg-white/20" data-action="remote#mute" data-remote-target="button" data-testid="sound">Sound off</button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <p class="text-center text-xs text-white/40">Arrow keys change the slide. Space plays and pauses.</p>
+</div>

@@ -5,6 +5,8 @@ require "zip"
 class Hunt < ApplicationRecord
   include BCrypt
 
+  PLAYBACK_COMMANDS = %w[play pause replay mute unmute].freeze
+
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
   has_many :submissions, through: :items
@@ -107,8 +109,42 @@ class Hunt < ApplicationRecord
     FileUtils.rm_f(zipfile_name) if zipfile_name
   end
 
-  def broadcast_presentation_update(submission)
-    broadcast_replace_to("hunt_presenter_#{id}", target: "current_submission", partial: "submissions/submission_presenter", locals: {submission: submission})
+  def presentation
+    @presentation ||= Presentation.new(self)
+  end
+
+  def presenter_stream
+    "hunt_presenter_#{id}"
+  end
+
+  def present!(submission_id)
+    update!(presentation_submission_id: submission_id, presentation_playback: "paused", playback_started_at: nil)
+    broadcast_presentation_update
+  end
+
+  def playback!(command)
+    case command
+    when "play" then assign_attributes(presentation_playback: "playing", playback_started_at: Time.current)
+    when "pause" then assign_attributes(presentation_playback: "paused")
+    when "replay" then assign_attributes(presentation_playback: "playing", playback_started_at: Time.current, playback_version: playback_version + 1)
+    when "mute" then assign_attributes(presentation_muted: true)
+    when "unmute" then assign_attributes(presentation_muted: false)
+    else raise ArgumentError, "unknown playback command #{command.inspect}"
+    end
+    save!
+    broadcast_presentation_update
+  end
+
+  def playing?
+    presentation_playback == "playing"
+  end
+
+  def broadcast_presentation_update
+    broadcast_refresh_later_to(presenter_stream)
+  end
+
+  def owner_password_matches?(candidate)
+    lock_password.blank? || password == candidate
   end
 
   def owner?(user_id)

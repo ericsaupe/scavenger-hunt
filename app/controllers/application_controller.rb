@@ -8,6 +8,6 @@ class ApplicationController < ActionController::Base
   private
 
   def set_user_id
-    cookies[:user_id] ||= SecureRandom.uuid
+    cookies.permanent[:user_id] = cookies[:user_id].presence || SecureRandom.uuid
   end
 end
