@@ -29,7 +29,7 @@ services:
     buildCommand: "bundle install && ./bin/install-ffmpeg"
     startCommand: 'bundle exec good_job start --queues="+mailers,priority,default"'
     region: oregon
-    plan: starter
+    plan: standard
     branch: main
     autoDeployTrigger: commit
     envVars:
