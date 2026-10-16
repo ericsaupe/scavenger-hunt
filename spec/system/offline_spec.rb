@@ -116,13 +116,11 @@ RSpec.describe "Offline" do
   end
 
   describe "the install prompt" do
-    it "appears on the team page once the browser offers to install, and stays dismissed" do
-      visit "/scavenger_hunts/#{hunt.code.upcase}"
-      page.execute_script("window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'), { prompt() {}, userChoice: Promise.resolve({ outcome: 'dismissed' }) }))")
+    it "appears on the home page once the browser offers to install, and stays dismissed" do
+      visit "/"
       expect(page).not_to have_text("Add Scavenger Hunt Party to your home screen")
 
-      choose(team.name)
-      click_on "Join the hunt"
+      page.execute_script("window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'), { prompt() {}, userChoice: Promise.resolve({ outcome: 'dismissed' }) }))")
 
       expect(page).to have_text("Add Scavenger Hunt Party to your home screen")
       click_on "Not now"
@@ -131,6 +129,14 @@ RSpec.describe "Offline" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       expect(page).to have_text(item.name)
       expect(page).not_to have_text("Add Scavenger Hunt Party to your home screen")
+    end
+
+    it "stays out of the way of pages with a bottom bar" do
+      visit "/scavenger_hunts/new"
+      page.execute_script("window.dispatchEvent(Object.assign(new Event('beforeinstallprompt'), { prompt() {}, userChoice: Promise.resolve({ outcome: 'dismissed' }) }))")
+
+      expect(page).to have_button("Create hunt")
+      expect(page).not_to have_css("[data-testid='install-prompt']")
     end
   end
 end

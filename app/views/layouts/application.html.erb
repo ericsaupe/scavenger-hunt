@@ -56,5 +56,6 @@
     </main>
 
     <%= yield :bottom_bar %>
+    <%= render partial: "shared/install_prompt" unless @presenter_mode || content_for?(:bottom_bar) %>
   </body>
 </html>

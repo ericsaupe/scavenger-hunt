@@ -5,7 +5,8 @@
       controller: "past-hunts",
       "past-hunts-code-value": @hunt.code,
       "past-hunts-name-value": @hunt.name,
-      "past-hunts-team-value": @team.name
+      "past-hunts-team-value": @team.name,
+      "past-hunts-path-value": hunt_team_path(@hunt.code, @team)
     } %>
 
 <div data-controller="checklist live queue" data-queue-team-id-value="<%= @team.id %>" data-queue-report-url-value="<%= pending_uploads_hunt_team_path(@hunt.code, @team) %>">
@@ -51,6 +52,4 @@
   <template id="queued_badge_template">
     <span class="absolute bottom-0 right-0 grid size-5 place-items-center rounded-tl-lg bg-base-100 text-ink-soft" data-testid="queued-badge"><%= icon :cloud, class: "size-3.5" %></span>
   </template>
-
-  <%= render partial: "teams/install_prompt" %>
 </div>
