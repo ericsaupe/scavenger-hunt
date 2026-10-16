@@ -1,48 +1,44 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "modal" ]
-  static values = {
-    object: String
-  }
+  static targets = [ "modal", "title", "content" ]
 
   openModal(event) {
-    this.objectValue = event.target.dataset.object
-    this.modalTarget.classList.add("modal-open")
-    this.showContent(event)
+    const data = event.currentTarget.dataset
+    this.fieldId = data.field
+    this.titleTarget.textContent = data.title
+
+    this.contentTarget.replaceChildren()
+    if (data.video === "true") {
+      const video = document.createElement("video")
+      video.controls = true
+      video.playsInline = true
+      video.src = data.src
+      video.className = "max-h-[65dvh] w-full"
+      this.contentTarget.appendChild(video)
+    } else {
+      const img = new Image()
+      img.src = data.src
+      img.alt = data.title
+      img.className = "max-h-[65dvh] w-full object-contain"
+      this.contentTarget.appendChild(img)
+    }
+
+    if (!this.modalTarget.open) {
+      this.modalTarget.showModal()
+    }
   }
 
   closeModal() {
-    this.modalTarget.classList.remove("modal-open")
-  }
-
-  showContent(event) {
-    const title = this.modalTarget.querySelector("#title")
-    title.innerHTML = event.target.dataset.title
-
-    const content = this.modalTarget.querySelector("#content")
-    if (event.target.dataset.video === 'true') {
-      content.innerHTML = `<video controls src='${event.target.dataset.src}'></video>`
-    } else {
-      // Trying to load the image before showing it to stop the popping effect
-      const img = new Image()
-      img.src = event.target.dataset.src
-      content.firstElementChild.remove()
-      content.appendChild(img)
-      this.modalTarget.focus()
+    if (this.modalTarget.open) {
+      this.modalTarget.close()
     }
   }
 
   clickForm() {
-    const fileLabel = document.querySelector(`label[for="submission_${this.objectValue}"]`)
-    if (fileLabel) {
-      fileLabel.click()
-    }
-  }
-
-  handleKeydown(event) {
-    if (event.key === 'Escape') {
-      this.closeModal()
+    const field = document.getElementById(this.fieldId)
+    if (field && !field.disabled) {
+      field.click()
     }
   }
 }

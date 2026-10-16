@@ -1,0 +1,18 @@
+<div data-controller="hunt">
+  <% @hunt.categories.each do |category| %>
+    <section class="mx-auto max-w-2xl pt-8">
+      <div class="flex items-baseline justify-between gap-3 px-5">
+        <h2 class="text-xl font-bold"><%= category.name %></h2>
+        <span class="shrink-0 text-sm font-semibold text-ink-soft"><%= pluralize(category.points, "point") %> each</span>
+      </div>
+      <ul class="mt-3 divide-y divide-base-300 border-y border-base-300 sm:overflow-hidden sm:rounded-2xl sm:border">
+        <% category.items.each do |item| %>
+          <% submission = @submissions&.find_by(item:) || item.submissions.new %>
+          <%= render partial: "submissions/submission", locals: {submission:, animate: false} %>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <%= render partial: "submissions/modal" %>
+</div>

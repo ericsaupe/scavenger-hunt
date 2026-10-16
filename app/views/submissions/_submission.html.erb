@@ -1,54 +1,43 @@
-<% animate = true if local_assigns[:animate].nil? %>
+<% animate = local_assigns[:animate].nil? || local_assigns[:animate] %>
+<% item = submission.item %>
+<% found = submission.photo.attached? %>
+<% field_id = "submission_#{submission.id || item.id}_photo" %>
 
-<div
-  id="<%= dom_id submission %>"
-  class="w-1/2 <%= "animate__animated animate__tada" if animate %>"
-  data-controller="submission">
-  <div class="flex flex-wrap">
-    <div class="w-1/6 md:w-1/12">
-      <div class="mt-1.5 text-lg font-medium" data-submission-target="icon">
-        <% if submission.photo.attached? %>
-          <ion-icon name="checkbox"
-            data-action="click->hunt#openModal"
-            data-title="<%= submission.item.name %>"
-            data-src="<%= submission.large_variant_url %>"
-            data-video="<%= submission.video? %>"
-            data-object="<%= object_id %>"
-            class="cursor-pointer"></ion-icon>
-        <% else %>
-          <ion-icon name="square-outline" class="cursor-pointer" data-action="click->submission#openFileField"></ion-icon>
-        <% end %>
-      </div>
-    </div>
-    <div class="w-5/6 md:w-11/12">
-      <div class="mt-1 text-lg wrap-break-word">
-        <% if submission.new_record? %>
-          <%= submission.item.name %>
-        <% else %>
-          <% object_id = submission.object_id.to_s %>
-          <% if submission.photo.attached? %>
-            <span
-              data-action="click->hunt#openModal"
-              data-title="<%= submission.item.name %>"
-              data-src="<%= submission.large_variant_url %>"
-              data-video="<%= submission.video? %>"
-              data-object="<%= object_id %>"
-              class="cursor-pointer">
-              <%= submission.item.name %>
-            </span>
-          <% end %>
+<%= tag.li id: dom_id(submission), class: "bg-base-100 has-[fieldset:disabled]:opacity-60", data: {controller: "submission", item: item.id, found: (true if found)}.compact do %>
+  <% unless submission.new_record? %>
+    <%= form_with model: submission, authenticity_token: false, html: {class: "contents", data: {"submission-target": "form"}} do |form| %>
+      <%= field_set_tag(nil, class: "submission-fieldset contents", disabled: !submission.hunt.in_progress?) do %>
+        <%= form.hidden_field :item_id %>
+        <%= form.hidden_field :team_id %>
+        <%= form.file_field :photo, id: field_id, class: "sr-only", accept: "image/*,video/*", data: {action: "change->submission#submitForm change->hunt#closeModal", "submission-target": "field"} %>
+      <% end %>
+    <% end %>
+  <% end %>
 
-          <% hidden_class = submission.photo.attached? ? "hidden" : "" %>
-          <%= form_with model: submission, authenticity_token: false, html: {id: object_id, class: hidden_class, data: {"submission-target": "form"}} do |form| %>
-            <%= field_set_tag(nil, class: "submission-fieldset", disabled: !submission.hunt.in_progress?) do %>
-              <%= form.hidden_field :item_id %>
-              <%= form.hidden_field :team_id %>
-              <%= form.label :photo, submission.item.name, for: "submission_#{object_id}", class: "cursor-pointer" %>
-              <%= form.file_field :photo, id: "submission_#{object_id}", class: "hidden", accept: "image/*,video/*", data: {action: "change->submission#submitForm change->hunt#closeModal", "submission-target": "field"} %>
-            <% end %>
-          <% end %>
+  <% if found %>
+    <button type="button"
+      class="row-tap py-2"
+      data-action="hunt#openModal"
+      data-title="<%= item.name %>"
+      data-src="<%= submission.large_variant_url %>"
+      data-video="<%= submission.video? %>"
+      data-field="<%= field_id %>"
+      data-testid="preview">
+      <span class="polaroid shrink-0 p-1! pb-1! <%= "animate-pop" if animate %>" style="--tilt: -3deg">
+        <% if submission.video? %>
+          <span class="grid size-10 place-items-center bg-neutral text-neutral-content"><%= icon :play, solid: true, class: "size-5" %></span>
+        <% else %>
+          <%= image_tag submission.small_variant_url, class: "size-10 object-cover", alt: "", loading: "lazy" %>
         <% end %>
-      </div>
-    </div>
-  </div>
-</div>
+      </span>
+      <span class="grow font-semibold"><%= item.name %></span>
+      <%= icon :check_circle, solid: true, class: "size-6 shrink-0 text-field" %>
+    </button>
+  <% else %>
+    <label for="<%= field_id %>" class="row-tap cursor-pointer py-2">
+      <span class="slot" data-submission-target="slot"><%= icon :camera, class: "size-5" %></span>
+      <span class="grow font-semibold"><%= item.name %></span>
+      <span class="shrink-0 text-sm font-semibold text-ink-soft">+<%= item.category.points %></span>
+    </label>
+  <% end %>
+<% end %>

@@ -7,6 +7,15 @@ import { application } from "./application"
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 
+import ChecklistController from "./checklist_controller"
+application.register("checklist", ChecklistController)
+
+import ClipboardController from "./clipboard_controller"
+application.register("clipboard", ClipboardController)
+
+import CodeController from "./code_controller"
+application.register("code", CodeController)
+
 import DownloadController from "./download_controller"
 application.register("download", DownloadController)
 
@@ -22,11 +31,11 @@ application.register("hunt", HuntController)
 import MessageController from "./message_controller"
 application.register("message", MessageController)
 
-import NavController from "./nav_controller"
-application.register("nav", NavController)
-
 import PastHuntsController from "./past_hunts_controller"
 application.register("past-hunts", PastHuntsController)
+
+import PresenterController from "./presenter_controller"
+application.register("presenter", PresenterController)
 
 import SubmissionController from "./submission_controller"
 application.register("submission", SubmissionController)

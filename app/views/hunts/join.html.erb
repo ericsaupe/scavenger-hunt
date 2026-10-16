@@ -1,42 +1,28 @@
-<%= render(PageHeaderComponent.new(title: "Join a hunt", subtitle: "Join a hunt that's already been started!")) %>
+<%= render(PageHeaderComponent.new(title: "Join a hunt", subtitle: "Type the five-letter code from your organizer, or scan their QR code.")) %>
 
-<div class="sm:flex sm:justify-center" data-controller="past-hunts">
-  <div class="sm:grid sm:grow 2xl:flex-none sm:gap-4 sm:grid-cols-2 sm:justify-items-center sm:w-full lg:w-1/2 sm:place-content-center">
-    <%= render(CardComponent.new) do %>
-      <div class="card-body">
-        <h2 class="card-title text-center">Enter your code to join a scavenger hunt!</h2>
-        <%= form_with url: join_hunts_path, method: :get do |form| %>
-          <fieldset class="fieldset w-full max-w-full">
-            <%= form.label :code, "Hunt code", class: "fieldset-legend text-sm" %>
-            <%= form.text_field :code,
-                  value: params[:code],
-                  class: "input w-full",
-                  required: true,
-                  oninput: "this.value = this.value.toUpperCase()",
-                  maxlength: 5,
-                  autofocus: true %>
-          </fieldset>
-          <%= form.submit "Let's go!", class: "btn btn-primary btn-block mt-4" %>
-        <% end %>
-      </div>
+<div class="page space-y-12">
+  <%= form_with url: join_hunts_path, method: :get, data: {controller: "code"} do |form| %>
+    <%= form.label :code, "Hunt code", class: "mb-1.5 block text-sm font-semibold" %>
+    <%= form.text_field :code,
+          value: params[:code],
+          class: "code-field",
+          required: true,
+          maxlength: 5,
+          autofocus: true,
+          autocomplete: "off",
+          autocapitalize: "characters",
+          spellcheck: false,
+          placeholder: "ABCDE",
+          data: {action: "input->code#normalize"} %>
+    <%= form.button class: "btn btn-primary btn-lg btn-block mt-4" do %>
+      Join
+      <%= icon :chevron_right, class: "size-5" %>
     <% end %>
+  <% end %>
 
-    <div class="divider sm:hidden">OR</div>
-
-    <%= render(CardComponent.new) do %>
-      <div class="card-body">
-        <h2 class="card-title text-center">Rejoin a scavenger hunt you participated in!</h2>
-        <%= form_with url: join_hunts_path, method: :get do |form| %>
-          <fieldset class="fieldset w-full max-w-full">
-            <%= form.label :hunt_select, "Scavenger hunts", class: "fieldset-legend text-sm" %>
-            <%= form.select :hunt_select, [], {include_blank: "Select a scavenger hunt"}, {
-                  class: "select w-full max-w-full", data: {"past-hunts-target": "list"},
-                  name: "code"
-                } %>
-          </fieldset>
-          <%= form.submit "Rejoin the scavenger hunt!", class: "btn btn-primary btn-block mt-4" %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+  <section data-controller="past-hunts">
+    <h2 class="text-lg font-bold">Hunts you've joined</h2>
+    <ul class="mt-3 -mx-5 divide-y divide-base-300 border-y border-base-300" data-past-hunts-target="list"></ul>
+    <p class="mt-2 text-sm text-ink-soft" data-past-hunts-target="empty">Hunts you join on this phone show up here so you can get back in.</p>
+  </section>
 </div>

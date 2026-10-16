@@ -1,32 +1,39 @@
 <%= turbo_stream_from "hunt_presenter_#{@hunt.id}" %>
 
-<div class="flex flex-col sm:flex-row h-screen">
-  <div class="flex flex-col items-center w-full <%= "sm:w-10/12" if Flipper.enabled?(:chat) %> h-full min-h-[75vh] sm:h-[90vh]">
+<div class="flex min-h-dvh flex-col sm:h-dvh sm:flex-row" data-controller="presenter">
+  <div class="relative flex min-h-dvh grow flex-col sm:min-h-0">
+    <%= link_to hunt_results_path(@hunt.code.upcase), class: "absolute left-3 top-3 z-10 btn btn-ghost btn-sm text-white/70 hover:text-white" do %>
+      <%= icon :arrow_left, class: "size-4" %>
+      Results
+    <% end %>
+
     <%= render(partial: "submissions/submission_presenter", locals: {submission: @submission}) %>
+
     <% if @hunt.owner?(cookies[:user_id]) %>
-      <div class="join">
-        <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "join-item btn", data: {turbo_prefetch: false}) do %>
-          «
-        <% end %>
-        <button class="join-item btn"><%= @submission.item.name %></button>
-        <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "join-item btn", data: {turbo_prefetch: false}) do %>
-          »
-        <% end %>
+      <div class="sticky bottom-0 z-10 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:absolute sm:inset-x-0">
+        <div class="flex items-center gap-1 rounded-full bg-white/10 p-1 backdrop-blur">
+          <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @previous_submission.id), class: "btn btn-circle btn-ghost text-white text-xl", data: {turbo_prefetch: false, "presenter-target": "previous"}, "aria-label": "Previous photo") do %>
+            «
+          <% end %>
+          <span class="max-w-48 truncate px-2 text-sm font-semibold text-white"><%= @submission.item.name %></span>
+          <%= link_to(hunt_presenter_path(@hunt.code.upcase, submission_id: @next_submission.id), class: "btn btn-circle btn-ghost text-white text-xl", data: {turbo_prefetch: false, "presenter-target": "next"}, "aria-label": "Next photo") do %>
+            »
+          <% end %>
+        </div>
       </div>
     <% end %>
 
     <% if @hunt.owner_id.blank? %>
-      <%= link_to(hunt_presenter_path(@hunt.code.upcase, become_presenter: true), class: "btn btn-link btn-xs", data: {turbo_prefetch: false}) do %>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-        </svg>
-        Click here to control the presentation
-      <% end %>
+      <div class="pb-[max(1rem,env(safe-area-inset-bottom))] text-center">
+        <%= link_to(hunt_presenter_path(@hunt.code.upcase, become_presenter: true), class: "btn btn-link btn-sm text-white/70", data: {turbo_prefetch: false}) do %>
+          Control this presentation
+        <% end %>
+      </div>
     <% end %>
   </div>
 
   <% if Flipper.enabled?(:chat) %>
-    <div class="w-full sm:w-2/12 h-[90vh]">
+    <div class="w-full shrink-0 border-t border-white/10 sm:w-80 sm:border-l sm:border-t-0">
       <%= render partial: "hunts/chat", locals: {hunt: @hunt} %>
     </div>
   <% end %>

@@ -2,75 +2,99 @@ import { Controller } from "@hotwired/stimulus"
 import Compress from "compress.js"
 
 export default class extends Controller {
-  static targets = [ "field", "form", "icon" ]
+  static targets = [ "field", "form", "slot" ]
   static values = {
     submitting: { type: Boolean, default: false }
   }
 
   submitForm(event) {
-    // Skip if we are already submitting
     if (this.submittingValue) {
       return
     }
 
-    let formTarget = this.formTarget
+    const file = this.fieldTarget.files[0]
+    if (!file) {
+      return
+    }
+
     this.submittingValue = true
-    this.iconTarget.innerHTML = '<ion-icon name="cloud-upload-outline" class="animate__animated animate__bounce animate__infinite"></ion-icon>'
-    this.compressImage(event).then(() => {
-      if (formTarget.requestSubmit){
-        formTarget.requestSubmit() // rails-ujs handles an async form submission
+    this.showUploading(file)
+
+    this.compressImage(file).then(() => {
+      if (this.formTarget.requestSubmit) {
+        this.formTarget.requestSubmit()
       } else {
-        fetch(formTarget.action, {
-          method: formTarget.method,
-          body: new FormData(formTarget),
+        fetch(this.formTarget.action, {
+          method: this.formTarget.method,
+          body: new FormData(this.formTarget),
         })
       }
       event.target.disabled = true
     }).catch((e) => {
+      this.submittingValue = false
+      this.showIdle()
       this.addBanner(e.message)
     })
   }
 
-  addBanner(message) {
-    fetch(`/banner?message=${message}`, {
-      method: 'GET',
-    }).then((response) => {
-      return response.text()
-    }).then((html) => {
-      let banner = document.createElement('div')
-      banner.innerHTML = html
-      document.getElementById('content').before(banner)
-    })
+  showUploading(file) {
+    this.element.dataset.uploading = "true"
+    if (!this.hasSlotTarget) {
+      return
+    }
+
+    this.slotTarget.replaceChildren()
+    this.slotTarget.classList.remove("border-dashed")
+    this.slotTarget.classList.add("overflow-hidden", "border-marigold", "relative")
+
+    if (file.type.startsWith("image/")) {
+      const img = document.createElement("img")
+      img.src = URL.createObjectURL(file)
+      img.alt = ""
+      img.className = "size-full object-cover animate-breathe"
+      img.onload = () => URL.revokeObjectURL(img.src)
+      this.slotTarget.appendChild(img)
+    } else {
+      const spinner = document.createElement("span")
+      spinner.className = "loading loading-spinner loading-sm text-marigold"
+      this.slotTarget.appendChild(spinner)
+    }
   }
 
-  compressImage(event) {
-    const fieldTarget = this.fieldTarget
-    const fileListItems = this.fileListItems.bind(this)
-    return new Promise(function(resolve, reject) {
+  showIdle() {
+    delete this.element.dataset.uploading
+  }
+
+  addBanner(message) {
+    fetch(`/banner?message=${encodeURIComponent(message)}`)
+      .then((response) => response.text())
+      .then((html) => {
+        const flash = document.getElementById("flash")
+        if (flash) {
+          flash.insertAdjacentHTML("beforeend", html)
+        }
+      })
+  }
+
+  compressImage(file) {
+    return new Promise((resolve, reject) => {
+      if (!file.type.startsWith("image/")) {
+        return resolve()
+      }
       try {
         const compress = new Compress({ maxWidth: 1920, maxHeight: 1920, quality: 0.75 })
-        const files = [...fieldTarget.files]
-        if (!files.every((file) => file && file['type'].split('/')[0] === 'image')) {
-          return resolve()
-        }
         // compress.js re-encodes to the input's type, so label the input as JPEG to always upload JPEG
-        const image = files[0]
-        const jpeg = new File([image], image.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" })
-        compress.compress(jpeg).then((file) => {
-          event.stopImmediatePropagation()
-          fieldTarget.files = fileListItems([file])
+        const jpeg = new File([file], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" })
+        compress.compress(jpeg).then((compressed) => {
+          const transfer = new DataTransfer()
+          transfer.items.add(compressed)
+          this.fieldTarget.files = transfer.files
           resolve()
         }).catch(reject)
       } catch (e) {
         reject(e)
       }
     })
-  }
-
-  fileListItems(files) {
-    var b = new DataTransfer()
-    for (var i = 0, len = files.length; i<len; i++) b.items.add(files[i])
-    return b.files
   }
 
   openFileField() {

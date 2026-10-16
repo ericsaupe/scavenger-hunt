@@ -19,7 +19,7 @@ RSpec.describe "Results" do
       it "displays the results" do
         visit "/scavenger_hunts/#{hunt.code}/results"
         expect(page).not_to have_content("Results are not yet available!")
-        expect(page).to have_content(hunt.name.upcase)
+        expect(page).to have_content(hunt.name)
         expect(page).to have_content(team.score)
       end
 
@@ -55,19 +55,19 @@ RSpec.describe "Results" do
           visit "/scavenger_hunts/#{hunt.code}/results"
           expect(page).to have_content("Results are not yet available!")
           fill_in "Password", with: "hunter2"
-          click_on "Unlock Results!"
+          click_on "Unlock results"
           expect(page).not_to have_content("Results are not yet available!")
-          expect(page).to have_content(hunt.name.upcase)
-          expect(page).to have_content(hunt.categories.first.name.upcase)
+          expect(page).to have_content(hunt.name)
+          expect(page).to have_content(hunt.categories.first.name)
         end
 
         it "has a locked leaderboard" do
           visit "/scavenger_hunts/#{hunt.code}/results"
           expect(page).to have_content("Results are not yet available!")
           fill_in "Password", with: "hunter2"
-          click_on "Unlock Results!"
+          click_on "Unlock results"
           expect(page).not_to have_content("Results are not yet available!")
-          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content(hunt.name)
           expect(page).to have_content("Leaderboard is not yet available!")
         end
 
@@ -75,13 +75,13 @@ RSpec.describe "Results" do
           visit "/scavenger_hunts/#{hunt.code}/results"
           expect(page).to have_content("Results are not yet available!")
           fill_in "Password", with: "hunter2"
-          click_on "Unlock Results!"
+          click_on "Unlock results"
           expect(page).not_to have_content("Results are not yet available!")
-          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content(hunt.name)
           expect(page).to have_content("Leaderboard is not yet available!")
           fill_in "Password", with: "hunter2"
-          click_on "Unlock Leaderboard!"
-          expect(page).to have_content(hunt.name.upcase)
+          click_on "Unlock leaderboard"
+          expect(page).to have_content(hunt.name)
           expect(page).to have_content("Score")
           expect(page).to have_content(team.score)
         end
@@ -91,7 +91,7 @@ RSpec.describe "Results" do
         it "displays the scores" do
           visit "/scavenger_hunts/#{hunt.code}/results"
           expect(page).not_to have_content("Results are not yet available!")
-          expect(page).to have_content(hunt.name.upcase)
+          expect(page).to have_content(hunt.name)
           expect(page).to have_content(team.score)
         end
 
@@ -112,7 +112,7 @@ RSpec.describe "Results" do
 
         it "displays the winning team name in an image" do
           visit "/scavenger_hunts/#{hunt.code}/results"
-          expect(page).to have_selector(".hero")
+          expect(page).to have_selector("[data-testid='winner']")
         end
       end
     end

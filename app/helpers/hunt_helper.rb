@@ -9,7 +9,7 @@ module HuntHelper
     elsif hunt.upcoming?
       "Starts in #{distance_of_time_in_words(Time.current, hunt.starts_at)}"
     elsif hunt.ended?
-      "This scavenger hunt has ended. No more submissions will be accepted."
+      "Hunt over. No more submissions."
     end
 
     content_tag(:span, text)
@@ -19,9 +19,13 @@ module HuntHelper
     RQRCode::QRCode.new(hunt_url(hunt.code.upcase)).as_svg(fill: "fff", viewbox: true).html_safe
   end
 
-  def timer_background(hunt)
-    return "bg-error text-error-content" if hunt.ended?
-    return "bg-success text-success-content" if hunt.in_progress?
-    "bg-info text-info-content" if hunt.upcoming?
+  def timer_state(hunt)
+    return "ended" if hunt.ended?
+    return "upcoming" if hunt.upcoming?
+    "live"
+  end
+
+  def template_item_count(template)
+    template[:categories].sum { |category| category[:items].size }
   end
 end

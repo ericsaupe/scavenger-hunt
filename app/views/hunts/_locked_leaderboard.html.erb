@@ -1,28 +1,14 @@
 <% if hunt.lock_password %>
-  <div class="hero h-fit sm:h-[50vh] bg-base-200">
-    <div class="hero-content flex flex-col lg:flex-row-reverse">
-      <div class="text-center lg:text-left">
-        <h1 class="text-3xl sm:text-5xl font-bold">Leaderboard is not yet available!</h1>
-        <p class="py-6">
-          The leaderboard is locked until the password is entered.
-        </p>
-      </div>
-      <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-        <%= form_with url: unlock_leaderboard_hunt_path(code: hunt.code.upcase), method: :post, class: "card-body" do |f| %>
-          <fieldset class="fieldset w-full max-w-xs">
-            <%= f.label :password, "Password", class: "fieldset-legend text-sm" %>
-            <%= f.password_field :password, required: true, class: "input w-full max-w-xs", autofocus: true %>
-          </fieldset>
-          <div class="flex flex-col mt-6">
-            <button class="btn btn-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden sm:block w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              Unlock Leaderboard!
-            </button>
-          </div>
-        <% end %>
-      </div>
+  <div class="page mt-8">
+    <div class="rounded-3xl bg-base-200 p-6">
+      <span class="grid size-12 place-items-center rounded-2xl bg-neutral text-marigold"><%= icon :trophy, class: "size-6" %></span>
+      <h2 class="display mt-4 text-2xl">Leaderboard is not yet available!</h2>
+      <p class="mt-2 text-ink-soft">Scores stay hidden until the password is entered. The photos below are open.</p>
+      <%= form_with url: unlock_leaderboard_hunt_path(code: hunt.code.upcase), method: :post, class: "mt-6" do |f| %>
+        <%= f.label :password, "Password", class: "mb-1.5 block text-sm font-semibold" %>
+        <%= f.password_field :password, required: true, class: "input input-lg w-full", autofocus: true %>
+        <button class="btn btn-primary btn-lg btn-block mt-3">Unlock leaderboard</button>
+      <% end %>
     </div>
   </div>
 <% end %>

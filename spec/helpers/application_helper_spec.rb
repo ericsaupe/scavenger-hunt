@@ -4,9 +4,9 @@ RSpec.describe ApplicationHelper do
   include ActiveSupport::Testing::TimeHelpers
 
   describe "#daisy_theme" do
-    it "returns the cmyk theme" do
+    it "returns the party theme" do
       travel_to Time.zone.local(2023, 4, 12, 1, 0, 0) do
-        expect(helper.daisy_theme).to eq("cmyk")
+        expect(helper.daisy_theme).to eq("party")
       end
     end
 
