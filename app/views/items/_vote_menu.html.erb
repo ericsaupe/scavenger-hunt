@@ -1,5 +1,5 @@
 <div id="submission_vote_<%= [vote.user_id, vote.submission_id].join("_") %>"
-  class="flex shrink-0 items-center gap-2"
+  class="flex shrink-0 flex-wrap items-center gap-2"
   data-controller="vote"
   data-vote-submission-id-value="<%= vote.submission_id %>"
   data-vote-user-id-value="<%= vote.user_id %>"
@@ -16,14 +16,14 @@
   </button>
   <% if vote.submission.max_downvotes_to_lose_points&.positive? %>
     <button type="button"
-      class="btn btn-circle <%= vote.denied? ? "btn-neutral" : "btn-ghost border border-base-300" %>"
+      class="btn rounded-full gap-1.5 <%= vote.denied? ? "border-flag bg-flag text-flag-content hover:bg-flag" : "btn-ghost border border-base-300" %>"
       data-action="vote#vote"
       data-value="deny"
-      data-testid="vote-menu-deny-button"
-      aria-pressed="<%= vote.denied? %>"
-      aria-label="Doesn't count">
-      <%= icon :thumb_down, solid: vote.denied?, class: "size-6" %>
+      data-testid="vote-menu-flag-button"
+      aria-pressed="<%= vote.denied? %>">
+      <%= icon :flag, solid: vote.denied?, class: "size-5 #{vote.denied? ? "text-flag-content" : "text-flag"}" %>
+      <%= vote.denied? ? "Flagged" : "Flag it" %>
     </button>
-    <%= render partial: "items/downvote_counter", locals: {submission: vote.submission} %>
+    <%= render partial: "items/flag_counter", locals: {submission: vote.submission} %>
   <% end %>
 </div>

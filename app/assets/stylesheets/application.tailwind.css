@@ -233,6 +233,13 @@
   --color-cobalt: var(--color-primary);
 }
 
+/* Reactions keep their own hues in every season: a flag is amber and a love is red. */
+@theme {
+  --color-flag: #ffb703;
+  --color-flag-content: #1b1f24;
+  --color-love: #d7263d;
+}
+
 @theme {
   --font-sans: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --animate-pop: pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
@@ -250,6 +257,28 @@
   @keyframes breathe {
     0%, 100% { opacity: 0.45; }
     50% { opacity: 1; }
+  }
+  @keyframes print-drop {
+    0% { opacity: 0; transform: translateY(-7vh) rotate(-4deg); }
+    65% { opacity: 1; transform: translateY(1.4vh) rotate(calc(var(--tilt, 0deg) + 1.2deg)); }
+    100% { opacity: 1; transform: translateY(0) rotate(var(--tilt, 0deg)); }
+  }
+  @keyframes print-fall {
+    0% { opacity: 1; transform: translate(0, 0) rotate(var(--tilt, 0deg)); }
+    100% { opacity: 0; transform: translate(22vw, 45vh) rotate(calc(var(--tilt, 0deg) + 12deg)); }
+  }
+  @keyframes print-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes print-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes float-up {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    12% { transform: translate(0, -6vh) scale(1.15); opacity: 1; }
+    100% { transform: translate(var(--drift, 0px), -72vh) rotate(var(--sway, 0deg)) scale(0.9); opacity: 0; }
   }
 }
 
@@ -349,6 +378,32 @@
   .stage {
     @apply bg-[#111317] text-white;
   }
+
+  .reaction {
+    @apply absolute bottom-24 right-0 drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)];
+    animation: float-up 2s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  }
+
+  [data-print] {
+    transform: rotate(var(--tilt, 0deg));
+  }
+
+  .print-pending {
+    opacity: 0;
+  }
+
+  .print-enter {
+    animation: print-drop 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .print-exit {
+    animation: print-fall 450ms cubic-bezier(0.5, 0, 0.8, 0.4) forwards;
+  }
+
+  .confetti {
+    @apply absolute h-3.5 w-2 rounded-[1px] opacity-80;
+    transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1));
+  }
 }
 
 @layer components {
@@ -430,5 +485,15 @@
     color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+}
+
+/* Outside the layers so these win over the base layer's reduced-motion reset: a print still has to appear. */
+@media (prefers-reduced-motion: reduce) {
+  .print-enter {
+    animation: print-fade-in 300ms ease both !important;
+  }
+  .print-exit {
+    animation: print-fade-out 300ms ease forwards !important;
   }
 }

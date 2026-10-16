@@ -16,7 +16,6 @@ class Hunt < ApplicationRecord
   has_many :messages, dependent: :destroy
   has_many :teams, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
-  belongs_to :presentation_submission, class_name: "Submission", optional: true
   belongs_to :victory_item, class_name: "Item", optional: true
 
   has_one_attached :archive
@@ -149,8 +148,8 @@ class Hunt < ApplicationRecord
     "hunt_presenter_#{id}"
   end
 
-  def present!(submission_id)
-    update!(presentation_submission_id: submission_id, presentation_playback: "paused", playback_started_at: nil)
+  def present!(slide_key)
+    update!(presentation_slide: slide_key, presentation_playback: "paused", playback_started_at: nil)
     broadcast_presentation_update
     announce_show!
   end

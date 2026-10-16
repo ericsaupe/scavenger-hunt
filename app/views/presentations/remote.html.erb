@@ -6,7 +6,7 @@
   data-remote-url-value="<%= hunt_presentation_path(@hunt.code.upcase) %>"
   data-remote-playback-url-value="<%= playback_hunt_presentation_path(@hunt.code.upcase) %>"
   data-remote-playing-value="<%= @hunt.playing? %>"
-  data-remote-video-value="<%= @submission.video? %>">
+  data-remote-video-value="<%= @slide.video? %>">
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
 
   <div class="flex items-center justify-between">
@@ -23,21 +23,27 @@
   <div class="flex items-center gap-4">
     <figure class="polaroid w-24 shrink-0" style="--tilt: -2deg">
       <div class="grid aspect-square place-items-center overflow-hidden bg-black">
-        <% if @submission.video? %>
-          <% if @submission.poster_url %>
-            <%= image_tag @submission.poster_url, class: "size-full object-cover", alt: "" %>
+        <% if (submission = @slide.submission) %>
+          <% if submission.video? %>
+            <% if submission.poster_url %>
+              <%= image_tag submission.poster_url, class: "size-full object-cover", alt: "" %>
+            <% else %>
+              <%= icon :video, class: "size-8 text-white/70" %>
+            <% end %>
           <% else %>
-            <%= icon :video, class: "size-8 text-white/70" %>
+            <%= image_tag submission_attachment_url(submission), class: "size-full object-cover", alt: "" %>
           <% end %>
+        <% elsif @slide.is_a?(Presentation::Finale) %>
+          <span class="grid size-full place-items-center bg-flag text-flag-content"><%= icon :trophy, class: "size-8" %></span>
         <% else %>
-          <%= image_tag submission_attachment_url(@submission), class: "size-full object-cover", alt: "" %>
+          <span class="grid size-full place-items-center bg-[#1b1f24] text-flag"><%= icon :flag, solid: true, class: "size-8" %></span>
         <% end %>
       </div>
     </figure>
     <div class="min-w-0">
-      <p class="text-sm font-semibold text-white/60" data-testid="progress"><%= @submission.video? ? "Video" : "Photo" %> <%= @presentation.position %> of <%= @presentation.count %></p>
-      <p class="display mt-1 truncate text-2xl" data-testid="current-item"><%= @submission.item.name %></p>
-      <p class="mt-1 truncate font-semibold text-white/70"><%= @submission.team.name %></p>
+      <p class="text-sm font-semibold text-white/60" data-testid="progress"><%= @slide.label %> <%= @slide.position %> of <%= @slide.count %></p>
+      <p class="display mt-1 truncate text-2xl" data-testid="current-item"><%= @slide.title %></p>
+      <p class="mt-1 truncate font-semibold text-white/70"><%= @slide.subtitle %></p>
     </div>
   </div>
 
@@ -52,7 +58,7 @@
     </button>
   </div>
 
-  <% if @submission.video? %>
+  <% if @slide.video? %>
     <div class="rounded-3xl bg-white/5 p-4">
       <p class="mb-3 text-sm font-semibold text-white/60">Video on the big screen</p>
       <div class="grid gap-3">

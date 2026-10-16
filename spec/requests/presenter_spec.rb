@@ -31,26 +31,114 @@ RSpec.describe "Presenter" do
     it "shows the current slide with its position but changes nothing, even for the owner" do
       first = found(first_team, items.first)
       second = found(second_team, items.first)
-      hunt.update!(presentation_submission: second)
+      hunt.update!(presentation_slide: "submission:#{second.id}")
       cookies[:user_id] = "owner"
       allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
 
-      get "/scavenger_hunts/#{hunt.code}/presenter?submission_id=#{first.id}"
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big&slide=submission:#{first.id}"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Photo 2 of 2", %(id="submission_#{second.id}_photo"))
-      expect(response.body).not_to include(%(id="submission_#{first.id}_photo"))
-      expect(hunt.reload.presentation_submission).to eq(second)
+      expect(response.body).to include("Photo 3 of 4", %(id="submission_#{second.id}_photo"))
+      expect(response.body).not_to include(%(id="submission_#{first.id}_photo"), "Browsing")
+      expect(hunt.reload.presentation_slide).to eq("submission:#{second.id}")
       expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+    end
+
+    it "lets a watcher browse another slide without leaving live for everyone else" do
+      first = found(first_team, items.first)
+      second = found(second_team, items.first)
+      hunt.update!(presentation_slide: "submission:#{second.id}")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?slide=submission:#{first.id}"
+
+      expect(response.body).to include("Browsing", "Photo 2 of 4", %(id="submission_#{first.id}_photo"), "Back to live, now on 3 of 4")
+      expect(response.body).to include(%(href="/scavenger_hunts/#{hunt.code}/presenter?slide=item%3A#{items.first.id}"))
+      expect(response.body).to include(%(href="/scavenger_hunts/#{hunt.code}/presenter?slide=submission%3A#{second.id}"))
+      expect(hunt.reload.presentation_slide).to eq("submission:#{second.id}")
+    end
+
+    it "treats an unknown slide as live" do
+      found(first_team, items.first)
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?slide=finale-ish"
+
+      expect(response.body).to include("Live", "Item 1 of 3")
+      expect(response.body).not_to include("Browsing")
     end
 
     it "falls back to the first slide when the presented one is gone" do
       first = found(first_team, items.first)
-      hunt.update!(presentation_submission_id: first.id + 100)
+      hunt.update!(presentation_slide: "submission:#{first.id + 100}")
 
       get "/scavenger_hunts/#{hunt.code}/presenter"
 
-      expect(response.body).to include("Photo 1 of 1", %(id="submission_#{first.id}_photo"))
+      expect(response.body).to include("Item 1 of 3", "Next up", ERB::Util.html_escape(items.first.name))
+    end
+
+    it "preloads the next photo and gives every print its own deterministic tilt" do
+      first = found(first_team, items.first)
+      second = found(second_team, items.first)
+      hunt.update!(presentation_slide: "submission:#{first.id}")
+
+      tilt_of = ->(body) { body[/id="submission_#{first.id}_print"[^>]*style="(--tilt: -?\d\.\ddeg)"[^>]*data-print/, 1] }
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+      first_tilt = tilt_of.call(response.body)
+
+      expect(response.body).to include(%(<link rel="preload" as="image" href="#{second.large_variant_url}"))
+      expect(first_tilt).to be_present
+      expect(response.body).to include(%(id="print_overlay"), %(data-controller="transition"))
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+      expect(tilt_of.call(response.body)).to eq(first_tilt)
+
+      hunt.update!(presentation_slide: "item:#{items.first.id}")
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(<link rel="preload" as="image" href="#{first.large_variant_url}"), %(id="item_#{items.first.id}_card"))
+    end
+
+    it "leaves the finale out while the leaderboard is locked" do
+      found(first_team, items.first)
+      hunt.update!(lock_password: "hunter2")
+
+      expect(hunt.presentation.keys).not_to include("finale")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?slide=finale"
+
+      expect(response.body).to include("Live", "Item 1 of 2")
+      expect(response.body).not_to include("First place", "Browsing")
+
+      hunt.update!(password_entered: true, password_entered_for_leaderboard: true)
+      expect(Presentation.new(hunt.reload).keys).to include("finale")
+    end
+
+    it "shows the item title card with who found it" do
+      found(first_team, items.first)
+      found(second_team, items.first)
+      hunt.update!(presentation_slide: "item:#{items.first.id}")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include("Found by 2 of 2 teams, #{hunt.categories.first.points} points each")
+      expect(response.body).to include(ERB::Util.html_escape(first_team.name), ERB::Util.html_escape(second_team.name))
+    end
+
+    it "shows the finale with the winner, the runners-up and the most loved photo" do
+      hunt.categories.first.update!(points: 5)
+      winning = found(first_team, items.first)
+      found(first_team, items.second)
+      loved = found(second_team, items.first)
+      loved.votes.create!(user_id: "a", value: "love")
+      loved.votes.create!(user_id: "b", value: "love")
+      winning.votes.create!(user_id: "a", value: "love")
+      hunt.update!(presentation_slide: "finale")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include("First place", ERB::Util.html_escape(first_team.name), "10 points", "5 points", "Most loved", "2 loves")
+      expect(response.body).to include(%(data-testid="runners-up"), %(data-testid="confetti"))
+      expect(response.body).to include(%(alt="#{ERB::Util.html_escape(second_team.name)} found #{ERB::Util.html_escape(items.first.name)}"))
     end
 
     it "opts out of the snapshot cache and morphs refreshes" do
@@ -64,6 +152,7 @@ RSpec.describe "Presenter" do
 
     it "renders the vote menu inline and offers the remote to anyone who does not hold it" do
       submission = found(first_team, items.first)
+      hunt.update!(presentation_slide: "submission:#{submission.id}")
       cookies[:user_id] = "viewer"
 
       get "/scavenger_hunts/#{hunt.code}/presenter"
@@ -82,17 +171,21 @@ RSpec.describe "Presenter" do
       expect(response.body).not_to include("Take the remote")
     end
 
-    it "hides the vote menu on the big screen" do
+    it "shows loves and flags instead of the vote menu on the big screen" do
       submission = found(first_team, items.first)
+      submission.votes.create!(user_id: "a", value: "love")
+      submission.votes.create!(user_id: "b", value: "deny")
+      hunt.update!(presentation_slide: "submission:#{submission.id}", max_downvotes_to_lose_points: 3)
 
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
 
-      expect(response.body).to include(%(data-playback-follow-value="true"))
-      expect(response.body).not_to include(%(id="submission_vote_), "submission_#{submission.id}_video")
+      expect(response.body).to include(%(data-playback-follow-value="true"), %(id="submission_#{submission.id}_reactions"), "1 love", "1 of 3 flags", %(id="reactions"))
+      expect(response.body).not_to include(%(id="submission_vote_), "submission_#{submission.id}_video", "Doesn't count")
     end
 
     it "keeps a hidden sound button on a big-screen video slide for browsers that block audio" do
       video = create(:video_submission, item: items.first, team: first_team)
+      hunt.update!(presentation_slide: "submission:#{video.id}")
 
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
 
@@ -102,13 +195,14 @@ RSpec.describe "Presenter" do
     end
 
     it "renders with the same number of queries however many photos there are" do
-      found(first_team, items.first)
+      hunt.update!(presentation_slide: "submission:#{found(first_team, items.first).id}")
+      found(first_team, items.second)
       path = "/scavenger_hunts/#{hunt.code}/presenter"
       get path
       few = queries_for(path)
 
       found(second_team, items.first)
-      found(first_team, items.second)
+      found(second_team, items.second)
       found(second_team, items.third)
       many = queries_for(path)
 

@@ -30,7 +30,9 @@ RSpec.describe "Items" do
     get "/scavenger_hunts/#{hunt.code}/items/#{items.first.id}"
 
     expect(response.body).to include(%(data-vote-value-value="love"))
-    expect(response.body).to match(%r{2 / 3\s*</span>})
+    expect(response.body).to match(%r{2 of 3 flags\s*</span>})
+    expect(response.body).to include("Flag it")
+    expect(response.body).not_to include("Doesn't count")
   end
 
   it "links to the previous and next found items, wrapping around the ends" do

@@ -1,22 +1,63 @@
 <% title "#{@hunt.name} on the big screen" %>
 <%= render partial: "hunts/presenter_head" %>
+<% if (preload_url = @slide.preload_url) %>
+  <% content_for :head do %>
+    <link rel="preload" as="image" href="<%= preload_url %>" data-testid="preload-next">
+  <% end %>
+<% end %>
 
 <div class="flex min-h-dvh flex-col sm:h-dvh sm:flex-row" data-controller="live">
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
-  <div class="relative flex min-h-dvh grow flex-col sm:min-h-0">
+  <% stage = {controller: "transition"} %>
+  <% stage = stage.merge(controller: "browse transition", browse_next_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), browse_previous_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.previous_key)) unless @big_screen %>
+  <%= tag.div class: "relative flex min-h-dvh grow flex-col sm:min-h-0", data: stage do %>
+    <div id="print_overlay" class="pointer-events-none absolute inset-0 z-10 overflow-hidden" data-turbo-permanent data-transition-target="overlay"></div>
     <div class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-3 pt-3">
       <%= link_to hunt_results_path(@hunt.code.upcase), class: "btn btn-ghost btn-sm text-white/70 hover:text-white" do %>
         <%= icon :arrow_left, class: "size-4" %>
         Results
       <% end %>
-      <span class="status-pill bg-white/10 text-white/80" data-testid="progress">
-        <%= @submission.video? ? "Video" : "Photo" %> <%= @presentation.position %> of <%= @presentation.count %>
-      </span>
+      <div class="flex items-center gap-2">
+        <% unless @big_screen %>
+          <% if @browsing %>
+            <span class="status-pill bg-flag text-flag-content" data-testid="live-pill">Browsing</span>
+          <% else %>
+            <span class="status-pill bg-success/20 text-success" data-testid="live-pill">
+              <span class="size-2 rounded-full bg-current animate-breathe" aria-hidden="true"></span>
+              Live
+            </span>
+          <% end %>
+        <% end %>
+        <span class="status-pill bg-white/10 text-white/80" data-testid="progress">
+          <%= @slide.label %> <%= @slide.position %> of <%= @slide.count %>
+        </span>
+      </div>
     </div>
 
-    <%= render(partial: "submissions/submission_presenter", locals: {submission: @submission, hunt: @hunt, big_screen: @big_screen}) %>
+    <% if @big_screen %>
+      <div id="reactions" class="pointer-events-none absolute inset-y-0 right-4 z-20 w-24 sm:right-10 sm:w-32" data-turbo-permanent data-testid="reactions-stage"></div>
+    <% end %>
+
+    <%= render(partial: @slide.partial, locals: {slide: @slide, hunt: @hunt, big_screen: @big_screen}) %>
 
     <div class="z-10 flex flex-col items-center gap-2 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-sm text-white/70 sm:absolute sm:inset-x-0 sm:bottom-0">
+      <% if @browsing %>
+        <%= link_to hunt_presenter_path(@hunt.code.upcase), class: "btn btn-primary btn-block max-w-md sticky bottom-4", data: {turbo_action: "replace", testid: "back-to-live"} do %>
+          Back to live, now on <%= @presentation.position %> of <%= @presentation.count %>
+        <% end %>
+      <% end %>
+      <% unless @big_screen %>
+        <div class="flex items-center gap-3">
+          <%= link_to hunt_presenter_path(@hunt.code.upcase, slide: @slide.previous_key), class: "btn btn-sm btn-ghost text-white", data: {turbo_action: "replace"}, "aria-label": "Previous slide" do %>
+            <%= icon :chevron_left, class: "size-5" %>
+            Previous
+          <% end %>
+          <%= link_to hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), class: "btn btn-sm btn-ghost text-white", data: {turbo_action: "replace"}, "aria-label": "Next slide" do %>
+            Next
+            <%= icon :chevron_right, class: "size-5" %>
+          <% end %>
+        </div>
+      <% end %>
       <% if @hunt.owner?(cookies[:user_id]) %>
         <p data-testid="presenting">You have the remote</p>
         <%= link_to "Open the remote", hunt_presenter_remote_path(@hunt.code.upcase), class: "btn btn-sm btn-ghost text-white" %>
@@ -35,7 +76,7 @@
         <% end %>
       <% end %>
     </div>
-  </div>
+  <% end %>
 
   <% if Flipper.enabled?(:chat) %>
     <div class="w-full shrink-0 border-t border-white/10 sm:w-80 sm:border-l sm:border-t-0">

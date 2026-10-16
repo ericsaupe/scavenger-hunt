@@ -1,0 +1,27 @@
+<div id="current_slide" class="flex grow flex-col items-center justify-center px-6 pb-28 pt-16 text-center sm:px-10 sm:py-10">
+  <div id="item_<%= slide.item.id %>_card" class="flex flex-col items-center" style="--tilt: 0deg" data-print data-testid="title-card">
+    <p class="text-sm font-extrabold uppercase tracking-[0.3em] text-flag sm:text-lg">Next up</p>
+    <h2 class="display mt-4 max-w-5xl text-5xl text-white sm:text-7xl lg:text-8xl"><%= slide.title %></h2>
+    <p class="mt-5 text-lg font-semibold text-white/70 sm:text-2xl" data-testid="title-card-summary">
+      Found by <%= slide.submissions.size %> of <%= pluralize(slide.team_count, "team") %>, <%= pluralize(slide.points, "point") %> each
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+      <% slide.submissions.first(10).each_with_index do |submission, i| %>
+        <figure class="polaroid w-20 p-1 pb-3 sm:w-28 sm:p-1.5 sm:pb-4" style="--tilt: <%= [-6, 4, -3, 5, -5, 3][i % 6] %>deg">
+          <div class="grid aspect-square place-items-center overflow-hidden bg-black">
+            <% if submission.video? %>
+              <% if submission.poster_url %>
+                <%= image_tag submission.poster_url, class: "size-full object-cover", alt: "" %>
+              <% else %>
+                <%= icon :play, solid: true, class: "size-6 text-white/80" %>
+              <% end %>
+            <% else %>
+              <%= image_tag submission_attachment_url(submission), class: "size-full object-cover", alt: "", loading: "lazy" %>
+            <% end %>
+          </div>
+          <figcaption class="mt-1 truncate text-[10px] font-semibold text-ink-soft sm:text-xs"><%= submission.team.name %></figcaption>
+        </figure>
+      <% end %>
+    </div>
+  </div>
+</div>

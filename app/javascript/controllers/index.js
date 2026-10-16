@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import BrowseController from "./browse_controller"
+application.register("browse", BrowseController)
+
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
 
@@ -18,6 +21,9 @@ application.register("code", CodeController)
 
 import DownloadController from "./download_controller"
 application.register("download", DownloadController)
+
+import FinaleController from "./finale_controller"
+application.register("finale", FinaleController)
 
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
@@ -55,6 +61,9 @@ application.register("push-settings", PushSettingsController)
 import QueueController from "./queue_controller"
 application.register("queue", QueueController)
 
+import ReactionController from "./reaction_controller"
+application.register("reaction", ReactionController)
+
 import RemoteController from "./remote_controller"
 application.register("remote", RemoteController)
 
@@ -63,6 +72,9 @@ application.register("submission", SubmissionController)
 
 import TimerController from "./timer_controller"
 application.register("timer", TimerController)
+
+import TransitionController from "./transition_controller"
+application.register("transition", TransitionController)
 
 import VoteController from "./vote_controller"
 application.register("vote", VoteController)

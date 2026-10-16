@@ -1,9 +1,0 @@
-<% if submission.max_downvotes_to_lose_points&.positive? %>
-  <%= turbo_stream_from "submission_#{submission.id}_downvote_counter" unless local_assigns[:disable_turbo_stream] %>
-
-  <span id="submission_<%= submission.id %>_downvote_counter"
-    class="status-pill <%= submission.denied_points? ? "bg-error text-error-content" : "bg-base-200 text-ink-soft" %>"
-    title="Flags before this photo stops counting">
-    <%= submission.votes.count(&:denied?) %> / <%= submission.max_downvotes_to_lose_points %>
-  </span>
-<% end %>
