@@ -75,8 +75,8 @@ class HuntsController < ApplicationController
 
   def presenter
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
-    submissions = @hunt.submissions.includes(:item, :team).found.order(:item_id, :team_id)
-    if submissions.empty?
+    ordered_ids = @hunt.submissions.found.order(:item_id, :team_id).ids
+    if ordered_ids.empty?
       flash[:warning] = "No submissions yet!"
       return redirect_to hunt_path(code: @hunt.code.upcase)
     end
@@ -85,20 +85,18 @@ class HuntsController < ApplicationController
       @hunt.update(owner_id: cookies[:user_id])
     end
 
+    submissions = @hunt.submissions.found.includes(:item, :team, photo_attachment: :blob)
     if params[:submission_id].present? && @hunt.owner?(cookies[:user_id])
       @submission = submissions.find(params[:submission_id])
       @hunt.update(presentation_submission: @submission)
     elsif @hunt.presentation_submission_id.present?
       @submission = submissions.find_by(id: @hunt.presentation_submission_id)
     end
-    @submission ||= submissions.first
+    @submission ||= submissions.find(ordered_ids.first)
 
-    ordered_submissions = submissions.order(:item_id, :team_id)
-    submission_index = ordered_submissions.index(@submission)
-    next_index = (submission_index + 1 >= ordered_submissions.length) ? 0 : submission_index + 1
-    previous_index = (submission_index - 1 < 0) ? ordered_submissions.length - 1 : submission_index - 1
-    @next_submission = ordered_submissions[next_index]
-    @previous_submission = ordered_submissions[previous_index]
+    index = ordered_ids.index(@submission.id)
+    @previous_submission_id = ordered_ids[index - 1]
+    @next_submission_id = ordered_ids[(index + 1) % ordered_ids.size]
     @hunt.broadcast_presentation_update(@submission) if @hunt.owner?(cookies[:user_id])
     @presenter_mode = true
   end
