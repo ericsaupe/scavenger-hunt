@@ -15,6 +15,10 @@ module HuntHelper
     content_tag(:span, text)
   end
 
+  def hunt_qr_code_svg(hunt)
+    RQRCode::QRCode.new(hunt_url(hunt.code.upcase)).as_svg(fill: "fff", viewbox: true).html_safe
+  end
+
   def timer_background(hunt)
     return "bg-error text-error-content" if hunt.ended?
     return "bg-success text-success-content" if hunt.in_progress?

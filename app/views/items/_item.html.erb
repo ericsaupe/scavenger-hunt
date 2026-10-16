@@ -18,7 +18,7 @@
   <div class="container grid grid-cols-1 gap-2 mx-auto">
     <h3 class="text-2xl sm:text-2xl sm:tracking-tight lg:text-3xl text-center">Huh, I guess nobody found this one.</h2>
     <div class="w-2/4 mx-auto rounded-sm shadow-xl animate__animated animate__fadeIn">
-      <%= image_tag 'nothing.png' %>
+      <%= image_tag "nothing.png" %>
     </div>
   </div>
 <% else %>
@@ -35,8 +35,8 @@
             <% end %>
 
             <%= render(partial: "items/vote_menu", locals: {
-              vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
-              }) %>
+                  vote: submission.votes.find_or_initialize_by(submission_id: submission.id, user_id: cookies[:user_id])
+                }) %>
 
             <div class="hidden absolute top-0 left-0 w-full pl-4 py-2 bg-base-300/70 font-bold">
               <%= submission.team.name %>

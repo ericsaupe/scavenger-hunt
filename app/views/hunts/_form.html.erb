@@ -1,6 +1,6 @@
-<%= form_with model: hunt, url: hunts_path, method: :post, data: { controller: 'form' }, class: "sm:w-1/2 mx-auto" do |f| %>
+<%= form_with model: hunt, url: hunts_path, method: :post, data: {controller: "form"}, class: "sm:w-1/2 mx-auto" do |f| %>
   <%= f.hidden_field :template, value: @hunt.name %>
-  <%= f.hidden_field :timezone, data: { 'form-target': 'timezone' } %>
+  <%= f.hidden_field :timezone, data: {"form-target": "timezone"} %>
 
   <fieldset class="fieldset w-full">
     <%= f.label :name, "What do you want to call your scavenger hunt?", class: "fieldset-legend text-sm w-full" %>
@@ -21,14 +21,14 @@
       When do you want to end your scavenger hunt?
       <span class="label text-xs font-normal"><i>Optional</i></span>
     <% end %>
-    <%= f.text_field :ends_at, class: "datetime input w-full", data: { action: "change->form#toggleEndFields" } %>
+    <%= f.text_field :ends_at, class: "datetime input w-full", data: {action: "change->form#toggleEndFields"} %>
     <p class="label whitespace-normal">Set this if you you want to stop accepting submissions at this date and time.</p>
   </fieldset>
 
   <div class="hidden" data-form-target="endConfig">
     <%= f.label :lock_results, class: "flex items-center justify-between cursor-pointer py-2 px-1" do %>
       <span class="text-sm">Lock results until after the hunt ends?</span>
-      <%= f.check_box :lock_results, class: "checkbox", data: { test: "lock-results-switch" } %>
+      <%= f.check_box :lock_results, class: "checkbox", data: {test: "lock-results-switch"} %>
     <% end %>
   </div>
 
