@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class TeamsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:pending_uploads]
-
   def show
     @hunt = Hunt.includes(categories: :items).find_by!(code: params[:hunt_code].upcase)
     @team = @hunt.teams.find(params[:id])
