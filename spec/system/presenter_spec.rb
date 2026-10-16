@@ -65,6 +65,7 @@ RSpec.describe "Presenter" do
     expect(page).to have_button("Next")
     expect(page).to have_button("Play on the big screen")
     expect(hunt.reload.owner_id).to be_present
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
 
     click_on "Next"
     expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 2")
