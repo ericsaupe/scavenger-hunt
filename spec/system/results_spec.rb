@@ -132,6 +132,26 @@ RSpec.describe "Results" do
           expect(page).to have_selector("img")
         end
       end
+
+      it "shows the team photo for each number tapped" do
+        allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000")
+        others = Array.new(2) { create(:photo_submission, item: photo_submission.item, team: create(:team, hunt:)) }
+        visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
+
+        others.each.with_index(2) do |submission, number|
+          find("[aria-label='Show submission #{number}']").click
+          expect(page).to have_css("#submission_#{submission.id}") { |photo| centered_in_carousel?(photo) }
+          expect(page).to have_no_css("html[aria-busy]")
+          expect(centered_in_carousel?(find("#submission_#{submission.id}"))).to be(true)
+        end
+      end
     end
+  end
+
+  def centered_in_carousel?(photo)
+    photo.evaluate_script(<<~JS)
+      Math.abs(this.getBoundingClientRect().left - this.parentElement.getBoundingClientRect().left -
+        (this.parentElement.clientWidth - this.offsetWidth) / 2) < 2
+    JS
   end
 end

@@ -90,11 +90,11 @@ RSpec.describe "Results" do
       end
 
       it "changes the vote with the current result" do
-        second_submission = create(:photo_submission, item: hunt.items.second, team: create(:team, hunt: hunt))
+        second_submission = create(:photo_submission, item: photo_submission.item, team: create(:team, hunt: hunt))
         visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
         # First click
         page.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-        find("a[href='#submission_#{photo_submission.id}']").click
+        find("[aria-label='Show submission 1']").click
         sleep(1)
         within("[data-vote-submission-id-value='#{photo_submission.id}']") do
           find("[data-testid='vote-menu-love-button']").click
@@ -104,7 +104,7 @@ RSpec.describe "Results" do
         end
         # Second click
         page.execute_script("window.scrollTo(0, 0)") # Bug in Chrome with carousel @see https://github.com/saadeghi/daisyui/issues/2442
-        find("a[href='#submission_#{second_submission.id}']").click
+        find("[aria-label='Show submission 2']").click
         sleep(1)
         within("[data-vote-submission-id-value='#{second_submission.id}']") do
           find("[data-testid='vote-menu-love-button']").click
