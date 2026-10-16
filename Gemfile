@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.3.6"
+ruby "4.0.7"
 
 gem "actionpack-action_caching"
 gem "aws-sdk-s3", require: false
