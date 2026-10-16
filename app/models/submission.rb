@@ -18,7 +18,9 @@ class Submission < ApplicationRecord
 
   validate :photo_within_limits, if: -> { attachment_changes["photo"] }
 
+  after_save { @leaderboard_changed = attachment_changes.key?("photo") || saved_change_to_denied_points? }
   after_update_commit { broadcast_replace_to("submissions_#{team_id}") }
+  after_update_commit :announce_lead_change, if: -> { @leaderboard_changed }
 
   scope :found, -> { joins(:photo_attachment) }
   scope :with_points, -> { where(denied_points: false) }
@@ -79,6 +81,11 @@ class Submission < ApplicationRecord
   end
 
   private
+
+  def announce_lead_change
+    @leaderboard_changed = false
+    LeadChangeJob.perform_later(hunt)
+  end
 
   def photo_within_limits
     if video?

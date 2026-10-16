@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       post :claim
       patch :playback
     end
+    resource :push_subscription, only: %i[create update destroy]
     get :print
     get :download_results, on: :member
     post :unlock_leaderboard, on: :member

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -204,6 +204,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.boolean "presentation_muted", default: true, null: false
     t.integer "playback_version", default: 0, null: false
     t.datetime "playback_started_at"
+    t.datetime "show_announced_at"
+    t.integer "leading_team_id"
+    t.datetime "lead_announced_at"
+    t.datetime "lead_recheck_at"
     t.index ["code"], name: "index_hunts_on_code"
     t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end
@@ -223,6 +227,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hunt_id"], name: "index_messages_on_hunt_id"
+  end
+
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.bigint "hunt_id", null: false
+    t.string "user_id", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh", null: false
+    t.string "auth", null: false
+    t.string "user_agent"
+    t.boolean "notify_starting_soon", default: true, null: false
+    t.boolean "notify_results", default: true, null: false
+    t.boolean "notify_show", default: true, null: false
+    t.boolean "notify_lead_change", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hunt_id", "user_id"], name: "index_push_subscriptions_on_hunt_id_and_user_id", unique: true
+    t.index ["hunt_id"], name: "index_push_subscriptions_on_hunt_id"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -279,5 +300,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "messages", "hunts"
+  add_foreign_key "push_subscriptions", "hunts"
   add_foreign_key "votes", "submissions"
 end

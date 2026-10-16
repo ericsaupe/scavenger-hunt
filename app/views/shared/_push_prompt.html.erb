@@ -1,0 +1,14 @@
+<div class="fixed inset-x-0 z-30 px-4 <%= content_for?(:bottom_bar) ? "bottom-24" : "bottom-4" %>" hidden data-controller="push-prompt" data-testid="push-prompt"
+  data-push-prompt-url-value="<%= hunt_push_subscription_path(@hunt.code) %>"
+  data-push-prompt-public-key-value="<%= PushSubscription.vapid[:public_key] %>"
+  data-push-prompt-code-value="<%= @hunt.code %>"
+  data-push-prompt-subscribed-value="<%= current_push_subscription.present? %>">
+  <div class="mx-auto max-w-md rounded-2xl bg-neutral p-4 text-neutral-content shadow-lg ring-1 ring-base-content/10">
+    <p class="flex items-center gap-2 font-semibold"><%= icon :bell, class: "size-5 shrink-0 text-marigold" %>Get a heads-up during the hunt</p>
+    <p class="mt-1 text-sm text-neutral-content/80">We'll tell you when the hunt is about to start, when results are up, when the show begins and when a team takes the lead. Nothing else.</p>
+    <div class="mt-3 flex gap-2">
+      <button type="button" class="btn btn-sm btn-primary" data-action="push-prompt#allow">Allow</button>
+      <button type="button" class="btn btn-sm btn-ghost text-neutral-content" data-action="push-prompt#dismiss">Not now</button>
+    </div>
+  </div>
+</div>

@@ -46,6 +46,12 @@ application.register("past-hunts", PastHuntsController)
 import PlaybackController from "./playback_controller"
 application.register("playback", PlaybackController)
 
+import PushPromptController from "./push_prompt_controller"
+application.register("push-prompt", PushPromptController)
+
+import PushSettingsController from "./push_settings_controller"
+application.register("push-settings", PushSettingsController)
+
 import QueueController from "./queue_controller"
 application.register("queue", QueueController)
 
