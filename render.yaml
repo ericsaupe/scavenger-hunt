@@ -20,8 +20,8 @@ services:
   - type: worker
     name: scavenger_hunt_worker
     runtime: ruby
-    buildCommand: "bundle install;"
-    startCommand: 'bundle exec good_job start --max-threads=10 --queues="+mailers,priority,default";'
+    buildCommand: "bundle install"
+    startCommand: 'bundle exec good_job start --threads=10 --queues="+mailers,priority,default"'
     region: oregon
     plan: starter
     branch: main
