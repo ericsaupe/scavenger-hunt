@@ -140,6 +140,13 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     expect(submission.photo.blob.filename.to_s).to eq("retake.jpg")
   end
 
+  it "does nothing while transcoding is switched off", :video_transcoding_off do
+    described_class.perform_now(submission)
+
+    expect(ffmpeg_calls).to be_empty
+    expect(submission.reload.playback).not_to be_attached
+  end
+
   it "leaves photos and already converted videos alone" do
     photo = create(:photo_submission)
     submission.playback.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "playback.mp4", content_type: "video/mp4")

@@ -115,6 +115,21 @@ RSpec.describe Submission do
     end
   end
 
+  describe "with video transcoding switched off", :video_transcoding_off do
+    include Rails.application.routes.url_helpers
+
+    it "serves the original without a poster or processing state and queues nothing", :test_queue_adapter do
+      expect { create(:video_submission) }.not_to have_enqueued_job(TranscodeVideoJob)
+      submission = Submission.last
+      submission.playback.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "playback.mp4", content_type: "video/mp4")
+
+      expect(submission.media_url).to eq(rails_blob_path(submission.photo))
+      expect(submission.large_variant_url).to eq(rails_blob_path(submission.photo))
+      expect(submission.poster_url).to be_nil
+      expect(submission).not_to be_processing_video
+    end
+  end
+
   describe "retaking a converted video", :test_queue_adapter do
     include Rails.application.routes.url_helpers
 

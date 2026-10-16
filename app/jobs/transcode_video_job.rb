@@ -12,7 +12,7 @@ class TranscodeVideoJob < ApplicationJob
   retry_on GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError, attempts: Float::INFINITY, wait: 5.seconds
 
   def perform(submission)
-    return unless submission.video? && !submission.playback.attached?
+    return unless Submission.video_transcoding? && submission.video? && !submission.playback.attached?
 
     source = submission.photo.blob
     source.analyze

@@ -31,6 +31,10 @@ class Submission < ApplicationRecord
   scope :found, -> { joins(:photo_attachment) }
   scope :with_points, -> { where(denied_points: false) }
 
+  def self.video_transcoding?
+    Flipper.enabled?(:video_transcoding)
+  end
+
   def image?
     !!photo&.blob&.content_type&.include?("image")
   end
@@ -40,7 +44,7 @@ class Submission < ApplicationRecord
   end
 
   def processing_video?
-    video? && !playback.attached? && !photo.blob.metadata[:playback_failed]
+    self.class.video_transcoding? && video? && !playback.attached? && !photo.blob.metadata[:playback_failed]
   end
 
   def photo_extension
@@ -68,7 +72,7 @@ class Submission < ApplicationRecord
   def media_url
     return nil unless photo.attached?
 
-    routes.rails_blob_path(playback.attached? ? playback : photo, only_path: true)
+    routes.rails_blob_path(playback_ready? ? playback : photo, only_path: true)
   end
 
   def poster(size)
@@ -76,7 +80,7 @@ class Submission < ApplicationRecord
   end
 
   def poster_url(size = :large)
-    return nil unless video? && playback.attached? && photo.previewable?
+    return nil unless video? && playback_ready? && photo.previewable?
 
     routes.rails_representation_path(poster(size), only_path: true)
   end
@@ -106,6 +110,10 @@ class Submission < ApplicationRecord
     Rails.application.routes.url_helpers
   end
 
+  def playback_ready?
+    self.class.video_transcoding? && playback.attached?
+  end
+
   def announce_lead_change
     @leaderboard_changed = false
     LeadChangeJob.perform_later(hunt)
@@ -118,7 +126,7 @@ class Submission < ApplicationRecord
       playback.detach
       stale.purge_later
     end
-    TranscodeVideoJob.perform_later(self) if video?
+    TranscodeVideoJob.perform_later(self) if video? && self.class.video_transcoding?
   end
 
   def photo_within_limits
