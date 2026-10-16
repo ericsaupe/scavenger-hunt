@@ -7,6 +7,7 @@ RSpec.describe "Hunts" do
     it "creates a new hunt" do
       visit "/"
       click_on "Start"
+      expect(page).to have_current_path(hunts_path)
       within("#content") do
         click_link "Start", match: :first
       end
@@ -22,6 +23,7 @@ RSpec.describe "Hunts" do
     it "supports locking" do
       visit "/"
       click_on "Start"
+      expect(page).to have_current_path(hunts_path)
       within("#content") do
         click_link "Start", match: :first
       end
