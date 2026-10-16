@@ -5,9 +5,11 @@ require "open3"
 class VideoTranscoder
   class Error < StandardError; end
 
-  MAX_WIDTH = 1280
-  MAX_HEIGHT = 720
+  MAX_WIDTH = 1920
+  MAX_HEIGHT = 1080
   MAX_FPS = 60
+  LEVEL = "4.2"
+  CRF = "22"
   TIMEOUT = 10.minutes
   INPUT_OPTIONS = ["-protocol_whitelist", "file", "-format_whitelist", "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm"].freeze
   SCALE = "scale=w='if(gt(a,1),min(#{MAX_WIDTH},iw),min(#{MAX_HEIGHT},iw))':" \
@@ -79,7 +81,7 @@ class VideoTranscoder
       *INPUT_OPTIONS, "-i", input,
       "-t", Submission::MAX_VIDEO_SECONDS.to_s,
       "-vf", FILTERS,
-      "-c:v", "libx264", "-profile:v", "high", "-level", "4.0", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23",
+      "-c:v", "libx264", "-profile:v", "high", "-level", LEVEL, "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", CRF,
       "-c:a", "aac", "-b:a", "128k",
       "-movflags", "+faststart",
       output]

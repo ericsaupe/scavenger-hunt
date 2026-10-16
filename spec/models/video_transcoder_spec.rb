@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe VideoTranscoder do
   describe "#command" do
-    it "asks ffmpeg for a faststart H.264 MP4 that fits 1280x720 and plays anywhere" do
+    it "asks ffmpeg for a faststart H.264 MP4 that fits 1920x1080 and plays anywhere" do
       command = described_class.new("/tmp/original.mov", "/tmp/playback.mp4").command
 
       expect(command).to eq([
@@ -12,8 +12,8 @@ RSpec.describe VideoTranscoder do
         "-protocol_whitelist", "file", "-format_whitelist", "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm",
         "-i", "/tmp/original.mov",
         "-t", "30",
-        "-vf", "scale=w='if(gt(a,1),min(1280,iw),min(720,iw))':h='if(gt(a,1),min(720,ih),min(1280,ih))':force_original_aspect_ratio=decrease:force_divisible_by=2,fps=fps='min(source_fps,60)'",
-        "-c:v", "libx264", "-profile:v", "high", "-level", "4.0", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23",
+        "-vf", "scale=w='if(gt(a,1),min(1920,iw),min(1080,iw))':h='if(gt(a,1),min(1080,ih),min(1920,ih))':force_original_aspect_ratio=decrease:force_divisible_by=2,fps=fps='min(source_fps,60)'",
+        "-c:v", "libx264", "-profile:v", "high", "-level", "4.2", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "22",
         "-c:a", "aac", "-b:a", "128k",
         "-movflags", "+faststart",
         "/tmp/playback.mp4"
