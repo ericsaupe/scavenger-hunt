@@ -81,6 +81,15 @@ RSpec.describe "Votes" do
       expect(Turbo::StreamsChannel).not_to have_received(:broadcast_append_to).with(stream, anything)
       expect(Turbo::StreamsChannel).not_to have_received(:broadcast_replace_to).with(stream, anything)
     end
+
+    it "checks the stored slide without building the whole sequence" do
+      presentation = Presentation.new(hunt)
+      expect(presentation).not_to receive(:keys)
+
+      expect(presentation.presenting?(submission)).to be(true)
+      submission.photo.purge
+      expect(presentation.presenting?(submission)).to be(false)
+    end
   end
 
   it "keeps a single vote per viewer across a double tap" do

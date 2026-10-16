@@ -71,7 +71,7 @@ class Presentation
   end
 
   def presenting?(submission)
-    current_key == self.class.submission_key(submission.id)
+    hunt.presentation_slide == self.class.submission_key(submission.id) && submission.photo.attached?
   end
 
   def broadcast_reaction(vote)

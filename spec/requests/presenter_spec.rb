@@ -80,15 +80,17 @@ RSpec.describe "Presenter" do
       second = found(second_team, items.first)
       hunt.update!(presentation_slide: "submission:#{first.id}")
 
+      tilt_of = ->(body) { body[/id="submission_#{first.id}_print"[^>]*style="(--tilt: -?\d\.\ddeg)"[^>]*data-print/, 1] }
+
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+      first_tilt = tilt_of.call(response.body)
 
       expect(response.body).to include(%(<link rel="preload" as="image" href="#{second.large_variant_url}"))
-      expect(response.body).to match(/id="submission_#{first.id}_print"[^>]*style="--tilt: -?\d\.\ddeg"[^>]*data-print/)
+      expect(first_tilt).to be_present
       expect(response.body).to include(%(id="print_overlay"), %(data-controller="transition"))
 
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
-      tilt = response.body[/id="submission_#{first.id}_print"[^>]*style="(--tilt: [^"]+)"/, 1]
-      expect(tilt).to eq(response.body[/id="submission_#{first.id}_print"[^>]*style="(--tilt: [^"]+)"/, 1])
+      expect(tilt_of.call(response.body)).to eq(first_tilt)
 
       hunt.update!(presentation_slide: "item:#{items.first.id}")
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
