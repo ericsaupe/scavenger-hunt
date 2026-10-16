@@ -9,7 +9,7 @@
   <div data-controller="carousel">
     <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8" data-carousel-target="track">
       <% submissions.each do |submission| %>
-        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center justify-center" data-carousel-target="item">
+        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center items-start justify-center" data-carousel-target="item">
           <figure class="polaroid-lg relative w-full max-w-md pb-5!" style="transform: rotate(0)">
             <% image_url = submission_attachment_url(submission, variant_size: :large) %>
             <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
@@ -19,8 +19,8 @@
                 <%= image_tag(image_url, class: "max-h-[60dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
               <% end %>
             </div>
-            <figcaption class="mt-4 flex items-center justify-between gap-3">
-              <span class="display min-w-0 truncate text-2xl text-ink"><%= submission.team.name %></span>
+            <figcaption class="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <span class="display min-w-0 grow basis-40 text-2xl leading-tight text-ink"><%= submission.team.name %></span>
               <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
             </figcaption>
           </figure>
