@@ -7,6 +7,7 @@ module NetworkHelpers
 
   def go_online
     page.driver.browser.delete_network_conditions
+    page.execute_script("window.dispatchEvent(new Event('online'))")
   end
 
   def wait_for_service_worker
@@ -71,6 +72,6 @@ RSpec.configure do |config|
   end
 
   config.after(:each, type: :system) do
-    go_online if page.driver.browser.respond_to?(:delete_network_conditions)
+    page.driver.browser.delete_network_conditions if page.driver.browser.respond_to?(:delete_network_conditions)
   end
 end

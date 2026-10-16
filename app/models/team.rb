@@ -6,6 +6,7 @@ class Team < ApplicationRecord
   has_many :items, through: :submissions
 
   PENDING_UPLOADS_TTL = 5.minutes
+  MAX_PENDING_REPORTERS = 25
 
   validates :name, uniqueness: {scope: :hunt, case_sensitive: false}
 
@@ -25,11 +26,13 @@ class Team < ApplicationRecord
 
   def report_pending_uploads(client, count)
     reports = self.class.live_pending_reports(Rails.cache.read(pending_uploads_cache_key))
+    count = count.clamp(0, hunt.items.count)
     if count.positive?
       reports[client] = [count, Time.current.to_i]
     else
       reports.delete(client)
     end
+    reports = reports.min_by(MAX_PENDING_REPORTERS) { |_client, (_count, reported_at)| -reported_at }.to_h
     Rails.cache.write(pending_uploads_cache_key, reports, expires_in: PENDING_UPLOADS_TTL)
   end
 

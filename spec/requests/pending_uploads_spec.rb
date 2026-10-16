@@ -34,6 +34,18 @@ RSpec.describe "Pending uploads" do
     expect(hunt.pending_upload_count).to eq(1)
   end
 
+  it "never counts more photos than the hunt has items" do
+    report(team, 500)
+
+    expect(hunt.pending_upload_count).to eq(hunt.items.count)
+  end
+
+  it "keeps only the most recent reporters for a team" do
+    30.times { |i| report(team, 1, client: "phone-#{i}") }
+
+    expect(hunt.pending_upload_count).to eq(Team::MAX_PENDING_REPORTERS)
+  end
+
   it "needs to know which phone is reporting" do
     post "/scavenger_hunts/#{hunt.code}/teams/#{team.id}/pending_uploads", params: {count: 2}, as: :json
 

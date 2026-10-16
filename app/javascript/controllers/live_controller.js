@@ -46,10 +46,12 @@ export default class extends Controller {
   }
 
   keepBanners() {
-    const banners = Array.from(document.querySelectorAll("#flash > *"))
-    if (banners.length === 0) {
-      return
-    }
-    document.addEventListener("turbo:load", () => document.getElementById("flash")?.append(...banners), { once: true })
+    document.addEventListener("turbo:before-render", (event) => {
+      const banners = Array.from(document.querySelectorAll("#flash > *"))
+      const flash = event.detail.newBody?.querySelector("#flash")
+      if (flash && banners.length > 0) {
+        flash.append(...banners)
+      }
+    }, { once: true })
   }
 }
