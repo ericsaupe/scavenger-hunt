@@ -53,6 +53,12 @@ class Submission < ApplicationRecord
     video? ? routes.rails_blob_path(photo, only_path: true) : routes.rails_representation_path(photo.variant(size), only_path: true)
   end
 
+  def poster_url
+    return nil unless video? && photo.previewable?
+
+    Rails.application.routes.url_helpers.rails_representation_path(photo.preview(resize_to_limit: [1500, 1500]), only_path: true)
+  end
+
   def vote_for(user_id)
     votes.find { |vote| vote.user_id == user_id } || votes.build(user_id:)
   end

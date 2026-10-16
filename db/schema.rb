@@ -200,6 +200,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.integer "victory_item_id"
     t.boolean "password_entered_for_leaderboard", default: false, null: false
     t.integer "presentation_submission_id"
+    t.string "presentation_playback", default: "paused", null: false
+    t.boolean "presentation_muted", default: true, null: false
+    t.integer "playback_version", default: 0, null: false
+    t.datetime "playback_started_at"
     t.index ["code"], name: "index_hunts_on_code"
     t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end

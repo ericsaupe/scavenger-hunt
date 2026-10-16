@@ -3,56 +3,114 @@
 require "rails_helper"
 
 RSpec.describe "Presenter" do
-  let(:hunt) { create(:hunt) }
+  let(:hunt) { create(:hunt, owner_id: "host") }
   let(:team) { create(:team, hunt:) }
 
-  describe "presenter page" do
-    before do
-      allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000")
-      @video_submission = create(:video_submission, item: hunt.items.first, team:)
-      @photo_submission = create(:photo_submission, item: hunt.items.second, team:)
-    end
+  before do
+    @video = create(:video_submission, item: hunt.items.first, team:)
+    @photo = create(:photo_submission, item: hunt.items.second, team:)
+    hunt.update!(presentation_submission: @video)
+  end
 
-    context "as hunt owner" do
-      before do
-        allow_any_instance_of(Hunt).to receive(:owner?).and_return(true)
-      end
+  def video_paused?
+    page.evaluate_script("document.querySelector('video').paused")
+  end
 
-      it "displays presenter controls" do
-        visit "/scavenger_hunts/#{hunt.code}/presenter"
-        expect(page).to have_content("«")
-        expect(page).to have_content("»")
-      end
+  def video_error
+    page.evaluate_script("document.querySelector('video').error?.code")
+  end
 
-      it "saves the current submission id" do
-        expect_any_instance_of(Hunt).to receive(:update).with(presentation_submission: @video_submission)
-        visit "/scavenger_hunts/#{@video_submission.hunt.code}/presenter?submission_id=#{@video_submission.id}"
-        expect(page).to have_content("«")
-        expect(page).to have_content("»")
-      end
+  it "shows the slide without controls on the big screen and follows the remote" do
+    visit "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
 
-      it "does not change the current submission when hovering the next link" do
-        visit "/scavenger_hunts/#{hunt.code}/presenter"
-        find("a", text: "»").hover
-        sleep 1
-        expect(hunt.reload.presentation_submission_id).to be_nil
-      end
-    end
+    expect(page).to have_css("[data-testid='progress']", text: "Video 1 of 2")
+    expect(page).to have_css("video:not([autoplay])[playsinline][preload='metadata']")
+    expect(page).not_to have_button("Previous")
+    expect(page).not_to have_css("[data-testid='vote-menu']")
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+    expect(video_paused?).to be(true)
+    expect(video_error).to be_nil
 
-    context "not as hunt owner" do
-      it "does not display presenter controls" do
-        visit "/scavenger_hunts/#{hunt.code}/presenter"
-        expect(page).not_to have_content("«")
-        expect(page).not_to have_content("»")
-      end
+    hunt.reload.playback!("play")
+    expect(page).to have_css("[data-playback-state-value='playing']")
+    expect(video_paused?).to be(false)
 
-      it "does not save or transmit" do
-        expect_any_instance_of(Hunt).not_to receive(:update).with(presentation_submission: @video_submission)
-        expect_any_instance_of(Hunt).not_to receive(:broadcast_presentation_update)
-        visit "/scavenger_hunts/#{@video_submission.hunt.code}/presenter?submission_id=#{@video_submission.id}"
-        expect(page).not_to have_content("«")
-        expect(page).not_to have_content("»")
-      end
-    end
+    hunt.reload.playback!("pause")
+    expect(page).to have_css("[data-playback-state-value='paused']")
+    expect(video_paused?).to be(true)
+
+    hunt.reload.present!(@photo.id)
+    expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 2")
+    expect(page).to have_css("img#submission_#{@photo.id}_photo")
+  end
+
+  it "offers a tap to enable sound when the browser blocks audible playback" do
+    visit "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+    page.execute_script(<<~JS)
+      const play = HTMLMediaElement.prototype.play
+      HTMLMediaElement.prototype.play = function () {
+        if (!this.muted && !window.userGestureSeen) {
+          return Promise.reject(new DOMException("blocked", "NotAllowedError"))
+        }
+        return play.call(this)
+      }
+      document.addEventListener("click", () => { window.userGestureSeen = true }, true)
+    JS
+    expect(page).not_to have_button("Tap to enable sound")
+
+    hunt.reload.playback!("play")
+    hunt.reload.playback!("unmute")
+    expect(page).to have_button("Tap to enable sound")
+    expect(page.evaluate_script("document.querySelector('video').muted")).to be(true)
+    expect(video_paused?).to be(false)
+
+    click_on "Tap to enable sound"
+    expect(page).not_to have_button("Tap to enable sound")
+    expect(page.evaluate_script("document.querySelector('video').muted")).to be(false)
+    expect(video_paused?).to be(false)
+
+    hunt.reload.playback!("pause")
+    expect(page).to have_css("[data-playback-state-value='paused']")
+    expect(video_paused?).to be(true)
+  end
+
+  it "never starts the video on a watcher's phone" do
+    hunt.update!(presentation_playback: "playing", playback_started_at: Time.current)
+
+    visit "/scavenger_hunts/#{hunt.code}/presenter"
+
+    expect(page).to have_css("video[controls]")
+    expect(page).to have_css("button[aria-label='Play video']")
+    expect(page).to have_css("[data-testid='vote-menu']")
+    expect(video_paused?).to be(true)
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+
+    find("button[aria-label='Play video']").click
+    expect(page).not_to have_css("button[aria-label='Play video']")
+    expect(video_paused?).to be(false)
+
+    hunt.reload.playback!("replay")
+    expect(page).to have_css("[data-playback-version-value='1']")
+    expect(page).not_to have_css("button[aria-label='Play video']")
+    expect(video_paused?).to be(false)
+  end
+
+  it "hands the remote to whoever takes it" do
+    visit "/scavenger_hunts/#{hunt.code}/presenter"
+    expect(page).to have_text("Someone else has the remote")
+
+    click_on "Take the remote"
+
+    expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
+    expect(page).to have_button("Next")
+    expect(page).to have_button("Play on the big screen")
+    expect(hunt.reload.owner_id).to be_present
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+
+    click_on "Next"
+    expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 2")
+    expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
+    expect(hunt.reload.presentation_submission).to eq(@photo)
   end
 end

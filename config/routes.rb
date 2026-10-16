@@ -10,6 +10,11 @@ Rails.application.routes.draw do
     resources :messages, only: %i[create]
     get :results
     get :presenter
+    get "presenter/remote", to: "presentations#remote", as: :presenter_remote
+    resource :presentation, only: %i[update] do
+      post :claim
+      patch :playback
+    end
     get :print
     get :download_results, on: :member
     post :unlock_leaderboard, on: :member

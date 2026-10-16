@@ -28,14 +28,20 @@ application.register("form", FormController)
 import HuntController from "./hunt_controller"
 application.register("hunt", HuntController)
 
+import LiveController from "./live_controller"
+application.register("live", LiveController)
+
 import MessageController from "./message_controller"
 application.register("message", MessageController)
 
 import PastHuntsController from "./past_hunts_controller"
 application.register("past-hunts", PastHuntsController)
 
-import PresenterController from "./presenter_controller"
-application.register("presenter", PresenterController)
+import PlaybackController from "./playback_controller"
+application.register("playback", PlaybackController)
+
+import RemoteController from "./remote_controller"
+application.register("remote", RemoteController)
 
 import SubmissionController from "./submission_controller"
 application.register("submission", SubmissionController)

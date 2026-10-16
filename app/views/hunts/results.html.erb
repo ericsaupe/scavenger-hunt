@@ -12,9 +12,13 @@
   <%= render partial: "locked_results", locals: {hunt: @hunt} %>
 <% else %>
   <div class="page flex flex-wrap gap-2">
-    <%= link_to(hunt_presenter_path(@hunt.code.upcase), class: "btn btn-primary", data: {turbo_prefetch: false}) do %>
+    <%= link_to(hunt_presenter_path(@hunt.code.upcase, screen: "big"), class: "btn btn-primary", data: {turbo_prefetch: false}) do %>
       <%= icon :tv, class: "size-5" %>
       Present on a big screen
+    <% end %>
+    <%= link_to(hunt_presenter_path(@hunt.code.upcase), class: "btn", data: {turbo_prefetch: false}) do %>
+      <%= icon :video, class: "size-5" %>
+      Watch along
     <% end %>
     <%= render partial: "download_button" %>
   </div>
