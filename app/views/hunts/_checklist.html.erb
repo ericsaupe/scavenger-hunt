@@ -7,7 +7,7 @@
       </div>
       <ul class="mt-3 divide-y divide-base-300 border-y border-base-300 sm:overflow-hidden sm:rounded-2xl sm:border">
         <% category.items.each do |item| %>
-          <% submission = @submissions&.find_by(item:) || item.submissions.new %>
+          <% submission = @submissions[item.id] || item.submissions.new %>
           <%= render partial: "submissions/submission", locals: {submission:, animate: false} %>
         <% end %>
       </ul>

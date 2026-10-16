@@ -23,6 +23,38 @@ RSpec.describe Team do
     end
   end
 
+  describe "#score and #total_score" do
+    let(:hunt) { create(:hunt) }
+    let(:team) { create(:team, hunt:) }
+
+    def find(item, denied: false)
+      submission = team.submissions.find_by(item:)
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
+      submission.update!(denied_points: denied)
+    end
+
+    it "adds the category points of found items and leaves out denied ones from the score" do
+      hunt.categories.first.update!(points: 3)
+      bonus = create(:category, hunt:, points: 10)
+      bonus_item = create(:item, category: bonus)
+      team.submissions.create!(item: bonus_item)
+      first, second, third = hunt.categories.first.items.order(:id).to_a
+
+      find(first)
+      find(second, denied: true)
+      find(bonus_item)
+
+      expect(team.score).to eq(13)
+      expect(team.total_score).to eq(16)
+      expect(third).to be_present
+    end
+
+    it "is zero before anything is found" do
+      expect(team.score).to eq(0)
+      expect(team.total_score).to eq(0)
+    end
+  end
+
   context "victory_photo_url" do
     let(:hunt) { team.hunt }
     let(:team) { create(:team) }
