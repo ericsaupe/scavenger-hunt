@@ -3,12 +3,10 @@
 class ItemsController < ApplicationController
   def show
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
-    @item = @hunt.items.with_photo_submissions.find(params[:id])
-    @submissions = @item.submissions.includes(:votes).found.order(:team_id)
-    hunt_items = @hunt.items.with_photo_submissions
-    @next = hunt_items.where("items.id > ?", @item.id)
-      .order("items.id ASC").first || hunt_items.first
-    @previous = hunt_items.where("items.id < ?", @item.id)
-      .order("items.id DESC").first || hunt_items.last
+    found_item_ids = @hunt.items.with_photo_submissions.order(:id).ids
+    index = found_item_ids.index(params[:id].to_i) or raise ActiveRecord::RecordNotFound
+    item_ids = [found_item_ids[index], found_item_ids[index - 1], found_item_ids[(index + 1) % found_item_ids.size]]
+    @item, @previous, @next = Item.where(id: item_ids).index_by(&:id).values_at(*item_ids)
+    @submissions = @item.submissions.found.includes(:votes, team: :hunt, photo_attachment: :blob).order(:team_id).to_a
   end
 end
