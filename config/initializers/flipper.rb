@@ -4,7 +4,8 @@ Flipper.configure do |config|
   config.adapter do
     Flipper::Adapters::ActiveSupportCacheStore.new(
       Flipper::Adapters::ActiveRecord.new,
-      Rails.cache
+      Rails.cache,
+      5.minutes
     )
   end
 end
