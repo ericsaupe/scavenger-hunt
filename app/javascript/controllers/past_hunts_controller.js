@@ -49,7 +49,7 @@ export default class extends Controller {
       const path = (typeof entry === "object" && /^\/scavenger_hunts\/[A-Z]{1,5}\/teams\/\d+$/.test(entry.path)) ? entry.path : `/scavenger_hunts/${code}`
       const item = document.createElement("li")
       item.innerHTML = `
-        <a class="row-tap" data-code="${code}">
+        <a class="row-tap" data-code="${code}" data-turbo-prefetch="false">
           <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-base-200 font-mono text-xs font-bold tracking-widest">${code}</span>
           <span class="grow truncate font-semibold"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-5 shrink-0 text-ink-soft" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>

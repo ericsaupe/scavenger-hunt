@@ -24,6 +24,17 @@ RSpec.describe "My hunt" do
     expect(response).to redirect_to(team_path(team))
   end
 
+  it "does not remember a team whose page was only prefetched" do
+    team = create(:team)
+    prefetched_team = create(:team)
+    get team_path(team)
+    get team_path(prefetched_team), headers: {"X-Sec-Purpose" => "prefetch"}
+
+    get "/my_hunt"
+
+    expect(response).to redirect_to(team_path(team))
+  end
+
   it "ignores a forged team id so the cookie cannot reveal hunt codes" do
     team = create(:team)
     cookies[:last_team_id] = team.id
