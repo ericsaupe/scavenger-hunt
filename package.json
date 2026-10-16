@@ -14,7 +14,7 @@
     "tailwindcss": "^4.3.3"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --format=esm --outdir=app/assets/builds",
-    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css"
+    "build": "esbuild app/javascript/*.* --bundle --format=esm --minify --outdir=app/assets/builds",
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify"
   }
 }

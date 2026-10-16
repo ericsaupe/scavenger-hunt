@@ -8,7 +8,7 @@
     <% @templates.each do |template| %>
       <li>
         <%= link_to new_hunt_path(template: template[:name]), class: "row-tap gap-4 py-3 sm:h-full sm:rounded-2xl sm:border sm:border-base-300 sm:px-4 sm:py-4 sm:hover:border-base-content", data: {testid: "template"} do %>
-          <%= image_tag(asset_path(template[:image_path] || "templates/scavenger.jpg"), class: "size-20 shrink-0 rounded-xl object-cover", alt: "") %>
+          <%= image_tag(asset_path(template[:image_path] || "templates/scavenger.jpg"), class: "size-20 shrink-0 rounded-xl object-cover", alt: "", loading: "lazy") %>
           <div class="min-w-0 grow">
             <h2 class="text-lg font-bold leading-tight">
               <%= template[:name] %>
