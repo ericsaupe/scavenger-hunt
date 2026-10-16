@@ -6,34 +6,36 @@
     </div>
   </div>
 <% else %>
-  <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8">
-    <% submissions.each do |submission| %>
-      <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center justify-center">
-        <figure class="polaroid-lg relative w-full max-w-md pb-5!" style="transform: rotate(0)">
-          <% image_url = submission_attachment_url(submission, variant_size: :large) %>
-          <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
-            <% if submission.video? %>
-              <%= video_tag(image_url, controls: true, playsinline: true, preload: "metadata", class: "max-h-[60dvh] w-full") %>
-            <% else %>
-              <%= image_tag(image_url, class: "max-h-[60dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
-            <% end %>
-          </div>
-          <figcaption class="mt-4 flex items-center justify-between gap-3">
-            <span class="display min-w-0 truncate text-2xl text-ink"><%= submission.team.name %></span>
-            <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
-          </figcaption>
-        </figure>
+  <div data-controller="carousel">
+    <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8" data-carousel-target="track">
+      <% submissions.each do |submission| %>
+        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center justify-center" data-carousel-target="item">
+          <figure class="polaroid-lg relative w-full max-w-md pb-5!" style="transform: rotate(0)">
+            <% image_url = submission_attachment_url(submission, variant_size: :large) %>
+            <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
+              <% if submission.video? %>
+                <%= video_tag(image_url, controls: true, playsinline: true, preload: "metadata", class: "max-h-[60dvh] w-full") %>
+              <% else %>
+                <%= image_tag(image_url, class: "max-h-[60dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
+              <% end %>
+            </div>
+            <figcaption class="mt-4 flex items-center justify-between gap-3">
+              <span class="display min-w-0 truncate text-2xl text-ink"><%= submission.team.name %></span>
+              <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
+            </figcaption>
+          </figure>
+        </div>
+      <% end %>
+    </div>
+
+    <% if submissions.size > 1 %>
+      <div id="pages" class="mt-5 flex justify-center gap-2">
+        <% submissions.each_index do |i| %>
+          <button type="button" class="btn btn-circle btn-sm" data-action="carousel#show" data-carousel-index-param="<%= i %>" aria-label="Show submission <%= i + 1 %>"><%= i + 1 %></button>
+        <% end %>
       </div>
     <% end %>
   </div>
-
-  <% if submissions.size > 1 %>
-    <div id="pages" class="mt-5 flex justify-center gap-2">
-      <% submissions.each_with_index do |submission, i| %>
-        <a href="#submission_<%= submission.id %>" class="btn btn-circle btn-sm" aria-label="Show submission <%= i + 1 %>"><%= i + 1 %></a>
-      <% end %>
-    </div>
-  <% end %>
 <% end %>
 
 <% content_for :bottom_bar do %>
