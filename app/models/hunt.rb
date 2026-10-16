@@ -56,16 +56,20 @@ class Hunt < ApplicationRecord
   end
 
   def results
-    teams.map do |team|
-      {
-        name: team.name,
-        score: team.score,
-        total_score: team.total_score,
-        deductions: team.total_score - team.score,
-        submissions: team.submissions.found.size,
-        victory_photo_url: team.victory_photo_url(victory_item_id:)
-      }
-    end.sort_by { |team| team[:score] }.reverse
+    found = Submission.found.joins(item: :category).where(team: teams)
+    total_scores = found.group(:team_id).sum("categories.points")
+    scores = found.with_points.group(:team_id).sum("categories.points")
+    found_counts = found.group(:team_id).count
+
+    ranked = teams.map do |team|
+      score = scores.fetch(team.id, 0)
+      total_score = total_scores.fetch(team.id, 0)
+      [team, {name: team.name, score:, total_score:, deductions: total_score - score, submissions: found_counts.fetch(team.id, 0)}]
+    end.sort_by { |_, result| result[:score] }.reverse
+
+    winner, winning_result = ranked.first
+    winning_result[:victory_photo_url] = winner.victory_photo_url(victory_item_id:) if winner
+    ranked.map(&:last)
   end
 
   def results_locked?
