@@ -44,7 +44,7 @@ class PushSubscription < ApplicationRecord
   rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription
     destroy
     false
-  rescue WebPush::ResponseError => error
+  rescue WebPush::ResponseError, Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError => error
     Rails.error.report(error, handled: true)
     false
   end

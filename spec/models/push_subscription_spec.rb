@@ -77,6 +77,15 @@ RSpec.describe PushSubscription do
       expect(described_class.exists?(subscription.id)).to be(false)
     end
 
+    it "keeps the subscription when the push service times out, so the next phone still gets its turn" do
+      allow(WebPush).to receive(:payload_send).and_raise(Net::ReadTimeout)
+      allow(Rails.error).to receive(:report)
+
+      expect(subscription.deliver(title: "Hi", body: "There", url: "/")).to be(false)
+      expect(described_class.exists?(subscription.id)).to be(true)
+      expect(Rails.error).to have_received(:report).with(instance_of(Net::ReadTimeout), handled: true)
+    end
+
     it "keeps the subscription and reports any other push service error" do
       allow(WebPush).to receive(:payload_send).and_raise(push_response_error(WebPush::PushServiceError, 500))
       allow(Rails.error).to receive(:report)

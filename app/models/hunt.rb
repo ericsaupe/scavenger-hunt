@@ -174,6 +174,11 @@ class Hunt < ApplicationRecord
     announce_show!
   end
 
+  def schedule_notifications
+    schedule_starting_soon_notification
+    schedule_results_notification
+  end
+
   def announce_show!
     return if show_announced_at
 

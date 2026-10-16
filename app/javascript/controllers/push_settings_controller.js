@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { supported, installed, permission, optOut, currentSubscription, subscribe, unsubscribe, send } from "../push/client"
+import { supported, installed, permission, optOut, currentSubscription, subscribe, send } from "../push/client"
 
 export default class extends Controller {
   static targets = [ "toggles", "enable", "preference" ]
@@ -52,8 +52,11 @@ export default class extends Controller {
       }
       optOut.clear(this.codeValue)
       const subscription = await subscribe(this.publicKeyValue)
+      const fresh = !this.subscribedValue
       await send(this.urlValue, "POST", { subscription: subscription.toJSON() })
-      this.preferenceTargets.forEach((field) => field.checked = true)
+      if (fresh) {
+        this.preferenceTargets.forEach((field) => field.checked = true)
+      }
       this.subscribedValue = true
       this.render(true)
     } catch (error) {
@@ -62,13 +65,13 @@ export default class extends Controller {
   }
 
   async disable() {
-    optOut.set(this.codeValue)
     try {
       await send(this.urlValue, "DELETE")
-      await unsubscribe()
     } catch (error) {
       console.error(error)
+      return
     }
+    optOut.set(this.codeValue)
     this.subscribedValue = false
     this.render(false)
   }

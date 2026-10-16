@@ -217,6 +217,20 @@ RSpec.describe Hunt, "notifications", :test_queue_adapter do
     end
   end
 
+  describe "#schedule_notifications" do
+    it "queues both reminders for a hunt that already existed when reminders arrived" do
+      starts_at = 1.hour.from_now.change(usec: 0)
+      ends_at = 3.hours.from_now.change(usec: 0)
+      hunt = create(:hunt)
+      hunt.update_columns(starts_at:, ends_at:)
+
+      hunt.schedule_notifications
+
+      expect(HuntStartingSoonJob).to have_been_enqueued.with(hunt, starts_at).at(starts_at - 5.minutes)
+      expect(HuntResultsReadyJob).to have_been_enqueued.with(hunt, ends_at).at(ends_at + Hunt::LATE_UPLOAD_GRACE)
+    end
+  end
+
   describe "#announce_show!" do
     let(:hunt) { create(:hunt) }
 

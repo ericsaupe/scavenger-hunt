@@ -60,11 +60,6 @@ export async function subscribe(publicKey) {
   return registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: decodeKey(publicKey) })
 }
 
-export async function unsubscribe() {
-  const subscription = await currentSubscription()
-  await subscription?.unsubscribe()
-}
-
 export function send(url, method, body) {
   return fetch(url, {
     method,
