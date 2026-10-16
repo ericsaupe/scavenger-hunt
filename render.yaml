@@ -42,6 +42,6 @@ databases:
     databaseName: scavenger_hunt_party
     user: scavenger_hunt_party
     region: oregon
-    plan: basic-256mb
+    plan: basic-1gb
     diskSizeGB: 1
     postgresMajorVersion: "18"
