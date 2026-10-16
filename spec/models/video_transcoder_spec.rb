@@ -9,7 +9,9 @@ RSpec.describe VideoTranscoder do
 
       expect(command).to eq([
         Rails.root.join("spec/support/bin/ffmpeg").to_s, "-nostdin", "-y", "-loglevel", "error",
+        "-protocol_whitelist", "file", "-format_whitelist", "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm",
         "-i", "/tmp/original.mov",
+        "-t", "30",
         "-vf", "scale=w='if(gt(a,1),min(1280,iw),min(720,iw))':h='if(gt(a,1),min(720,ih),min(1280,ih))':force_original_aspect_ratio=decrease:force_divisible_by=2",
         "-c:v", "libx264", "-profile:v", "high", "-level", "4.0", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23",
         "-c:a", "aac", "-b:a", "128k",
@@ -20,6 +22,18 @@ RSpec.describe VideoTranscoder do
   end
 
   describe ".transcode" do
+    it "kills ffmpeg when it runs past the time limit" do
+      stub_const("VideoTranscoder::TIMEOUT", 1.second)
+      ENV["FAKE_FFMPEG_SLEEP"] = "10"
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      expect { described_class.transcode("/tmp/original.mov", "/tmp/playback.mp4") }
+        .to raise_error(VideoTranscoder::Error, "ffmpeg gave up after 1 second")
+      expect(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).to be < 5
+    ensure
+      ENV.delete("FAKE_FFMPEG_SLEEP")
+    end
+
     it "raises with ffmpeg's complaint when the conversion fails" do
       ENV["FAKE_FFMPEG_FAIL"] = "1"
 

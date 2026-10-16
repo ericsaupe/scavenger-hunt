@@ -131,7 +131,7 @@ class Submission < ApplicationRecord
 
   def video_duration
     blob = photo.blob
-    blob.analyze if blob.persisted? && !blob.analyzed?
+    blob.analyze if blob.persisted?
     blob.metadata[:duration]
   rescue ActiveStorage::IntegrityError
     errors.add(:photo, "The video didn't upload completely. Please try again")

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 duration="${FAKE_FFPROBE_DURATION:-5.0}"
-cat <<JSON
+if [ "$duration" = "none" ]; then
+  echo '{"streams":[{"codec_type":"video","width":640,"height":480}],"format":{}}'
+else
+  cat <<JSON
 {"streams":[{"codec_type":"video","width":640,"height":480,"duration":"${duration}"}],"format":{"duration":"${duration}"}}
 JSON
+fi

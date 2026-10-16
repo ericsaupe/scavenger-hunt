@@ -26,16 +26,10 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     described_class.perform_now(submission)
 
     conversion = ffmpeg_calls.find { |args| args.last.end_with?("/playback.mp4") }
-    expect(conversion[5]).to end_with(".mp4")
-    expect(conversion).to eq([
-      "-nostdin", "-y", "-loglevel", "error",
-      "-i", conversion[5],
-      "-vf", VideoTranscoder::SCALE,
-      "-c:v", "libx264", "-profile:v", "high", "-level", "4.0", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23",
-      "-c:a", "aac", "-b:a", "128k",
-      "-movflags", "+faststart",
-      conversion.last
-    ])
+    original = conversion[conversion.index("-i") + 1]
+    expect(original).to end_with(".mp4")
+    expect(conversion).to eq(VideoTranscoder.new(original, conversion.last).command.drop(1))
+    expect(conversion).to include("-t", "30", "-c:v", "libx264", "-movflags", "+faststart")
     expect(submission.reload.playback).to be_attached
     expect(submission.playback.blob).to have_attributes(filename: have_attributes(to_s: "playback.mp4"), content_type: "video/mp4", byte_size: Rails.root.join("spec/fixtures/video.mp4").size)
     expect(submission.photo.blob.filename.to_s).to eq("video.mp4")

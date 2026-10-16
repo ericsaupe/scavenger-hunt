@@ -123,30 +123,29 @@ RSpec.describe Submission do
         content_type: "video/mp4", metadata:, identify: false)
     end
 
-    it "refuses a video longer than thirty seconds" do
-      submission.photo.attach(video_blob(analyzed: true, duration: 30.5))
+    it "probes the upload and refuses a video longer than thirty seconds", ffprobe_duration: 30.5 do
+      submission.photo.attach(video_blob)
 
       expect(submission.errors[:photo]).to eq(["Videos must be 30 seconds or shorter"])
       expect(submission.reload.photo).not_to be_attached
     end
 
-    it "accepts a video of exactly thirty seconds" do
-      submission.photo.attach(video_blob(analyzed: true, duration: 30.0))
+    it "accepts a video of exactly thirty seconds", ffprobe_duration: 30 do
+      submission.photo.attach(video_blob)
 
       expect(submission.errors).to be_empty
       expect(submission.reload.photo).to be_attached
+      expect(submission.photo.blob.metadata).to include("analyzed" => true, "duration" => 30.0)
     end
 
-    it "accepts a video whose length could not be read" do
-      submission.photo.attach(video_blob(analyzed: true))
+    it "accepts a video whose length could not be read", ffprobe_duration: "none" do
+      submission.photo.attach(video_blob)
 
       expect(submission.reload.photo).to be_attached
     end
 
-    it "probes an unanalyzed upload before judging it", ffprobe_duration: 31 do
-      blob = video_blob
-
-      submission.photo.attach(blob)
+    it "ignores length metadata the client sent with the direct upload", ffprobe_duration: 31 do
+      submission.photo.attach(video_blob(analyzed: true, duration: 1))
 
       expect(submission.errors[:photo]).to eq(["Videos must be 30 seconds or shorter"])
       expect(submission.reload.photo).not_to be_attached

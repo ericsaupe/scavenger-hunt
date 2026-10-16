@@ -15,6 +15,9 @@ case " $* " in
       echo "Conversion failed!" >&2
       exit 1
     fi
+    if [ -n "${FAKE_FFMPEG_SLEEP:-}" ]; then
+      sleep "$FAKE_FFMPEG_SLEEP"
+    fi
     cp "$fixtures/video.mp4" "${@: -1}"
     ;;
 esac
