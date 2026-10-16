@@ -23,6 +23,37 @@ RSpec.describe Hunt do
     expect(hunt.code).to eq("TEST")
   end
 
+  describe "#results" do
+    let(:hunt) { create(:hunt) }
+
+    def find(team, item, denied: false)
+      submission = team.submissions.find_by(item:)
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
+      submission.update!(denied_points: denied)
+    end
+
+    it "ranks teams by score with their totals, deductions and found counts" do
+      hunt.categories.first.update!(points: 5)
+      first_item, second_item, third_item = hunt.items.order(:id).to_a
+      trailers = create(:team, hunt:, name: "Trailers")
+      leaders = create(:team, hunt:, name: "Leaders")
+      create(:team, hunt:, name: "Empty")
+      [first_item, second_item, third_item].each { |item| find(leaders, item) }
+      find(trailers, first_item)
+      find(trailers, second_item)
+      find(trailers, third_item, denied: true)
+
+      results = hunt.results
+
+      expect(results.map { |result| result.except(:victory_photo_url) }).to eq([
+        {name: "Leaders", score: 15, total_score: 15, deductions: 0, submissions: 3},
+        {name: "Trailers", score: 10, total_score: 15, deductions: 5, submissions: 3},
+        {name: "Empty", score: 0, total_score: 0, deductions: 0, submissions: 0}
+      ])
+      expect(results.first[:victory_photo_url]).to start_with("/rails/active_storage/representations/redirect/")
+    end
+  end
+
   describe "#create_archive_file" do
     before { allow(ActiveStorage::Current).to receive(:url_options).and_return(host: "localhost:3000") }
 
