@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker", to: "rails/pwa#service_worker", as: :pwa_service_worker
   get "offline", to: "pwa#offline"
+  get "my_hunt", to: "my_hunt#show", as: :my_hunt
 
   resources :hunts, only: %i[index new create show], param: :code, path: "scavenger_hunts" do
     get :join, on: :collection
