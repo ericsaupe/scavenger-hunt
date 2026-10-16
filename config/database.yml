@@ -4,7 +4,7 @@ default: &default
   port: <%= ENV.fetch('POSTGRES_PORT', '5432') %>
   username: <%= ENV.fetch('POSTGRES_USER', 'rails') %>
   password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
-  pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
+  pool: <%= ENV['GOOD_JOB_THREADS'] ? ENV['GOOD_JOB_THREADS'].to_i + 3 : ENV.fetch('RAILS_MAX_THREADS', 5) %>
   schema_search_path: "public,shared_extensions"
   timeout: 5000
 

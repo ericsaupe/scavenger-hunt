@@ -17,11 +17,17 @@ services:
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: VIPS_CONCURRENCY
+        value: "1"
+      - key: MALLOC_ARENA_MAX
+        value: "2"
   - type: worker
     name: scavenger_hunt_worker
     runtime: ruby
     buildCommand: "bundle install"
-    startCommand: 'bundle exec good_job start --threads=10 --queues="+mailers,priority,default"'
+    startCommand: 'bundle exec good_job start --queues="+mailers,priority,default"'
     region: oregon
     plan: starter
     branch: main
@@ -36,6 +42,12 @@ services:
           type: web
           name: scavenger_hunt_web
           envVarKey: RAILS_MASTER_KEY
+      - key: GOOD_JOB_THREADS
+        value: "5"
+      - key: VIPS_CONCURRENCY
+        value: "1"
+      - key: MALLOC_ARENA_MAX
+        value: "2"
 
 databases:
   - name: scavenger_hunt_db
