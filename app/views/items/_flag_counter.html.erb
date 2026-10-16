@@ -1,0 +1,12 @@
+<% if submission.max_downvotes_to_lose_points&.positive? %>
+  <%= turbo_stream_from "submission_#{submission.id}_flags" unless local_assigns[:disable_turbo_stream] %>
+
+  <span id="submission_<%= submission.id %>_flags" class="contents">
+    <span class="status-pill bg-base-200 text-ink-soft" title="Flags before this photo stops counting" data-testid="flag-counter">
+      <%= submission.votes.count(&:denied?) %> of <%= submission.max_downvotes_to_lose_points %> flags
+    </span>
+    <% if submission.denied_points? %>
+      <%= render partial: "items/doesnt_count" %>
+    <% end %>
+  </span>
+<% end %>

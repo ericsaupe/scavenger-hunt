@@ -9,7 +9,7 @@
   <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8">
     <% submissions.each do |submission| %>
       <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center justify-center">
-        <figure class="polaroid-lg w-full max-w-md pb-5!" style="transform: rotate(0)">
+        <figure class="polaroid-lg relative w-full max-w-md pb-5!" style="transform: rotate(0)">
           <% image_url = submission_attachment_url(submission, variant_size: :large) %>
           <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
             <% if submission.video? %>

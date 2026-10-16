@@ -233,6 +233,13 @@
   --color-cobalt: var(--color-primary);
 }
 
+/* Reactions keep their own hues in every season: a flag is amber and a love is red. */
+@theme {
+  --color-flag: #ffb703;
+  --color-flag-content: #1b1f24;
+  --color-love: #d7263d;
+}
+
 @theme {
   --font-sans: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --animate-pop: pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
@@ -250,6 +257,11 @@
   @keyframes breathe {
     0%, 100% { opacity: 0.45; }
     50% { opacity: 1; }
+  }
+  @keyframes float-up {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    12% { transform: translate(0, -6vh) scale(1.15); opacity: 1; }
+    100% { transform: translate(var(--drift, 0px), -72vh) rotate(var(--sway, 0deg)) scale(0.9); opacity: 0; }
   }
 }
 
@@ -348,6 +360,16 @@
 
   .stage {
     @apply bg-[#111317] text-white;
+  }
+
+  .reaction {
+    @apply absolute bottom-24 right-0 drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)];
+    animation: float-up 2s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  }
+
+  .confetti {
+    @apply absolute h-3.5 w-2 rounded-[1px] opacity-80;
+    transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1));
   }
 }
 

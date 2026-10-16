@@ -72,9 +72,9 @@ class Submission < ApplicationRecord
     elsif denied_vote_ratio < 1 && denied_points?
       update(denied_points: false)
     end
-    broadcast_replace_to("submission_#{id}_downvote_counter",
-      target: "submission_#{id}_downvote_counter",
-      partial: "items/downvote_counter",
+    broadcast_replace_to("submission_#{id}_flags",
+      target: "submission_#{id}_flags",
+      partial: "items/flag_counter",
       locals: {submission: self, disable_turbo_stream: true})
   end
 

@@ -11,20 +11,20 @@ class PresentationsController < ApplicationController
       return redirect_to hunt_path(code: @hunt.code.upcase)
     end
 
-    @submission = @presentation.current
+    @slide = @presentation.current
     @presenter_mode = true
   end
 
   def update
     presentation = @hunt.presentation
-    submission_id = if params[:direction].present?
-      presentation.step_id(params[:direction])
-    elsif presentation.submission_ids.include?(params[:submission_id].to_i)
-      params[:submission_id].to_i
+    slide_key = if params[:direction].present?
+      presentation.step_key(params[:direction])
+    elsif presentation.include?(params[:slide])
+      params[:slide]
     end
-    return head :unprocessable_content if submission_id.nil?
+    return head :unprocessable_content if slide_key.nil?
 
-    @hunt.present!(submission_id)
+    @hunt.present!(slide_key)
     head :no_content
   end
 

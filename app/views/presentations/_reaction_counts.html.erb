@@ -1,0 +1,15 @@
+<div id="submission_<%= submission.id %>_reactions" class="flex shrink-0 flex-wrap items-center gap-3" data-testid="reaction-counts">
+  <span class="inline-flex items-center gap-1.5 text-xl font-extrabold tabular-nums text-love" data-testid="love-count">
+    <%= icon :heart, solid: true, class: "size-6" %>
+    <%= pluralize(submission.votes.count(&:loved?), "love") %>
+  </span>
+  <% if submission.max_downvotes_to_lose_points&.positive? %>
+    <span class="status-pill bg-ink text-base text-white" data-testid="flag-count">
+      <%= icon :flag, solid: true, class: "size-5 text-flag" %>
+      <%= submission.votes.count(&:denied?) %> of <%= submission.max_downvotes_to_lose_points %> flags
+    </span>
+    <% if submission.denied_points? %>
+      <%= render partial: "items/doesnt_count" %>
+    <% end %>
+  <% end %>
+</div>

@@ -81,8 +81,9 @@ class HuntsController < ApplicationController
       return redirect_to hunt_path(code: @hunt.code.upcase)
     end
 
-    @submission = @presentation.current
     @big_screen = params[:screen] == "big"
+    @browsing = !@big_screen && @presentation.include?(params[:slide])
+    @slide = @browsing ? @presentation.slide(params[:slide]) : @presentation.current
     @presenter_mode = true
   end
 

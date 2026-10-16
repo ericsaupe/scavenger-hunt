@@ -1,0 +1,7 @@
+<div class="reaction" data-controller="reaction" data-testid="reaction" data-reaction-kind="<%= (value == "love") ? "love" : "flag" %>">
+  <% if value == "love" %>
+    <%= icon :heart, solid: true, class: "size-14 text-love" %>
+  <% else %>
+    <%= icon :flag, solid: true, class: "size-14 text-flag" %>
+  <% end %>
+</div>

@@ -25,48 +25,59 @@ RSpec.describe "Presentations" do
     it "refuses anyone without the remote" do
       cookies[:user_id] = "viewer"
 
-      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {submission_id: second.id}, as: :json
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "submission:#{second.id}"}, as: :json
 
       expect(response).to have_http_status(:forbidden)
-      expect(hunt.reload.presentation_submission_id).to be_nil
+      expect(hunt.reload.presentation_slide).to be_nil
       expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
     end
 
     it "jumps to a slide and broadcasts a single refresh" do
-      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {submission_id: second.id}, as: :json
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "submission:#{second.id}"}, as: :json
 
       expect(response).to have_http_status(:no_content)
-      expect(hunt.reload.presentation_submission).to eq(second)
+      expect(hunt.reload.presentation_slide).to eq("submission:#{second.id}")
       expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with("hunt_presenter_#{hunt.id}", request_id: nil).once
     end
 
-    it "steps forward and wraps around the end" do
-      hunt.update!(presentation_submission: third)
+    it "walks title card, photos and finale in order, wrapping around the end" do
+      expected = [
+        "item:#{items.first.id}", "submission:#{first.id}",
+        "item:#{items.second.id}", "submission:#{second.id}",
+        "item:#{items.third.id}", "submission:#{third.id}",
+        "finale"
+      ]
+      expect(hunt.presentation.keys).to eq(expected)
+
+      walked = expected.drop(1).map do
+        patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "next"}, as: :json
+        hunt.reload.presentation_slide
+      end
+      expect(walked).to eq(expected.drop(1))
 
       patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "next"}, as: :json
-
-      expect(hunt.reload.presentation_submission).to eq(first)
+      expect(hunt.reload.presentation_slide).to eq(expected.first)
     end
 
     it "steps back and wraps around the start" do
       patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "previous"}, as: :json
 
-      expect(hunt.reload.presentation_submission).to eq(third)
+      expect(hunt.reload.presentation_slide).to eq("finale")
     end
 
     it "pauses playback when the slide changes" do
-      hunt.update!(presentation_submission: first, presentation_playback: "playing", playback_started_at: Time.current)
+      hunt.update!(presentation_slide: "submission:#{first.id}", presentation_playback: "playing", playback_started_at: Time.current)
 
       patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "next"}, as: :json
 
-      expect(hunt.reload).to have_attributes(presentation_submission: second, presentation_playback: "paused", playback_started_at: nil)
+      expect(hunt.reload).to have_attributes(presentation_slide: "item:#{items.second.id}", presentation_playback: "paused", playback_started_at: nil)
     end
 
     it "ignores a slide that is not part of the show" do
-      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {submission_id: third.id + 100}, as: :json
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "submission:#{third.id + 100}"}, as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(hunt.reload.presentation_submission_id).to be_nil
+      expect(hunt.reload.presentation_slide).to be_nil
     end
   end
 
@@ -126,22 +137,33 @@ RSpec.describe "Presentations" do
     end
 
     it "shows the owner the current slide and the slide controls" do
-      hunt.update!(presentation_submission: second)
+      hunt.update!(presentation_slide: "submission:#{second.id}")
 
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Photo 2 of 3", ERB::Util.html_escape(items.second.name), "Previous", "Next")
+      expect(response.body).to include("Photo 4 of 7", ERB::Util.html_escape(items.second.name), "Previous", "Next")
       expect(response.body).not_to include("Play on the big screen")
+    end
+
+    it "describes title cards and the finale" do
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).to include("Item 1 of 7", "Next up", ERB::Util.html_escape(items.first.name))
+
+      hunt.update!(presentation_slide: "finale")
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).to include("Finale 7 of 7", "First place", ERB::Util.html_escape(team.name))
     end
 
     it "shows the video transport on a video slide" do
       video = create(:video_submission, item: items.first, team: create(:team, hunt:))
-      hunt.update!(presentation_submission: video)
+      hunt.update!(presentation_slide: "submission:#{video.id}")
 
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"
 
-      expect(response.body).to include("Video 2 of 4", "Play on the big screen", "Replay", "Sound on")
+      expect(response.body).to include("Video 3 of 8", "Play on the big screen", "Replay", "Sound on")
 
       hunt.update!(presentation_playback: "playing", presentation_muted: false)
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"

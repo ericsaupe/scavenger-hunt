@@ -21,10 +21,34 @@ RSpec.describe "Results" do
         expect(Vote.last).to be_loved
       end
 
-      it "displays maximum downvotes" do
-        hunt.update!(max_downvotes_to_lose_points: 1)
+      it "displays the flag threshold" do
+        hunt.update!(max_downvotes_to_lose_points: 3)
         visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
-        expect(page).to have_text("0 / 1")
+        expect(page).to have_css("[data-testid='flag-counter']", text: "0 of 3 flags")
+        expect(page).to have_button("Flag it")
+        expect(page).not_to have_css("[data-testid='vote-menu-deny-button']")
+      end
+
+      it "flags a photo and marks it when it stops counting" do
+        hunt.update!(max_downvotes_to_lose_points: 2)
+        create(:downvote, submission: photo_submission)
+        visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
+        expect(page).to have_css("[data-testid='flag-counter']", text: "1 of 2 flags")
+        expect(page).not_to have_css("[data-testid='doesnt-count']")
+
+        click_on "Flag it"
+        expect(page).to have_button("Flagged")
+        expect(page).to have_css("[data-testid='vote-menu-flag-button'][aria-pressed='true']")
+        expect(page).to have_css("[data-testid='flag-counter']", text: "2 of 2 flags")
+        expect(page).to have_css("[data-testid='doesnt-count']", text: /doesn't count/i)
+        expect(photo_submission.reload).to be_denied_points
+
+        click_on "Flagged"
+        expect(page).to have_button("Flag it")
+        expect(page).to have_css("[data-testid='vote-menu-flag-button'][aria-pressed='false']")
+        expect(page).to have_css("[data-testid='flag-counter']", text: "1 of 2 flags")
+        expect(page).not_to have_css("[data-testid='doesnt-count']")
+        expect(photo_submission.reload).not_to be_denied_points
       end
 
       it "counts a double tap once" do
@@ -59,7 +83,7 @@ RSpec.describe "Results" do
         expect(Vote.count).to eq(1)
         expect(Vote.last).to be_loved
         # Second click
-        find("[data-testid='vote-menu-deny-button']").click
+        click_on "Flag it"
         expect(page).to have_selector("[data-vote-value-value='deny']")
         expect(Vote.count).to eq(1)
         expect(Vote.last).to be_denied
@@ -90,10 +114,10 @@ RSpec.describe "Results" do
         end
       end
 
-      it "hides downvote if downvotes are not enabled" do
+      it "hides the flag if flags are not enabled" do
         hunt.update(max_downvotes_to_lose_points: nil)
         visit "scavenger_hunts/#{hunt.code}/items/#{photo_submission.item_id}"
-        expect(page).not_to have_selector("[data-testid='vote-menu-deny-button']")
+        expect(page).not_to have_selector("[data-testid='vote-menu-flag-button']")
       end
     end
   end
