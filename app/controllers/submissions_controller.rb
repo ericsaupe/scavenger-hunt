@@ -5,20 +5,27 @@ class SubmissionsController < ApplicationController
 
   def update
     submission = Submission.find(params[:id])
-    hunt = submission.hunt
 
-    if keep_existing? && submission.photo.attached?
-      discard_queued_photo(submission)
-    else
-      submission.assign_attributes(submission_params)
-
-      if !hunt.accepts_photo_captured_at?(submission.captured_at)
-        reject(submission, "The hunt ended before this photo was sent")
-      elsif submission.save
-        accept(submission)
+    outcome, message = submission.with_lock do
+      if keep_existing? && submission.photo.attached?
+        :kept
       else
-        reject(submission, submission.errors[:photo].first)
+        submission.assign_attributes(submission_params)
+
+        if !submission.hunt.accepts_photo_captured_at?(submission.captured_at)
+          [:rejected, "The hunt ended before this photo was sent"]
+        elsif submission.save
+          :accepted
+        else
+          [:rejected, submission.errors[:photo].first]
+        end
       end
+    end
+
+    case outcome
+    when :accepted then accept(submission)
+    when :rejected then reject(submission, message)
+    when :kept then discard_queued_photo(submission)
     end
   end
 

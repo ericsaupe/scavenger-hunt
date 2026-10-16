@@ -23,7 +23,8 @@ export default class extends Controller {
       if (this.teamValue) {
         pastHunts[this.codeValue] = { label: `${this.teamValue} - ${this.nameValue}`, path: this.pathValue }
       } else if (this.nameValue) {
-        pastHunts[this.codeValue] = this.nameValue
+        const existing = pastHunts[this.codeValue]
+        pastHunts[this.codeValue] = typeof existing === "object" && existing !== null ? existing : this.nameValue
       }
       try {
         localStorage.pastHunts = JSON.stringify(pastHunts)

@@ -13,11 +13,24 @@ class Team < ApplicationRecord
   after_update_commit { broadcast_replace(partial: "teams/score") }
 
   def self.pending_uploads_for(teams)
-    Rails.cache.read_multi(*teams.map { |team| team.pending_uploads_cache_key }).values.sum
+    Rails.cache.read_multi(*teams.map { |team| team.pending_uploads_cache_key }).values.sum do |reports|
+      live_pending_reports(reports).values.sum { |count, _reported_at| count }
+    end
   end
 
-  def pending_uploads=(count)
-    Rails.cache.write(pending_uploads_cache_key, count, expires_in: PENDING_UPLOADS_TTL)
+  def self.live_pending_reports(reports)
+    cutoff = PENDING_UPLOADS_TTL.ago.to_i
+    (reports || {}).select { |_client, (_count, reported_at)| reported_at > cutoff }
+  end
+
+  def report_pending_uploads(client, count)
+    reports = self.class.live_pending_reports(Rails.cache.read(pending_uploads_cache_key))
+    if count.positive?
+      reports[client] = [count, Time.current.to_i]
+    else
+      reports.delete(client)
+    end
+    Rails.cache.write(pending_uploads_cache_key, reports, expires_in: PENDING_UPLOADS_TTL)
   end
 
   def pending_uploads_cache_key

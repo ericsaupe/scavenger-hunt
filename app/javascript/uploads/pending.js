@@ -1,8 +1,12 @@
 const HINT = "Will upload when you have signal"
 
+function slotFor(row) {
+  return row.querySelector("[data-submission-target='slot']") || row.querySelector(".polaroid")
+}
+
 export function showPending(row, file) {
   row.dataset.uploading = "true"
-  const slot = row.querySelector("[data-submission-target='slot']")
+  const slot = slotFor(row)
   if (!slot) {
     return
   }
@@ -15,12 +19,13 @@ export function showPending(row, file) {
     const img = document.createElement("img")
     img.src = URL.createObjectURL(file)
     img.alt = ""
-    img.className = "size-full object-cover animate-breathe"
+    img.className = "size-10 object-cover animate-breathe [.slot_&]:size-full"
     img.onload = () => URL.revokeObjectURL(img.src)
     slot.appendChild(img)
   } else {
     const spinner = document.createElement("span")
-    spinner.className = "loading loading-spinner loading-sm text-marigold"
+    spinner.className = "grid size-10 place-items-center [.slot_&]:size-full"
+    spinner.innerHTML = '<span class="loading loading-spinner loading-sm text-marigold"></span>'
     slot.appendChild(spinner)
   }
 }
@@ -30,12 +35,13 @@ export function showQueued(row, file) {
   delete row.dataset.uploading
   row.dataset.queued = "true"
 
-  const slot = row.querySelector("[data-submission-target='slot']")
+  const slot = slotFor(row)
   const template = document.getElementById("queued_badge_template")
   if (slot && template) {
     slot.querySelector("img")?.classList.remove("animate-breathe")
     slot.appendChild(template.content.firstElementChild.cloneNode(true))
   }
+  row.querySelector("[data-submission-target='check']")?.classList.add("hidden")
   setHint(row, HINT, "text-ink-soft")
 }
 
@@ -50,6 +56,6 @@ export function setHint(row, text, className) {
     return
   }
   hint.textContent = text
-  hint.classList.remove("text-ink-soft", "text-error", "text-sm")
+  hint.classList.remove("hidden", "text-ink-soft", "text-error", "text-sm")
   hint.classList.add(className, "max-w-36", "text-xs", "leading-tight")
 }

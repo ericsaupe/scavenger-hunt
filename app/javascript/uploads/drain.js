@@ -38,46 +38,64 @@ async function run() {
     return
   }
 
-  for (const entry of await entries()) {
-    const row = document.getElementById(`submission_${entry.submissionId}`)
-    if (row) {
-      delete row.dataset.queued
-      row.dataset.uploading = "true"
-    }
-
-    let response
-    try {
-      const field = row?.querySelector("[data-direct-upload-url]")
-      const blob = await uploadWithRetries(entry.file, field?.dataset.directUploadUrl || entry.directUploadUrl)
-      response = await fetch(entry.updateUrl, {
-        method: "PATCH",
-        headers: { Accept: "text/vnd.turbo-stream.html" },
-        body: formDataFor(entry, blob.signed_id)
-      })
-    } catch (e) {
-      if (row) showQueued(row, entry.file)
+  const attempted = new Set()
+  while (true) {
+    const pending = (await entries()).filter((entry) => !attempted.has(entry.id))
+    if (pending.length === 0) {
       return
     }
-
-    if (response.ok || response.status === 422) {
-      await remove(entry.id)
-      const html = await response.text()
-      Turbo.renderStreamMessage(html)
-      if (response.status === 422) {
-        await noteRefusal(entry, html)
+    for (const entry of pending) {
+      attempted.add(entry.id)
+      if (!await send(entry)) {
+        return
       }
-    } else if (response.status < 500) {
-      await remove(entry.id)
-      refusals.set(entry.submissionId, UPLOAD_REFUSED)
-      if (row) {
-        showIdle(row)
-        setHint(row, UPLOAD_REFUSED, "text-error")
-      }
-    } else {
-      if (row) showQueued(row, entry.file)
-      return
     }
   }
+}
+
+async function send(entry) {
+  const row = document.getElementById(`submission_${entry.submissionId}`)
+  if (row) {
+    delete row.dataset.queued
+    row.dataset.uploading = "true"
+  }
+
+  let response
+  try {
+    const field = row?.querySelector("[data-direct-upload-url]")
+    const blob = await uploadWithRetries(entry.file, field?.dataset.directUploadUrl || entry.directUploadUrl)
+    response = await fetch(entry.updateUrl, {
+      method: "PATCH",
+      headers: { Accept: "text/vnd.turbo-stream.html" },
+      body: formDataFor(entry, blob.signed_id)
+    })
+  } catch (e) {
+    if (row) showQueued(row, entry.file)
+    return false
+  }
+
+  if (response.ok || response.status === 422) {
+    await remove(entry.id)
+    const html = await response.text()
+    Turbo.renderStreamMessage(html)
+    if (response.status === 422) {
+      await noteRefusal(entry, html)
+    }
+    return true
+  }
+
+  if (response.status < 500) {
+    await remove(entry.id)
+    refusals.set(entry.submissionId, UPLOAD_REFUSED)
+    if (row) {
+      showIdle(row)
+      setHint(row, UPLOAD_REFUSED, "text-error")
+    }
+    return true
+  }
+
+  if (row) showQueued(row, entry.file)
+  return false
 }
 
 function formDataFor(entry, signedId) {

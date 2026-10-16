@@ -143,6 +143,7 @@ RSpec.describe "Hunts" do
 
       it "takes you straight back to your team's checklist" do
         visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
         visit "/scavenger_hunts/join"
         click_on "#{team.name} - #{hunt.name}"
         expect(page).to have_current_path("/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}")

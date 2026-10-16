@@ -39,11 +39,12 @@ export default class extends Controller {
       return
     }
 
-    this.retake = !!this.element.dataset.found
+    const uploading = !!this.element.dataset.uploading
+    this.retake = !!this.element.dataset.found || uploading
     showPending(this.element, file)
     this.pendingFile = await this.compressImage(file)
 
-    if (navigator.onLine) {
+    if (navigator.onLine && !uploading) {
       this.retryUpload()
     } else {
       this.queue()

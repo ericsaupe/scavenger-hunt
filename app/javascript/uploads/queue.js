@@ -4,10 +4,14 @@ const CHANGED = "upload-queue:changed"
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE, 1)
+    const request = indexedDB.open(DATABASE, 2)
     request.onupgradeneeded = () => {
-      const store = request.result.createObjectStore(STORE, { keyPath: "id", autoIncrement: true })
-      store.createIndex("teamId", "teamId")
+      const database = request.result
+      const store = database.objectStoreNames.contains(STORE)
+        ? request.transaction.objectStore(STORE)
+        : database.createObjectStore(STORE, { keyPath: "id", autoIncrement: true })
+      if (!store.indexNames.contains("teamId")) store.createIndex("teamId", "teamId")
+      if (!store.indexNames.contains("submissionId")) store.createIndex("submissionId", "submissionId")
     }
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
@@ -18,10 +22,16 @@ async function transaction(mode, operate) {
   const database = await openDatabase()
   try {
     return await new Promise((resolve, reject) => {
-      const store = database.transaction(STORE, mode).objectStore(STORE)
-      const request = operate(store)
-      request.onsuccess = () => resolve(request.result)
-      request.onerror = () => reject(request.error)
+      const tx = database.transaction(STORE, mode)
+      let result
+      const track = (request) => {
+        request.onsuccess = () => { result = request.result }
+        return request
+      }
+      operate(tx.objectStore(STORE), track)
+      tx.oncomplete = () => resolve(result)
+      tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error || new Error("The upload queue transaction was aborted"))
     })
   } finally {
     database.close()
@@ -33,28 +43,34 @@ function announce() {
 }
 
 export async function enqueue(entry) {
-  const id = await transaction("readwrite", (store) => store.add({ ...entry, queuedAt: Date.now() }))
+  const id = await transaction("readwrite", (store, track) => {
+    const previous = store.index("submissionId").getAllKeys(IDBKeyRange.only(entry.submissionId))
+    previous.onsuccess = () => {
+      previous.result.forEach((key) => store.delete(key))
+      track(store.add({ ...entry, queuedAt: Date.now() }))
+    }
+  })
   announce()
   return id
 }
 
 export async function remove(id) {
-  await transaction("readwrite", (store) => store.delete(id))
+  await transaction("readwrite", (store, track) => track(store.delete(id)))
   announce()
 }
 
 export function entries(teamId) {
   if (teamId === undefined) {
-    return transaction("readonly", (store) => store.getAll())
+    return transaction("readonly", (store, track) => track(store.getAll()))
   }
-  return transaction("readonly", (store) => store.index("teamId").getAll(teamId))
+  return transaction("readonly", (store, track) => track(store.index("teamId").getAll(teamId)))
 }
 
 export function count(teamId) {
   if (teamId === undefined) {
-    return transaction("readonly", (store) => store.count())
+    return transaction("readonly", (store, track) => track(store.count()))
   }
-  return transaction("readonly", (store) => store.index("teamId").count(teamId))
+  return transaction("readonly", (store, track) => track(store.index("teamId").count(teamId)))
 }
 
 export function onChange(callback) {

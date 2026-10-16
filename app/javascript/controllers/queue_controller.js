@@ -4,7 +4,7 @@ import { drain, restoreRefusals } from "../uploads/drain"
 import { showQueued } from "../uploads/pending"
 
 export default class extends Controller {
-  static values = { teamId: Number, reportUrl: String }
+  static values = { teamId: Number, reportUrl: String, retryEvery: { type: Number, default: 10000 } }
 
   connect() {
     this.reported = 0
@@ -25,6 +25,8 @@ export default class extends Controller {
     document.addEventListener("visibilitychange", this.onVisibilityChange)
     navigator.serviceWorker?.addEventListener("message", this.onMessage)
 
+    this.timer = setInterval(() => this.drain(), this.retryEveryValue)
+
     this.restore().then(() => this.drain())
   }
 
@@ -33,13 +35,14 @@ export default class extends Controller {
     document.removeEventListener("visibilitychange", this.onVisibilityChange)
     navigator.serviceWorker?.removeEventListener("message", this.onMessage)
     this.stopWatching()
+    clearInterval(this.timer)
   }
 
   async restore() {
     const queued = await entries(this.teamIdValue)
     queued.forEach((entry) => {
       const row = document.getElementById(`submission_${entry.submissionId}`)
-      if (row && !row.dataset.found && !row.dataset.uploading) {
+      if (row && !row.dataset.uploading && (!row.dataset.found || entry.retake)) {
         showQueued(row, entry.file)
       }
     })
@@ -49,6 +52,19 @@ export default class extends Controller {
 
   drain() {
     return drain().then(() => this.report())
+  }
+
+  get clientId() {
+    try {
+      let id = localStorage.getItem("uploadClientId")
+      if (!id) {
+        id = crypto.randomUUID()
+        localStorage.setItem("uploadClientId", id)
+      }
+      return id
+    } catch (e) {
+      return "unknown"
+    }
   }
 
   async report(pending) {
@@ -63,7 +79,7 @@ export default class extends Controller {
     await fetch(this.reportUrlValue, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || "" },
-      body: JSON.stringify({ count: total }),
+      body: JSON.stringify({ count: total, client: this.clientId }),
       keepalive: true
     }).catch(() => {})
   }

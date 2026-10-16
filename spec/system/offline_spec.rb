@@ -19,8 +19,7 @@ RSpec.describe "Offline" do
       visit team_path
       clear_upload_queue
       wait_for_service_worker
-      visit team_path
-      expect(page).to have_text(team.name)
+      expect(wait_for_page_cached).to be(true)
     end
 
     after { forget_service_worker }
@@ -76,11 +75,45 @@ RSpec.describe "Offline" do
 
       go_online
 
-      expect(page).to have_css("li[data-found]", wait: 10)
+      expect(page).to have_css("li[data-found]", wait: 15)
       expect(page).not_to have_text("Will upload when you have signal")
       submission = team.submissions.find_by(item:)
       expect(submission.photo).to be_attached
       expect(submission.captured_at).to be_within(1.minute).of(Time.current)
+    end
+
+    it "sends only the last photo chosen for an item while offline" do
+      go_offline
+      choose_photo
+      expect(page).to have_css("li[data-queued]")
+      choose_photo
+      expect(page).to have_css("li[data-queued]")
+      expect(page.evaluate_async_script(<<~JS)).to eq(1)
+        const done = arguments[0]
+        const request = indexedDB.open("scavenger-hunt-party")
+        request.onsuccess = () => {
+          const count = request.result.transaction("queued_uploads").objectStore("queued_uploads").count()
+          count.onsuccess = () => done(count.result)
+        }
+      JS
+
+      go_online
+
+      expect(page).to have_css("li[data-found]", wait: 10)
+      expect(page).not_to have_text("A teammate already found")
+    end
+
+    it "shows a queued retake on a found row" do
+      team.submissions.find_by(item:).photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "first.jpg")
+      visit team_path
+      clear_upload_queue
+      expect(page).to have_css("li[data-found]")
+
+      go_offline
+      attach_file("submission_#{team.submissions.find_by(item:).id}_photo", Rails.root.join("spec/fixtures/test.jpg"), make_visible: true)
+
+      expect(page).to have_css("li[data-found][data-queued]")
+      expect(page).to have_text("Will upload when you have signal")
     end
 
     it "keeps a teammate's photo that landed first and says so" do

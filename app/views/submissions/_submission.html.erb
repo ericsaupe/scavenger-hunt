@@ -30,7 +30,8 @@
         <% end %>
       </span>
       <span class="grow font-semibold"><%= item.name %></span>
-      <%= icon :check_circle, solid: true, class: "size-6 shrink-0 text-field" %>
+      <span class="hidden shrink-0 text-right text-xs font-semibold" data-submission-target="hint"></span>
+      <%= icon :check_circle, solid: true, class: "size-6 shrink-0 text-field", data: {submission_target: "check"} %>
     </button>
   <% else %>
     <label for="<%= field_id %>" class="row-tap cursor-pointer py-2">

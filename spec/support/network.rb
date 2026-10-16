@@ -19,6 +19,27 @@ module NetworkHelpers
     JS
   end
 
+  def wait_for_page_cached
+    page.evaluate_async_script(<<~JS)
+      const done = arguments[0]
+      const url = location.href
+      const cached = async () => {
+        for (const name of (await caches.keys()).filter((name) => name.startsWith("pages-"))) {
+          if (await (await caches.open(name)).match(url, { ignoreVary: true })) return true
+        }
+        return false
+      }
+      const poll = async () => {
+        for (let i = 0; i < 100; i++) {
+          if (await cached()) return done(true)
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+        done(false)
+      }
+      poll()
+    JS
+  end
+
   def clear_upload_queue
     page.evaluate_async_script(<<~JS)
       const done = arguments[0]
