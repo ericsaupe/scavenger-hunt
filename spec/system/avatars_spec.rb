@@ -28,8 +28,7 @@ RSpec.describe "Avatars" do
     expect(page).to have_css("h1", text: "Red Rockets")
     rockets = hunt.teams.find_by!(name: "Red Rockets")
     expect(rockets.avatar_seed).to eq(seed)
-    expect(page).to have_css("[data-testid='team-avatar'][src='#{rockets.avatar_url}']")
-    expect(page.evaluate_script("document.querySelector(\"[data-testid='team-avatar']\").complete")).to be(true)
+    expect(page).to have_css("[data-testid='team-avatar'][src='#{rockets.avatar_url}']") { |img| img.evaluate_script("this.complete && this.naturalWidth > 0") }
     expect(a_request(:get, %r{critters/svg}).with(query: hash_including("seed" => Avatar.digest("team", seed)))).to have_been_made.once
   end
 

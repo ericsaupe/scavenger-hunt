@@ -40,6 +40,17 @@ RSpec.describe Avatar do
     end
   end
 
+  describe ".fetch" do
+    it "returns the row another request stored first instead of failing on the unique index" do
+      digest = Avatar.digest("team", "seed")
+      winner = Avatar.create!(kind: "team", digest:, svg: "<svg xmlns='http://www.w3.org/2000/svg'/>")
+
+      expect(Avatar.fetch("team", digest)).to eq(winner)
+      expect(Avatar.count).to eq(1)
+      expect(a_request(:get, AvatarHelpers::DICEBEAR)).to have_been_made.once
+    end
+  end
+
   describe ".desynchronize" do
     it "scopes a per-avatar speed and negative delay to the SVG's own id, and leaves other SVGs alone" do
       svg = Rails.root.join("spec/fixtures/avatar.svg").read

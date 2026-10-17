@@ -11,7 +11,7 @@ class Avatar < ApplicationRecord
   DIGEST_BODY_LENGTH = 48
 
   validates :kind, inclusion: {in: KINDS}
-  validates :digest, format: /\A\h{64}\z/, uniqueness: {scope: :kind}
+  validates :digest, format: /\A\h{64}\z/
   validates :svg, presence: true
 
   def self.for(kind, seed, initial: nil)
