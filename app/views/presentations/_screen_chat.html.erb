@@ -1,4 +1,4 @@
-<aside class="screen-chat hidden w-[460px] shrink-0 flex-col border-l border-white/10 bg-[#0b0d10] sm:flex" aria-label="Party chat" data-controller="screen-chat" data-screen-chat-mode-value="<%= hunt.screen_chat %>" data-screen-chat-ttl-value="<%= Hunt::SCREEN_CHAT_TTL.in_milliseconds %>" data-screen-chat-limit-value="<%= Hunt::SCREEN_CHAT_LIMIT %>" data-screen-chat-now-value="<%= Time.current.iso8601(3) %>" data-testid="screen-chat">
+<aside id="screen_chat" class="screen-chat hidden w-[460px] shrink-0 flex-col border-l border-white/10 bg-[#0b0d10] sm:flex" aria-label="Party chat" data-controller="screen-chat" data-screen-chat-mode-value="<%= hunt.screen_chat %>" data-screen-chat-ttl-value="<%= Hunt::SCREEN_CHAT_TTL.in_milliseconds %>" data-screen-chat-limit-value="<%= Hunt::SCREEN_CHAT_LIMIT %>" data-screen-chat-now-value="<%= Time.current.iso8601(3) %>" data-testid="screen-chat">
   <%= turbo_stream_from hunt.chat_stream, id: "chat_stream", data: {turbo_permanent: true} %>
   <header class="shrink-0 px-7 pb-4 pt-7">
     <h2 class="display text-3xl">Party chat</h2>

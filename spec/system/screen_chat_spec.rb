@@ -8,7 +8,6 @@ RSpec.describe "Big screen chat" do
 
   before do
     Flipper.enable(:chat)
-    page.driver.browser.manage.window.resize_to(1400, 1000)
     @photo = create(:photo_submission, item: hunt.items.first, team:)
     hunt.update!(presentation_slide: "submission:#{@photo.id}")
   end
@@ -69,7 +68,7 @@ RSpec.describe "Big screen chat" do
     find("[data-testid='screen-chat-switch']").click
     expect(page).to have_css("[data-testid='screen-chat-switch']:checked")
     expect(page).to have_css("[data-testid='announcements-only-switch']:enabled")
-    expect(hunt.reload.screen_chat).to eq("all")
+    eventually { hunt.reload.screen_chat == "all" }
 
     using_session(:big_screen) do
       expect(page).to have_css("[data-testid='screen-chat']")
@@ -129,7 +128,7 @@ RSpec.describe "Big screen chat" do
     visit "/scavenger_hunts/#{hunt.code}/presenter/remote"
     find("[data-testid='announcements-only-switch']").click
     expect(page).to have_css("[data-testid='announcements-only-switch']:checked")
-    expect(hunt.reload.screen_chat).to eq("announcements")
+    eventually { hunt.reload.screen_chat == "announcements" }
 
     using_session(:big_screen) do
       within("[data-testid='screen-chat']") do
@@ -172,7 +171,7 @@ RSpec.describe "Big screen chat" do
     visit "/scavenger_hunts/#{hunt.code}/presenter/remote"
     find("[data-testid='screen-chat-switch']").click
     expect(page).to have_css("[data-testid='announcements-only-switch']:disabled")
-    expect(hunt.reload.screen_chat).to eq("off")
+    eventually { hunt.reload.screen_chat == "off" }
 
     using_session(:big_screen) do
       expect(page).not_to have_css("[data-testid='screen-chat']")
@@ -204,5 +203,27 @@ RSpec.describe "Big screen chat" do
     regretted.remove!
     expect(page).to have_no_css("[data-testid='chat-message']", text: "Take that back")
     expect(page).not_to have_text("Message removed")
+  end
+
+  it "brings back eligible recent messages when the mode changes" do
+    hunt.update!(screen_chat: "all", owner_id: "host")
+    create(:message, hunt:, sender_name: "Host", organizer: true, announcement: true, content: "Pizza at 7")
+    create_list(:message, 8, hunt:, content: "Warm-up")
+
+    visit big_screen_path
+    expect(page).to have_css("[data-testid='screen-chat'] [data-testid='chat-message']", count: 8)
+    expect(page).not_to have_text("Pizza at 7")
+
+    hunt.reload.screen_chat!("announcements")
+    within("[data-testid='screen-chat']") do
+      expect(page).to have_css("[data-testid='chat-message'][data-announcement]", text: "Pizza at 7")
+      expect(page).to have_css("[data-testid='chat-message']", count: 1)
+    end
+
+    hunt.reload.screen_chat!("all")
+    within("[data-testid='screen-chat']") do
+      expect(page).to have_css("[data-testid='chat-message']", text: "Warm-up", count: 8)
+      expect(page).not_to have_text("Pizza at 7")
+    end
   end
 end

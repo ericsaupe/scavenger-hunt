@@ -13,15 +13,16 @@ export default class extends Controller {
   connect() {
     this.observer = new MutationObserver((mutations) => this.changed(mutations))
     this.observer.observe(this.listTarget, { childList: true })
-    const serverNow = Date.parse(this.nowValue) || Date.now()
+    this.onBeforeRender = (event) => this.reconcile(event.detail.newBody)
+    document.addEventListener("turbo:before-render", this.onBeforeRender)
     for (const message of this.messages) {
-      const age = serverNow - Date.parse(message.querySelector("time")?.dateTime)
-      this.admit(message, Number.isFinite(age) ? age : 0)
+      this.admit(message)
     }
   }
 
   disconnect() {
     this.observer.disconnect()
+    document.removeEventListener("turbo:before-render", this.onBeforeRender)
     for (const timer of this.timers.values()) {
       clearTimeout(timer)
     }
@@ -38,19 +39,41 @@ export default class extends Controller {
     return Array.from(this.listTarget.querySelectorAll(":scope > [data-message-id]"))
   }
 
+  get serverNow() {
+    return Date.parse(this.nowValue) || Date.now()
+  }
+
   changed(mutations) {
     for (const mutation of mutations) {
       mutation.removedNodes.forEach((node) => this.forget(node))
       for (const node of mutation.addedNodes) {
         if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute("data-message-id")) {
-          this.admit(node, 0)
+          this.admit(node)
         }
       }
     }
   }
 
-  admit(message, age) {
-    const remaining = this.ttlValue - age
+  reconcile(newBody) {
+    const fresh = newBody?.querySelector(`#${this.element.id}`)
+    if (!fresh || fresh.dataset.screenChatModeValue === this.modeValue) {
+      return
+    }
+    this.nowValue = fresh.dataset.screenChatNowValue
+    this.modeValue = fresh.dataset.screenChatModeValue
+    for (const row of fresh.querySelectorAll(`#${this.listTarget.id} > [data-message-id]`)) {
+      if (document.getElementById(row.id)) {
+        continue
+      }
+      const id = Number(row.dataset.messageId)
+      const next = this.messages.find((message) => Number(message.dataset.messageId) > id)
+      this.listTarget.insertBefore(row.cloneNode(true), next ?? null)
+    }
+  }
+
+  admit(message) {
+    const age = this.serverNow - Date.parse(message.querySelector("time")?.dateTime)
+    const remaining = this.ttlValue - Math.max(0, Number.isFinite(age) ? age : 0)
     if (!this.welcome(message) || remaining <= 0) {
       message.remove()
       return

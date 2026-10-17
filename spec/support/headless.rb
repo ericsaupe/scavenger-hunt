@@ -28,4 +28,8 @@ RSpec.configure do |config|
       driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400]
     end
   end
+
+  config.after(:each, type: :system) do
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
 end
