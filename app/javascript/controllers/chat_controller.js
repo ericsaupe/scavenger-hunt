@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 const VISIT_GRACE_MS = 10000
+const SEND_FAILED = "Couldn't send. Tap send to try again."
 const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
 
 export default class extends Controller {
@@ -258,13 +259,42 @@ export default class extends Controller {
     this.counterTarget.classList.toggle("text-error", length > this.maxValue - 20)
   }
 
+  formTargetConnected(form) {
+    this.onFetchResponse ||= (event) => this.keepFailedResponse(event)
+    form.addEventListener("turbo:before-fetch-response", this.onFetchResponse)
+  }
+
+  formTargetDisconnected(form) {
+    form.removeEventListener("turbo:before-fetch-response", this.onFetchResponse)
+  }
+
+  keepFailedResponse(event) {
+    const response = event.detail.fetchResponse
+    if (response.succeeded || this.rendersNotice(response)) return
+    event.preventDefault()
+  }
+
+  rendersNotice(response) {
+    return response?.contentType?.includes("turbo-stream") ?? false
+  }
+
   sent(event) {
-    if (!event.detail.success) return
+    if (!event.detail.success) {
+      if (!this.rendersNotice(event.detail.fetchResponse)) {
+        this.notice(SEND_FAILED)
+      }
+      return
+    }
     this.formTarget.reset()
     this.setAnnouncement(false)
     this.count()
     this.scrollToBottom()
     this.focus(this.inputTarget)
+  }
+
+  notice(text) {
+    const notice = document.getElementById(`chat_notice_${this.huntIdValue}`)
+    if (notice) notice.textContent = text
   }
 
   toggleAnnouncement() {
