@@ -47,7 +47,7 @@ RSpec.describe "Hunts" do
       fill_in "Or start a new team", with: "Test"
       click_on "Join the hunt"
       expect(page).to have_text("Test")
-      expect(page).to have_text("Tap an item to take a photo or video.")
+      expect(page).to have_text("Tap an item to take a photo or a video up to 60 seconds.")
     end
 
     it "requires a name to start a team" do
@@ -62,7 +62,7 @@ RSpec.describe "Hunts" do
       choose(team_name)
       click_on "Join the hunt"
       expect(page).to have_text(team_name)
-      expect(page).to have_text("Tap an item to take a photo or video.")
+      expect(page).to have_text("Tap an item to take a photo or a video up to 60 seconds.")
     end
 
     it "crosses off an item" do
@@ -155,7 +155,7 @@ RSpec.describe "Hunts" do
         visit "/scavenger_hunts/join"
         click_on "#{team.name} - #{hunt.name}"
         expect(page).to have_current_path("/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}")
-        expect(page).to have_text("Tap an item to take a photo or video.")
+        expect(page).to have_text("Tap an item to take a photo or a video up to 60 seconds.")
       end
     end
   end

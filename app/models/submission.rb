@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Submission < ApplicationRecord
-  MAX_VIDEO_BYTES = 50.megabytes
-  MAX_VIDEO_SECONDS = 30
+  MAX_VIDEO_BYTES = 150.megabytes
+  MAX_VIDEO_SECONDS = 60
   POSTER_SIZES = {small: [500, 500], large: [1500, 1500]}.freeze
 
   has_one_attached :photo do |attachable|
@@ -131,7 +131,7 @@ class Submission < ApplicationRecord
 
   def photo_within_limits
     if video?
-      errors.add(:photo, "Videos must be 50 MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
+      errors.add(:photo, "Videos must be #{MAX_VIDEO_BYTES / 1.megabyte} MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
     elsif !image?
       errors.add(:photo, "Only photos and videos can be uploaded")
     end
