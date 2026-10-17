@@ -45,11 +45,6 @@ RSpec.describe "Party chat" do
     a["left"] < b["right"] && b["left"] < a["right"] && a["top"] < b["bottom"] && b["top"] < a["bottom"]
   end
 
-  def emulate_phone(width, height)
-    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width:, height:, deviceScaleFactor: 2, mobile: true)
-    expect(page.evaluate_script("[window.innerWidth, window.innerHeight]")).to eq([width, height])
-  end
-
   def box(selector)
     page.evaluate_script(<<~JS)
       (() => {
@@ -365,8 +360,9 @@ RSpec.describe "Party chat" do
 
     it "keeps the pill clear of the slide, the controls and the most-loved print on a phone" do
       create(:vote, submission: photo)
+      emulate_viewport(390, 844)
       visit "/scavenger_hunts/#{hunt.code}/presenter"
-      emulate_phone(390, 844)
+      expect(page.evaluate_script("[window.innerWidth, window.innerHeight]")).to eq([390, 844])
       expect(page).to have_css("#presenter_stream[connected]", visible: :all)
       expect(page).to have_css("[data-testid='photo-slide'] figure img[src]")
 
@@ -393,8 +389,6 @@ RSpec.describe "Party chat" do
       expect(on_screen?(box("a[aria-label='Next slide']"))).to be(true)
 
       open_chat
-    ensure
-      page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
     end
 
     it "ignores swipes that start inside the open chat sheet" do
