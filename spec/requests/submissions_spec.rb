@@ -83,7 +83,11 @@ RSpec.describe "Submissions" do
       get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("/rails/active_storage/blobs/redirect/")
+      expect(response.body).to include(ERB::Util.html_escape(Submission::PLACEHOLDER_IMAGE))
+      expect(response.body).not_to include("/rails/active_storage/blobs/redirect/")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+      expect(response).to have_http_status(:ok)
     end
 
     it "refuses a photo posted directly as a file after the end" do

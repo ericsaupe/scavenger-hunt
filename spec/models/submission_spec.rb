@@ -60,13 +60,13 @@ RSpec.describe Submission do
       expect(create(:submission).small_variant_url).to be_nil
     end
 
-    it "serves an image that cannot be transformed as it is" do
+    it "shows a placeholder for an image that cannot be transformed" do
       submission = create(:submission)
       submission.photo.attach(io: Rails.root.join("spec/fixtures/avatar.svg").open, filename: "avatar.svg", content_type: "image/svg+xml")
       submission.save!(validate: false)
 
-      expect(submission.small_variant_url).to eq(submission.media_url)
-      expect(submission.large_variant_url).to start_with("/rails/active_storage/blobs/redirect/")
+      expect(submission.small_variant_url).to start_with("data:image/svg+xml,")
+      expect(submission.large_variant_url).to eq(Submission::PLACEHOLDER_IMAGE)
     end
   end
 

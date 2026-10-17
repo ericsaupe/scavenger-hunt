@@ -11,7 +11,7 @@
         <%= icon :video, class: "size-5" %>
         Record a video
       </button>
-      <button type="button" class="btn btn-lg justify-start gap-3" data-action="hunt#capture" data-accept="image/*,video/*">
+      <button type="button" class="btn btn-lg justify-start gap-3" data-action="hunt#capture" data-accept="<%= Submission::LIBRARY_TYPES.join(",") %>">
         <%= icon :plus_square, class: "size-5" %>
         Choose from your photos
       </button>

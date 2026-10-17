@@ -14,6 +14,7 @@ export default class extends Controller {
     submitting: { type: Boolean, default: false },
     maxVideoBytes: Number,
     maxVideoSeconds: Number,
+    acceptedTypes: String,
     attempts: { type: Number, default: 3 },
     retryDelay: { type: Number, default: 1000 }
   }
@@ -120,7 +121,7 @@ export default class extends Controller {
   }
 
   async mediaProblem(file) {
-    if (file.type === "image/svg+xml") {
+    if (file.type.startsWith("image/") && !this.accepted(file)) {
       return "That image type can't be used. Take a photo instead."
     }
     if (file.type.startsWith("image/")) {
@@ -137,6 +138,11 @@ export default class extends Controller {
       return `Videos must be ${this.maxVideoSecondsValue} seconds or shorter. Try a shorter clip.`
     }
     return null
+  }
+
+  accepted(file) {
+    const types = this.acceptedTypesValue.split(",").filter(Boolean)
+    return types.length === 0 || types.includes(file.type)
   }
 
   videoDuration(file) {
