@@ -97,6 +97,10 @@ class Submission < ApplicationRecord
     votes.find { |vote| vote.user_id == user_id } || votes.build(user_id:)
   end
 
+  def shown_flag_count
+    [votes.count(&:denied?), max_downvotes_to_lose_points].min
+  end
+
   def calculate_denied_points
     return unless max_downvotes_to_lose_points&.positive?
 
