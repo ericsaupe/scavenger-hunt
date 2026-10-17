@@ -18,7 +18,7 @@ RSpec.describe "Presentations" do
 
   before do
     cookies[:user_id] = "owner"
-    allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
+    allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
   end
 
   describe "PATCH /presentation" do
@@ -29,7 +29,7 @@ RSpec.describe "Presentations" do
 
       expect(response).to have_http_status(:forbidden)
       expect(hunt.reload.presentation_slide).to be_nil
-      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
     end
 
     it "jumps to a slide and broadcasts a single refresh" do
@@ -37,7 +37,17 @@ RSpec.describe "Presentations" do
 
       expect(response).to have_http_status(:no_content)
       expect(hunt.reload.presentation_slide).to eq("submission:#{second.id}")
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with("hunt_presenter_#{hunt.id}", request_id: nil).once
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with("hunt_presenter_#{hunt.id}").once
+    end
+
+    it "tags the refresh with the Turbo request that caused it so that page skips it" do
+      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to).and_call_original
+      allow(ActionCable.server).to receive(:broadcast)
+
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "next"}, headers: {"X-Turbo-Request-Id" => "remote-tap"}, as: :json
+
+      expect(ActionCable.server).to have_received(:broadcast)
+        .with("hunt_presenter_#{hunt.id}", a_string_including('action="refresh"', 'request-id="remote-tap"')).once
     end
 
     it "walks title card, photos and finale in order, wrapping around the end" do
@@ -116,7 +126,7 @@ RSpec.describe "Presentations" do
 
       playback("replay")
       expect(hunt.reload).to have_attributes(presentation_playback: "playing", playback_version: 1)
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).exactly(3).times
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).exactly(3).times
     end
 
     it "starts muted and toggles the sound" do
@@ -133,7 +143,7 @@ RSpec.describe "Presentations" do
       playback("rewind")
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
     end
   end
 
@@ -149,7 +159,7 @@ RSpec.describe "Presentations" do
 
       expect(response).to have_http_status(:forbidden)
       expect(hunt.reload.screen_chat).to eq("off")
-      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
     end
 
     it "starts off, then shows everything, only announcements, and nothing again, refreshing the screen each time" do
@@ -164,7 +174,7 @@ RSpec.describe "Presentations" do
 
       screen_chat("off")
       expect(hunt.reload.screen_chat).to eq("off")
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with("hunt_presenter_#{hunt.id}", request_id: nil).exactly(3).times
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with("hunt_presenter_#{hunt.id}").exactly(3).times
     end
 
     it "rejects a mode it does not know" do
@@ -172,7 +182,7 @@ RSpec.describe "Presentations" do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(hunt.reload.screen_chat).to eq("off")
-      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
     end
   end
 
