@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
+const CAPTURE_GRACE_MS = 3000
+
 export default class extends Controller {
   static values = { interval: Number }
 
@@ -26,6 +28,7 @@ export default class extends Controller {
     this.observer.disconnect()
     document.removeEventListener("visibilitychange", this.onVisibilityChange)
     clearInterval(this.timer)
+    clearTimeout(this.captureTimer)
   }
 
   connectionChanged() {
@@ -41,8 +44,38 @@ export default class extends Controller {
     if (document.querySelector("[data-uploading]")) {
       return
     }
+    if (this.waitForCapture()) {
+      return
+    }
     this.keepBanners()
     Turbo.visit(window.location.href, { action: "replace" })
+  }
+
+  // Opening the camera backgrounds the page, so the return fires visibilitychange
+  // a moment before the input's change event; a refresh then would replace the row
+  // the upload is about to submit from.
+  waitForCapture() {
+    const capturing = document.querySelector("[data-capturing]")
+    if (!capturing) {
+      return false
+    }
+    clearTimeout(this.captureTimer)
+    if (document.visibilityState === "hidden") {
+      return true
+    }
+    this.captureTimer = setTimeout(() => {
+      const field = capturing.querySelector("input[type=file]")
+      if (capturing.isConnected && !capturing.hasAttribute("data-capturing")) {
+        return
+      }
+      if (field?.files.length || document.visibilityState === "hidden") {
+        this.waitForCapture()
+        return
+      }
+      capturing.removeAttribute("data-capturing")
+      this.refresh()
+    }, CAPTURE_GRACE_MS)
+    return true
   }
 
   keepBanners() {

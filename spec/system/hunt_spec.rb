@@ -133,6 +133,54 @@ RSpec.describe "Hunts" do
       expect(page).to have_button(second.name)
     end
 
+    it "keeps a photo taken with the camera when the page comes back to the foreground" do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      item = hunt.items.first
+      field = "submission_#{team.submissions.find_by(item:).id}_photo"
+      page.execute_script("HTMLInputElement.prototype.click = function () {}")
+
+      find(:button, text: item.name).click
+      click_on "Take a photo"
+      expect(page).to have_css("li[data-capturing]", visible: :all)
+
+      page.execute_script("document.dispatchEvent(new Event('visibilitychange'))")
+      attach_file(field, Rails.root.join("spec/fixtures/test.jpg"), make_visible: true)
+
+      expect(page).to have_css("li[data-found]", text: item.name)
+      expect(page).not_to have_css("li[data-capturing]", visible: :all)
+    end
+
+    it "holds the refresh while the page is still hidden behind the camera" do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      page.execute_script("HTMLInputElement.prototype.click = function () {}")
+      page.execute_script("window.visitCount = 0; document.addEventListener('turbo:visit', () => { window.visitCount += 1 })")
+
+      find(:button, text: hunt.items.first.name).click
+      click_on "Take a photo"
+      page.execute_script("Object.defineProperty(document, 'visibilityState', { get: () => 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange'))")
+      sleep 4
+      expect(page).to have_css("li[data-capturing]", visible: :all)
+      expect(page.evaluate_script("window.visitCount")).to eq(0)
+
+      page.execute_script("Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true }); document.dispatchEvent(new Event('visibilitychange'))")
+      expect(page).not_to have_css("li[data-capturing]", visible: :all, wait: 6)
+      expect(page.evaluate_script("window.visitCount")).to eq(1)
+    end
+
+    it "refreshes again once a cancelled capture has had its chance" do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      page.execute_script("HTMLInputElement.prototype.click = function () {}")
+      page.execute_script("window.visitCount = 0; document.addEventListener('turbo:visit', () => { window.visitCount += 1 })")
+
+      find(:button, text: hunt.items.first.name).click
+      click_on "Take a photo"
+      page.execute_script("document.dispatchEvent(new Event('visibilitychange'))")
+      expect(page.evaluate_script("window.visitCount")).to eq(0)
+
+      expect(page).not_to have_css("li[data-capturing]", visible: :all, wait: 6)
+      expect(page.evaluate_script("window.visitCount")).to eq(1)
+    end
+
     it "closes the modal" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do

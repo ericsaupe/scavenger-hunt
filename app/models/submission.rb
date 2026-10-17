@@ -147,6 +147,7 @@ class Submission < ApplicationRecord
   end
 
   def photo_within_limits
+    photo.blob.identify if photo.blob && !photo.blob.identified?
     if video?
       errors.add(:photo, "Videos must be #{MAX_VIDEO_BYTES / 1.megabyte} MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
     elsif !image?

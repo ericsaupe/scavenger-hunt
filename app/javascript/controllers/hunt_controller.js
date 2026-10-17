@@ -64,6 +64,7 @@ export default class extends Controller {
     } else {
       field.removeAttribute("capture")
     }
+    field.closest("[data-controller~=submission]")?.setAttribute("data-capturing", "")
     field.click()
   }
 

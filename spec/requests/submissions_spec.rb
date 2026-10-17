@@ -67,6 +67,16 @@ RSpec.describe "Submissions" do
       expect(submission.reload.photo).not_to be_attached
     end
 
+    it "accepts a camera photo the browser gave no type" do
+      untyped = direct_uploaded(content_type: "", byte_size: Rails.root.join("spec/fixtures/test.jpg").size, io: Rails.root.join("spec/fixtures/test.jpg").open)
+      send_photo(untyped)
+
+      expect(response).to have_http_status(:ok)
+      expect(submission.photo).to be_attached
+      expect(submission.photo.blob.content_type).to eq("image/jpeg")
+      expect(submission.small_variant_url).to start_with("/rails/active_storage/representations/redirect/")
+    end
+
     it "refuses an SVG and keeps the row rendering" do
       svg = ActiveStorage::Blob.create_and_upload!(io: Rails.root.join("spec/fixtures/avatar.svg").open, filename: "avatar.svg", content_type: "image/svg+xml").signed_id
       send_photo(svg)
