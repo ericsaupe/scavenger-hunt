@@ -141,9 +141,15 @@ export default class extends Controller {
 
   syncWithRender(event) {
     const fresh = event.detail.newBody?.querySelector(`#${this.frameTarget.id}`)
-    const current = this.frameTarget.querySelector("[data-chat-box]")
-    if (!fresh || !current || fresh.hasAttribute("data-chat-organizer") === current.hasAttribute("data-chat-organizer")) return
+    if (!fresh || fresh.dataset.chatRole === this.shownRole) return
+    this.frameTarget.dataset.chatRole = fresh.dataset.chatRole
     this.refresh()
+  }
+
+  get shownRole() {
+    const box = this.frameTarget.querySelector("[data-chat-box]")
+    if (!box) return this.frameTarget.dataset.chatRole
+    return box.hasAttribute("data-chat-organizer") ? "organizer" : "guest"
   }
 
   snapshotComposer() {

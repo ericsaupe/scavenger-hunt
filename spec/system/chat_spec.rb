@@ -192,6 +192,37 @@ RSpec.describe "Party chat" do
       expect(page).to have_css("[data-testid='chat-announcement-toggle']")
       send_message("Taking it from here")
     end
+
+    it "takes the organizer's chat controls away when they hand the remote over" do
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      hunt.update!(owner_id: viewer_id)
+      create(:message, hunt:, content: "Who took the cones?", sender_name: "Dana", team: other_team)
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      expect(page).to have_css("#presenter_stream[connected]", visible: :all)
+      open_chat
+      set_name("Host")
+      expect(page).to have_css("[data-testid='chat-announcement-toggle']")
+      expect(page).to have_css("[data-testid='chat-remove']", visible: :visible)
+
+      hunt.reload.hand_remote_to!("someone else")
+
+      expect(page).to have_no_css("[data-testid='chat-announcement-toggle']")
+      expect(page).to have_no_css("[data-testid='chat-remove']", visible: :visible)
+    end
+
+    it "reloads the chat for a handover that lands before the sheet has loaded" do
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      expect(page).to have_css("#presenter_stream[connected]", visible: :all)
+      expect(page).to have_css("[data-chat-box]", visible: :all)
+      page.execute_script("document.querySelector('[data-chat-box]').remove()")
+
+      hunt.reload.hand_remote_to!(viewer_id)
+
+      expect(page).to have_css("[data-testid='presenting']", text: "You have the remote")
+      open_chat
+      set_name("Eric")
+      expect(page).to have_css("[data-testid='chat-announcement-toggle']")
+    end
   end
 
   it "stays hidden when the hunt turned chat off" do

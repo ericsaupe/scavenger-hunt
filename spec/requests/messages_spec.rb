@@ -238,13 +238,14 @@ RSpec.describe "Messages" do
     it "shows the announcement megaphone to the organizer only" do
       set_name("Eric")
       get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
-      expect(response.body).not_to match(/<turbo-frame[^>]*data-chat-organizer/)
+      expect(response.body).to match(/<turbo-frame[^>]*data-chat-role="guest"/)
       get "/scavenger_hunts/#{hunt.code}/messages", headers: {"Turbo-Frame" => "chat_box_#{hunt.id}"}
       expect(response.body).not_to include('data-testid="chat-announcement-toggle"')
 
       cookies[:user_id] = "organizer"
       get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
-      expect(response.body).to match(/<turbo-frame[^>]*data-chat-organizer/)
+      expect(response.body).to match(/<turbo-frame[^>]*data-chat-role="organizer"/)
+      expect(response.body).not_to match(/<turbo-frame[^>]*data-chat-organizer/)
       get "/scavenger_hunts/#{hunt.code}/messages", headers: {"Turbo-Frame" => "chat_box_#{hunt.id}"}
       expect(response.body).to include('data-testid="chat-announcement-toggle"', 'aria-pressed="false"')
     end
