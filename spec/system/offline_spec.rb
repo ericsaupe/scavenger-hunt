@@ -83,6 +83,25 @@ RSpec.describe "Offline" do
       expect(submission.captured_at).to be_within(1.minute).of(Time.current)
     end
 
+    it "catches up on broadcasts missed in the camera once a queued capture uploads" do
+      field = "submission_#{team.submissions.find_by(item:).id}_photo"
+      page.execute_script("HTMLInputElement.prototype.click = function () {}")
+      page.execute_script("window.visitCount = 0; document.addEventListener('turbo:visit', () => { window.visitCount += 1; document.documentElement.dataset.visits = window.visitCount })")
+      find(:button, text: item.name).click
+      click_on "Take a photo"
+      page.execute_script("document.dispatchEvent(new Event('visibilitychange'))")
+
+      go_offline
+      attach_file(field, Rails.root.join("spec/fixtures/test.jpg"), make_visible: true)
+      expect(page).to have_css("[data-testid='queued-badge']")
+      expect(page).not_to have_css("html[data-visits]")
+
+      go_online
+
+      expect(page).to have_css("li[data-found]", wait: 15)
+      expect(page).to have_css("html[data-visits='1']", wait: 5)
+    end
+
     it "sends only the last photo chosen for an item while offline" do
       go_offline
       choose_photo
