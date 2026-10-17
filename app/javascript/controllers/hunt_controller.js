@@ -1,4 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
+import { addBanner } from "../banners"
+
+const CLOSED = {
+  upcoming: "The hunt hasn't started yet. Photos open when the countdown ends.",
+  ended: "The hunt is over, so no more photos can be added."
+}
 
 export default class extends Controller {
   static targets = [ "modal", "title", "content", "capture", "captureTitle" ]
@@ -70,6 +76,8 @@ export default class extends Controller {
 
   showCapture() {
     if (!this.field) {
+      const state = document.querySelector("[data-controller~=timer]")?.dataset.state
+      addBanner(CLOSED[state] || "Photos can't be added to this hunt right now.")
       return
     }
     if (!this.captureTarget.open) {

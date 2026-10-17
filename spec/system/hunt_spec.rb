@@ -183,6 +183,20 @@ RSpec.describe "Hunts" do
       expect(page.evaluate_script("window.visitCount")).to eq(1)
     end
 
+    it "says why a tap does nothing before the hunt starts or after it ends" do
+      hunt.update!(starts_at: 1.hour.from_now, ends_at: 2.hours.from_now)
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      find(:button, text: hunt.items.first.name).click
+      expect(page).to have_text("The hunt hasn't started yet")
+      expect(page).not_to have_css("[data-testid='capture-sheet'][open]")
+
+      hunt.update!(starts_at: 2.hours.ago, ends_at: 1.hour.ago)
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      find(:button, text: hunt.items.first.name).click
+      expect(page).to have_text("The hunt is over, so no more photos")
+      expect(page).not_to have_css("[data-testid='capture-sheet'][open]")
+    end
+
     it "closes the modal" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
