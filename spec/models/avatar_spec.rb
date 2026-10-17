@@ -14,10 +14,18 @@ RSpec.describe Avatar do
       expect(Avatar.for(:person, "other token")).not_to eq(url)
     end
 
-    it "adds the still flag and a single upcased initial for the fallback" do
+    it "signs the digest so only URLs the app produced are ever fetched" do
+      digest = Avatar.digest("person", "token")
+
+      expect(Avatar.valid_digest?("person", digest)).to be(true)
+      expect(Avatar.valid_digest?("team", digest)).to be(false)
+      expect(Avatar.valid_digest?("person", digest.reverse)).to be(false)
+      expect(Avatar.valid_digest?("person", nil)).to be(false)
+    end
+
+    it "adds a single upcased initial for the fallback" do
       expect(Avatar.for(:team, "seed", initial: "owls")).to end_with(".svg?initial=O")
-      expect(Avatar.for(:team, "seed", initial: "owls", still: true)).to end_with(".svg?initial=O&still=1")
-      expect(Avatar.for(:person, "seed", still: true)).to end_with(".svg?still=1")
+      expect(Avatar.for(:team, "seed", initial: "")).to end_with(".svg")
     end
 
     it "only knows teams and people" do
@@ -26,24 +34,22 @@ RSpec.describe Avatar do
   end
 
   describe ".dicebear_uri" do
-    it "asks for the style's animated variants, one parameter each, since DiceBear rejects comma lists" do
-      expect(Avatar.dicebear_uri("team", "abc").to_s).to eq("https://api.dicebear.com/10.x/critters/svg?seed=abc&animationVariant=fast&animationVariant=medium&animationVariant=slow")
-      expect(Avatar.dicebear_uri("person", "abc").to_s).to start_with("https://api.dicebear.com/10.x/thumbs/svg?seed=abc&")
+    it "asks for the animated variant, since DiceBear returns a still avatar by default" do
+      expect(Avatar.dicebear_uri("team", "abc").to_s).to eq("https://api.dicebear.com/10.x/critters/svg?seed=abc&animationVariant=medium")
+      expect(Avatar.dicebear_uri("person", "abc").to_s).to eq("https://api.dicebear.com/10.x/thumbs/svg?seed=abc&animationVariant=medium")
     end
   end
 
-  describe "#still_svg" do
-    it "removes SMIL and CSS animations but keeps the drawing" do
-      avatar = Avatar.new(kind: "team", digest: "a" * 64, svg: Rails.root.join("spec/fixtures/avatar.svg").read)
+  describe ".desynchronize" do
+    it "scopes a per-avatar speed and negative delay to the SVG's own id, and leaves other SVGs alone" do
+      svg = Rails.root.join("spec/fixtures/avatar.svg").read
+      digest = "ab" * 32
 
-      still = avatar.still_svg
+      personal = Avatar.desynchronize(svg, digest)
 
-      expect(still).not_to include("<animate")
-      expect(still).not_to include("@keyframes")
-      expect(still).not_to include("animation")
-      expect(still).to include("<circle")
-      expect(still).to include("transform-box:fill-box")
-      expect(Nokogiri::XML(still) { |config| config.strict }.root.name).to eq("svg")
+      expect(personal).to start_with(%(<svg id="avababababab"))
+      expect(personal).to end_with(%(<style>#avababababab{--dbcr-t:#{Avatar.timing(digest)[:speed]}}#avababababab [class*='dbcr-']{animation-delay:-#{Avatar.timing(digest)[:delay]}s}</style></svg>))
+      expect(Avatar.desynchronize("<svg xmlns='http://www.w3.org/2000/svg'><circle r='1'/></svg>", digest)).to eq("<svg xmlns='http://www.w3.org/2000/svg'><circle r='1'/></svg>")
     end
   end
 end

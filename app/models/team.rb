@@ -47,8 +47,8 @@ class Team < ApplicationRecord
     "teams/#{id}/pending_uploads"
   end
 
-  def avatar_url(still: false)
-    Avatar.for(:team, avatar_seed, initial: name, still:)
+  def avatar_url
+    Avatar.for(:team, avatar_seed, initial: name)
   end
 
   def shuffle_avatar!

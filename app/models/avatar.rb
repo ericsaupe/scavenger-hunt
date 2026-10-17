@@ -7,27 +7,60 @@ class Avatar < ApplicationRecord
   TIMEOUT = 5
   MAX_BYTES = 256.kilobytes
   FAILURE_TTL = 1.minute
-  ANIMATION_VARIANTS = %w[fast medium slow].freeze
+  ANIMATION_VARIANT = "medium"
+  DIGEST_BODY_LENGTH = 48
 
   validates :kind, inclusion: {in: KINDS}
   validates :digest, format: /\A\h{64}\z/, uniqueness: {scope: :kind}
   validates :svg, presence: true
 
-  def self.for(kind, seed, initial: nil, still: false)
+  def self.for(kind, seed, initial: nil)
     kind = kind.to_s
     raise ArgumentError, "unknown avatar kind #{kind.inspect}" unless KINDS.include?(kind)
 
-    query = {initial: initial.presence&.first&.upcase, still: ("1" if still)}.compact
     path = "/avatars/#{kind}/#{digest(kind, seed)}.svg"
-    query.empty? ? path : "#{path}?#{query.to_query}"
+    initial.present? ? "#{path}?#{{initial: initial.first.upcase}.to_query}" : path
   end
 
   def self.digest(kind, seed)
-    OpenSSL::HMAC.hexdigest("SHA256", Rails.application.key_generator.generate_key("avatars"), "#{kind}:#{seed}")
+    body = hmac("#{kind}:#{seed}").first(DIGEST_BODY_LENGTH)
+    body + digest_tag(kind, body)
+  end
+
+  def self.valid_digest?(kind, digest)
+    digest = digest.to_s
+    return false unless digest.match?(/\A\h{64}\z/)
+
+    body = digest.first(DIGEST_BODY_LENGTH)
+    ActiveSupport::SecurityUtils.secure_compare(digest, body + digest_tag(kind, body))
+  end
+
+  def self.digest_tag(kind, body)
+    hmac("tag:#{kind}:#{body}").first(64 - DIGEST_BODY_LENGTH)
+  end
+
+  def self.hmac(message)
+    OpenSSL::HMAC.hexdigest("SHA256", Rails.application.key_generator.generate_key("avatars"), message)
   end
 
   def self.lookup(kind, digest)
+    return unless valid_digest?(kind, digest)
+
     find_by(kind:, digest:) || fetch(kind, digest)
+  end
+
+  def self.timing(digest)
+    {delay: ((digest.first(2).hex % 100) / 10.0).round(1), speed: (0.85 + (digest[2, 2].hex % 41) / 100.0).round(2)}
+  end
+
+  def self.desynchronize(svg, digest)
+    prefix = svg[/--(db[a-z]+)-t/, 1]
+    return svg unless prefix
+
+    id = "av#{digest.first(10)}"
+    timing = timing(digest)
+    style = "<style>##{id}{--#{prefix}-t:#{timing[:speed]}}##{id} [class*='#{prefix}-']{animation-delay:-#{timing[:delay]}s}</style>"
+    svg.sub(/<svg\b/, %(<svg id="#{id}")).sub(%r{</svg>\s*\z}, "#{style}</svg>")
   end
 
   def self.fetch(kind, digest)
@@ -40,14 +73,14 @@ class Avatar < ApplicationRecord
       return
     end
 
-    create!(kind:, digest:, svg:)
+    create!(kind:, digest:, svg: desynchronize(svg, digest))
   rescue ActiveRecord::RecordNotUnique
     find_by!(kind:, digest:)
   end
 
   def self.dicebear_uri(kind, seed)
     URI("#{ENDPOINT}/#{STYLES.fetch(kind)}/svg").tap do |uri|
-      uri.query = URI.encode_www_form([["seed", seed], *ANIMATION_VARIANTS.map { |variant| ["animationVariant", variant] }])
+      uri.query = URI.encode_www_form(seed:, animationVariant: ANIMATION_VARIANT)
     end
   end
 
@@ -73,16 +106,5 @@ class Avatar < ApplicationRecord
     document.root&.name == "svg" && document.xpath("//*[local-name()='script' or local-name()='foreignObject']").empty?
   rescue Nokogiri::XML::SyntaxError
     false
-  end
-
-  def still_svg
-    document = Nokogiri::XML(svg)
-    document.xpath("//*[local-name()='animate' or local-name()='animateTransform' or local-name()='animateMotion' or local-name()='set']").remove
-    document.xpath("//*[local-name()='style']").each { |style| style.content = self.class.still_css(style.content) }
-    document.root.to_xml
-  end
-
-  def self.still_css(css)
-    css.gsub(/@keyframes\s+[\w-]+\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/, "").gsub(/animation[\w-]*\s*:[^;}]*;?/, "")
   end
 end

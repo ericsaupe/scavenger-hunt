@@ -56,7 +56,6 @@ RSpec.describe Team do
       team = create(:team, name: "owls")
 
       expect(team.avatar_url).to eq("/avatars/team/#{Avatar.digest("team", team.avatar_seed)}.svg?initial=O")
-      expect(team.avatar_url(still: true)).to end_with("?initial=O&still=1")
       expect(team.avatar_url).not_to include(team.avatar_seed)
     end
   end

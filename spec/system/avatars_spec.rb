@@ -13,8 +13,7 @@ RSpec.describe "Avatars" do
   it "shows each team's critter in the team list and lets a new team shuffle theirs before joining" do
     visit "/scavenger_hunts/#{hunt.code}"
 
-    expect(page).to have_css("[data-testid='team-avatar'][src='#{team.avatar_url}'][width='40'][height='40'][loading='lazy']")
-    expect(page).to have_css("source[media='(prefers-reduced-motion: reduce)'][srcset='#{team.avatar_url(still: true)}']", visible: :all)
+    expect(page).to have_css("img[data-testid='team-avatar'][src='#{team.avatar_url}'][width='40'][height='40'][loading='lazy']")
     first_seed = avatar_seed_field
     expect(page).to have_css("[data-testid='new-team-avatar'][src='#{Avatar.for(:team, first_seed)}']")
 

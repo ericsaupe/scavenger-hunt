@@ -52,7 +52,6 @@ RSpec.describe Message, :test_queue_adapter do
 
     expect(message.avatar_url).to eq(Avatar.for(:person, message.sender_token))
     expect(message.avatar_url).not_to include("viewer")
-    expect(message.avatar_url(still: true)).to end_with("?still=1")
   end
 
   it "knows whose message it is" do

@@ -21,7 +21,6 @@ RSpec.describe "Teams" do
     seed = response.body[/name="avatar_seed"[^>]*value="(\h{16})"/, 1]
     expect(seed).to be_present
     expect(response.body).to include(Avatar.for(:team, seed))
-    expect(response.body).to include(Avatar.for(:team, seed, still: true))
 
     get "/scavenger_hunts/#{hunt.code}/teams/avatar", headers: {"Turbo-Frame" => "new_team_avatar"}
     expect(response).to have_http_status(:ok)
@@ -36,7 +35,7 @@ RSpec.describe "Teams" do
     expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/teams/#{team.id}")
 
     follow_redirect!
-    expect(response.body).to include(%(src="#{team.avatar_url}" width="48" height="48" loading="lazy" alt="" class="avatar-img" data-testid="team-avatar"))
+    expect(response.body).to include(%(src="#{team.avatar_url}" width="48" height="48" loading="lazy" alt="" data-testid="team-avatar" class="avatar-img"))
   end
 
   it "renders the checklist with the same number of queries however many items there are" do
