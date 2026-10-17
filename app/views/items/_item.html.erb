@@ -10,13 +10,13 @@
     <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8" data-carousel-target="track">
       <% submissions.each do |submission| %>
         <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center items-start justify-center" data-carousel-target="item">
-          <figure class="polaroid-lg relative w-full max-w-md pb-5!" style="transform: rotate(0)">
+          <figure class="polaroid-lg relative w-full pb-5! sm:w-fit sm:min-w-96 sm:max-w-[min(100%,72rem)]" style="transform: rotate(0)">
             <% image_url = submission_attachment_url(submission, variant_size: :large) %>
             <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
               <% if submission.video? %>
-                <%= video_tag(submission.media_url, controls: true, playsinline: true, preload: "metadata", poster: submission.poster_url, class: "max-h-[60dvh] w-full") %>
+                <%= video_tag(submission.media_url, controls: true, playsinline: true, preload: "metadata", poster: submission.poster_url, class: "max-h-[70dvh] w-full sm:w-auto sm:max-w-full") %>
               <% else %>
-                <%= image_tag(image_url, class: "max-h-[60dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
+                <%= image_tag(image_url, class: "max-h-[70dvh] w-full object-contain sm:w-auto sm:max-w-full", alt: "#{submission.team.name} found #{submission.item.name}") %>
               <% end %>
             </div>
             <figcaption class="mt-4 flex flex-wrap items-center justify-between gap-3">
