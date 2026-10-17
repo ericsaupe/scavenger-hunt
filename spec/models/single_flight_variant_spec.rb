@@ -28,13 +28,18 @@ RSpec.describe "Single-flight variants" do
     end
   end
 
-  it "resizes a new variant once when several requests ask for it together" do
-    transforms = Concurrent::AtomicFixnum.new
-    allow_any_instance_of(ActiveStorage::Variation).to receive(:transform).and_wrap_original do |original, *args, &block|
-      transforms.increment
-      sleep 0.2
-      original.call(*args, &block)
+  def count_transforms(delay: 0)
+    Concurrent::AtomicFixnum.new.tap do |transforms|
+      allow_any_instance_of(ActiveStorage::Variation).to receive(:transform).and_wrap_original do |original, *args, &block|
+        transforms.increment
+        sleep delay
+        original.call(*args, &block)
+      end
     end
+  end
+
+  it "resizes a new variant once when several requests ask for it together" do
+    transforms = count_transforms(delay: 0.2)
     blob
     ready = Concurrent::CyclicBarrier.new(4)
 
@@ -44,5 +49,21 @@ RSpec.describe "Single-flight variants" do
     expect(keys.uniq.size).to eq(1)
     expect(blob.service.exist?(keys.first)).to be(true)
     expect(ActiveRecord::Base.connection.select_value("SELECT count(*) FROM pg_locks JOIN pg_database ON pg_database.oid = pg_locks.database WHERE locktype = 'advisory' AND datname = current_database()")).to eq(0)
+  end
+
+  it "gives up rather than resizing alongside a process that holds the lock too long" do
+    stub_const("SingleFlightVariant::LOCK_WAIT", 0.2)
+    transforms = count_transforms
+    variant = blob.variant(resize_to_limit: [10, 10])
+    holder = ActiveRecord::Base.connection_pool.checkout
+    key = "hashtextextended(#{holder.quote("active_storage_variant:#{blob.id}:#{variant.variation.digest}")}, 0)"
+    holder.select_value("SELECT pg_advisory_lock(#{key})")
+
+    expect { variant.processed }.to raise_error(SingleFlightVariant::LockTimeout)
+    expect(transforms.value).to eq(0)
+    expect(blob.variant_records).to be_empty
+  ensure
+    holder&.select_value("SELECT pg_advisory_unlock(#{key})")
+    ActiveRecord::Base.connection_pool.checkin(holder) if holder
   end
 end

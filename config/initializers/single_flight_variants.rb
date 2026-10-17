@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module SingleFlightVariant
+  class LockTimeout < StandardError; end
+
   LOCK_WAIT = 15
   LOCK_POLL = 0.05
   SETTLED_AFTER = 1.minute
@@ -27,7 +29,8 @@ module SingleFlightVariant
     key = "hashtextextended(#{connection.quote("active_storage_variant:#{blob.id}:#{variation.digest}")}, 0)"
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + LOCK_WAIT
     locked = false
-    until (locked = connection.select_value("SELECT pg_try_advisory_lock(#{key})")) || Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+    until (locked = connection.select_value("SELECT pg_try_advisory_lock(#{key})"))
+      raise LockTimeout, "gave up after #{LOCK_WAIT}s waiting for variant #{variation.digest} of blob #{blob.id}" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
       sleep LOCK_POLL
     end
     yield
