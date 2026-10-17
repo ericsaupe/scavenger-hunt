@@ -25,6 +25,16 @@ RSpec.describe "Votes" do
     expect(response.body).to match(%r{2 of 3 flags\s*</span>})
   end
 
+  it "shows the threshold as the count once flags go past it" do
+    %w[a b c].each { |user_id| submission.votes.create!(user_id:, value: "deny") }
+
+    vote("deny")
+
+    expect(submission.votes.denied.count).to eq(4)
+    expect(response.body).to match(%r{3 of 3 flags\s*</span>})
+    expect(response.body).to include("Doesn't count")
+  end
+
   describe "reactions on the big screen" do
     let(:stream) { hunt.presenter_stream }
 

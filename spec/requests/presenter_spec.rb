@@ -257,6 +257,18 @@ RSpec.describe "Presenter" do
       expect(response.body).not_to include(%(id="submission_vote_), "submission_#{submission.id}_video", "Doesn't count")
     end
 
+    it "shows the threshold as the flag count on the big screen once flags go past it" do
+      submission = found(first_team, items.first)
+      hunt.update!(presentation_slide: "submission:#{submission.id}", max_downvotes_to_lose_points: 2)
+      %w[a b c].each { |user_id| submission.votes.create!(user_id:, value: "deny") }
+      submission.calculate_denied_points
+
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include("2 of 2 flags", "Doesn't count")
+      expect(response.body).not_to include("3 of 2 flags")
+    end
+
     it "plays the converted video with its poster" do
       video = create(:video_submission, item: items.first, team: first_team).reload
       hunt.update!(presentation_slide: "submission:#{video.id}")

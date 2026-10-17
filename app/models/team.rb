@@ -14,6 +14,7 @@ class Team < ApplicationRecord
   before_validation :assign_avatar_seed, on: :create
 
   after_create_commit { broadcast_append_to("teams_#{hunt_id}") }
+  after_create_commit { broadcast_update_to(hunt.chat_stream, target: hunt.chat_team_count_id, partial: "messages/team_count", locals: {hunt:}) }
   after_update_commit { broadcast_replace(partial: "teams/score") }
 
   def self.pending_uploads_for(teams)
