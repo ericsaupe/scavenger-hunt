@@ -20,6 +20,8 @@ class DemoHunt
   VIEWERS = 28
   FLAG_THRESHOLD = 3
   PHOTO_CACHE = Rails.root.join("tmp/demo_photos")
+  CLIP_SECONDS = 20
+  CLIP = PHOTO_CACHE.join("clip-#{CLIP_SECONDS}s.mp4")
   FALLBACK_SOURCES = %w[app/assets/images/hero.jpg spec/fixtures/test.jpg app/assets/images/templates/neighborhood.jpg app/assets/images/templates/camping.jpg app/assets/images/templates/beach.jpg app/assets/images/templates/team.jpg].freeze
 
   def initialize(code:, template:, owner_id: nil)
@@ -86,7 +88,15 @@ class DemoHunt
   end
 
   def video_file
-    {io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "MOV_#{@random.rand(1000..9999)}.mp4", content_type: "video/mp4"}
+    {io: clip.open, filename: "MOV_#{@random.rand(1000..9999)}.mp4", content_type: "video/mp4"}
+  end
+
+  def clip
+    unless CLIP.exist?
+      VideoTranscoder.run([VideoTranscoder.ffmpeg_path, "-v", "error", "-i", Rails.root.join("spec/fixtures/video.mp4").to_s,
+        "-t", CLIP_SECONDS.to_s, "-c", "copy", CLIP.to_s])
+    end
+    CLIP
   end
 
   def photo_file(item, team, index)
