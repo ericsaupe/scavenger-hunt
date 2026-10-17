@@ -68,7 +68,8 @@ RSpec.describe "Hunts" do
     it "crosses off an item" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:label, text: hunt.items.first.name).click
+        find(:button, text: hunt.items.first.name).click
+        click_on "Choose from your photos"
       end
       expect(page).to have_css("li[data-found]")
     end
@@ -77,7 +78,8 @@ RSpec.describe "Hunts" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       page.execute_script(%(Object.defineProperty(HTMLMediaElement.prototype, "duration", { get: () => 5 })))
       attach_file(Rails.root.join("spec/fixtures/video.mp4")) do
-        find(:label, text: hunt.items.first.name).click
+        find(:button, text: hunt.items.first.name).click
+        click_on "Choose from your photos"
       end
       expect(page).to have_css("li[data-found]")
     end
@@ -85,7 +87,8 @@ RSpec.describe "Hunts" do
     it "changes the image" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:label, text: hunt.items.first.name).click
+        find(:button, text: hunt.items.first.name).click
+        click_on "Choose from your photos"
       end
       expect(page).to have_css("li[data-found]")
 
@@ -93,14 +96,48 @@ RSpec.describe "Hunts" do
       expect(page).to have_button("Retake")
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
         find(:button, text: "Retake").click
+        click_on "Choose from your photos"
       end
       expect(page).to have_css("li[data-found]")
+    end
+
+    it "offers the camera for a photo, the camera for a video, or the saved photos" do
+      visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+      first, second = hunt.items.first(2)
+      field = "submission_#{team.submissions.find_by(item: first).id}_photo"
+      page.execute_script(<<~JS)
+        window.originalFileClick = HTMLInputElement.prototype.click
+        HTMLInputElement.prototype.click = function () { window.clickedField = this.id }
+      JS
+
+      find(:button, text: first.name).click
+      expect(page).to have_css("[data-testid='capture-sheet'][open]", text: first.name)
+      expect(page).not_to have_css("input[type=file][multiple]", visible: false)
+
+      click_on "Take a photo"
+      expect(page).not_to have_css("[data-testid='capture-sheet'][open]")
+      expect(page).to have_css("##{field}[accept='image/*'][capture='environment']", visible: false)
+      expect(page.evaluate_script("window.clickedField")).to eq(field)
+
+      find(:button, text: first.name).click
+      click_on "Record a video"
+      expect(page).to have_css("##{field}[accept='video/*'][capture='environment']", visible: false)
+
+      page.execute_script("HTMLInputElement.prototype.click = window.originalFileClick")
+      attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
+        find(:button, text: first.name).click
+        click_on "Choose from your photos"
+      end
+      expect(page).to have_css("##{field}[accept='image/*,video/*']:not([capture])", visible: false)
+      expect(page).to have_css("li[data-found]", text: first.name)
+      expect(page).to have_button(second.name)
     end
 
     it "closes the modal" do
       visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:label, text: hunt.items.first.name).click
+        find(:button, text: hunt.items.first.name).click
+        click_on "Choose from your photos"
       end
       expect(page).to have_css("li[data-found]")
 
@@ -116,7 +153,8 @@ RSpec.describe "Hunts" do
       item = hunt.items.first
       points = item.category.points
       attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-        find(:label, text: item.name).click
+        find(:button, text: item.name).click
+        click_on "Choose from your photos"
       end
       expect(page).to have_css("#team_#{team.id}", exact_text: points.to_s)
     end

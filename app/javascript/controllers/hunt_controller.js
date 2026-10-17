@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "modal", "title", "content" ]
+  static targets = [ "modal", "title", "content", "capture", "captureTitle" ]
 
   openModal(event) {
     const data = event.currentTarget.dataset
@@ -38,10 +38,48 @@ export default class extends Controller {
     }
   }
 
-  clickForm() {
+  openCapture(event) {
+    const data = event.currentTarget.dataset
+    this.fieldId = data.field
+    this.captureTitleTarget.textContent = data.title
+    this.showCapture()
+  }
+
+  retake() {
+    this.captureTitleTarget.textContent = this.titleTarget.textContent
+    this.closeModal()
+    this.showCapture()
+  }
+
+  capture(event) {
     const field = document.getElementById(this.fieldId)
-    if (field && !field.disabled) {
-      field.click()
+    this.closeCapture()
+    if (!field || field.disabled) {
+      return
+    }
+    const { accept, capture } = event.currentTarget.dataset
+    field.accept = accept
+    if (capture) {
+      field.setAttribute("capture", capture)
+    } else {
+      field.removeAttribute("capture")
+    }
+    field.click()
+  }
+
+  showCapture() {
+    const field = document.getElementById(this.fieldId)
+    if (!field || field.disabled) {
+      return
+    }
+    if (!this.captureTarget.open) {
+      this.captureTarget.showModal()
+    }
+  }
+
+  closeCapture() {
+    if (this.captureTarget.open) {
+      this.captureTarget.close()
     }
   }
 }

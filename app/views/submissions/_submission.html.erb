@@ -41,10 +41,10 @@
       <%= icon :check_circle, solid: true, class: "size-6 shrink-0 text-field", data: {submission_target: "check"} %>
     </button>
   <% else %>
-    <label for="<%= field_id %>" class="row-tap cursor-pointer py-2">
+    <button type="button" class="row-tap w-full cursor-pointer py-2 text-left" data-action="hunt#openCapture" data-field="<%= field_id %>" data-title="<%= item.name %>" data-testid="find">
       <span class="slot" data-submission-target="slot"><%= icon :camera, class: "size-5" %></span>
       <span class="grow font-semibold"><%= item.name %></span>
       <span class="shrink-0 text-right text-sm font-semibold text-ink-soft" data-submission-target="hint">+<%= item.category.points %></span>
-    </label>
+    </button>
   <% end %>
 <% end %>

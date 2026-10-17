@@ -1,0 +1,22 @@
+<dialog class="modal modal-bottom sm:modal-middle" data-hunt-target="capture" data-testid="capture-sheet">
+  <div class="modal-box p-5 sm:max-w-md">
+    <p class="text-sm font-semibold text-ink-soft">Found it?</p>
+    <h3 class="mt-0.5 text-xl font-bold" data-hunt-target="captureTitle"></h3>
+    <div class="mt-4 grid gap-2">
+      <button type="button" class="btn btn-lg btn-primary justify-start gap-3" data-action="hunt#capture" data-accept="image/*" data-capture="environment">
+        <%= icon :camera, class: "size-5" %>
+        Take a photo
+      </button>
+      <button type="button" class="btn btn-lg justify-start gap-3" data-action="hunt#capture" data-accept="video/*" data-capture="environment">
+        <%= icon :video, class: "size-5" %>
+        Record a video
+      </button>
+      <button type="button" class="btn btn-lg justify-start gap-3" data-action="hunt#capture" data-accept="image/*,video/*">
+        <%= icon :plus_square, class: "size-5" %>
+        Choose from your photos
+      </button>
+    </div>
+    <p class="mt-3 text-xs text-ink-soft">One photo or one video per item. Videos up to <%= Submission::MAX_VIDEO_SECONDS %> seconds.</p>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button type="submit" aria-label="Close">close</button></form>
+</dialog>

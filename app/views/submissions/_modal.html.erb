@@ -5,7 +5,7 @@
       <h3 class="text-xl font-bold" data-hunt-target="title"></h3>
       <div class="mt-4 flex gap-2">
         <% if @hunt.in_progress? %>
-          <button type="button" class="btn btn-lg btn-outline grow" data-action="hunt#clickForm">
+          <button type="button" class="btn btn-lg btn-outline grow" data-action="hunt#retake">
             <%= icon :retake, class: "size-5" %>
             Retake
           </button>
