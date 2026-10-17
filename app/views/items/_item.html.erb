@@ -6,20 +6,20 @@
     </div>
   </div>
 <% else %>
-  <div data-controller="carousel">
-    <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8" data-carousel-target="track">
+  <div class="sm:flex sm:min-h-0 sm:flex-1 sm:flex-col" data-controller="carousel">
+    <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:min-h-0 sm:flex-1 sm:gap-8" data-carousel-target="track">
       <% submissions.each do |submission| %>
-        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center items-start justify-center" data-carousel-target="item">
-          <figure class="polaroid-lg relative w-full pb-5! sm:w-fit sm:min-w-96 sm:max-w-[min(100%,72rem)]" style="transform: rotate(0)">
+        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center items-start justify-center sm:h-full" data-carousel-target="item">
+          <figure class="polaroid-lg relative w-full pb-5! sm:flex sm:h-full sm:w-fit sm:min-w-[30rem] sm:max-w-[min(100%,72rem)] sm:flex-col sm:items-center" style="transform: rotate(0)" data-carousel-target="card">
             <% image_url = submission_attachment_url(submission, variant_size: :large) %>
-            <div class="grid min-h-48 place-items-center overflow-hidden bg-black">
+            <div class="flex min-h-48 w-full items-center justify-center bg-black sm:min-h-0 sm:w-auto sm:max-w-full sm:flex-1" style="aspect-ratio: <%= submission.media_aspect_ratio %>" data-carousel-target="media">
               <% if submission.video? %>
-                <%= video_tag(submission.media_url, controls: true, playsinline: true, preload: "metadata", poster: submission.poster_url, class: "max-h-[70dvh] w-full sm:w-auto sm:max-w-full") %>
+                <%= video_tag(submission.media_url, controls: true, playsinline: true, preload: "metadata", poster: submission.poster_url, class: "size-full object-contain") %>
               <% else %>
-                <%= image_tag(image_url, class: "max-h-[70dvh] w-full object-contain sm:w-auto sm:max-w-full", alt: "#{submission.team.name} found #{submission.item.name}") %>
+                <%= image_tag(image_url, class: "size-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
               <% end %>
             </div>
-            <figcaption class="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <figcaption class="mt-4 flex w-full shrink-0 flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
               <span class="display min-w-0 grow basis-40 wrap-anywhere text-2xl leading-tight text-ink"><%= submission.team.name %></span>
               <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
             </figcaption>
@@ -29,7 +29,7 @@
     </div>
 
     <% if submissions.size > 1 %>
-      <div id="pages" class="mt-5 flex justify-center gap-2">
+      <div id="pages" class="mt-5 flex shrink-0 flex-wrap justify-center gap-2">
         <% submissions.each_index do |i| %>
           <button type="button" class="btn btn-circle btn-sm" data-action="carousel#show" data-carousel-index-param="<%= i %>" aria-label="Show submission <%= i + 1 %>"><%= i + 1 %></button>
         <% end %>
