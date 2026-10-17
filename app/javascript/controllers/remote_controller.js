@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "button" ]
+  static targets = [ "button", "items" ]
   static values = {
     url: String,
     playbackUrl: String,
@@ -39,6 +39,23 @@ export default class extends Controller {
 
   previous() {
     this.send(this.urlValue, { direction: "previous" })
+  }
+
+  jump(event) {
+    this.closeItems()
+    this.send(this.urlValue, { slide: event.currentTarget.dataset.slide })
+  }
+
+  openItems() {
+    if (this.hasItemsTarget && !this.itemsTarget.open) {
+      this.itemsTarget.showModal()
+    }
+  }
+
+  closeItems() {
+    if (this.hasItemsTarget && this.itemsTarget.open) {
+      this.itemsTarget.close()
+    }
   }
 
   play() {

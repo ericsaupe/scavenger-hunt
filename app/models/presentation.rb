@@ -65,6 +65,29 @@ class Presentation
     slide(current_key)
   end
 
+  def upcoming(limit: 6, from: current_key)
+    return [] if empty?
+
+    keys[position(from), limit].map { |key| slide(key) }
+  end
+
+  def item_cards
+    ids = keys.grep(/\Aitem:/).map { |key| key.delete_prefix("item:").to_i }
+    items = hunt.items.where(id: ids).index_by(&:id)
+    ids.map { |id| TitleCard.new(self, self.class.item_key(id), items.fetch(id)) }
+  end
+
+  def current_item_key
+    case (slide = current)
+    when TitleCard then slide.key
+    when PhotoSlide then self.class.item_key(slide.submission.item_id)
+    end
+  end
+
+  def found_counts
+    @found_counts ||= hunt.submissions.found.group(:item_id).count
+  end
+
   def next_submission(key = current_key)
     next_key = keys.rotate(position(key)).find { |candidate| candidate.start_with?("submission:") }
     hunt.submissions.includes(photo_attachment: :blob).find(next_key.delete_prefix("submission:")) if next_key
@@ -208,6 +231,10 @@ class Presentation
 
     def submissions
       @submissions ||= presentation.submissions.where(item:).order(:team_id).to_a
+    end
+
+    def found_count
+      presentation.found_counts.fetch(item.id, 0)
     end
 
     def team_count
