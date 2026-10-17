@@ -95,6 +95,6 @@ class HuntsController < ApplicationController
 
   def hunt_params
     params.require(:hunt).permit(:template, :timezone, :name, :starts_at, :ends_at, :lock_results, :lock_password,
-      :max_downvotes_to_lose_points).with_defaults(owner_id: cookies[:user_id])
+      :max_downvotes_to_lose_points, :chat_enabled).with_defaults(owner_id: cookies[:user_id])
   end
 end

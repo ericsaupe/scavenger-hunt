@@ -1,0 +1,5 @@
+<% if more %>
+  <%= render partial: "messages/earlier", locals: {hunt:, before: messages.first.id} %>
+<% end %>
+<div id="<%= hunt.chat_list_id %>" class="chat-list space-y-3" data-chat-target="list"><%= render partial: "messages/message", collection: messages, locals: {viewer_id: cookies[:user_id]} %></div>
+<p class="chat-empty py-10 text-center text-sm text-ink-soft">No messages yet. Say hi!</p>

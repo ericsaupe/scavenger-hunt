@@ -1,8 +1,33 @@
-<div class="chat chat-start" data-controller="message">
-  <div class="chat-image avatar">
-    <div class="w-9 rounded-lg">
-      <%= image_tag "https://api.dicebear.com/7.x/fun-emoji/svg?seed=#{message.user_id}", alt: "" %>
+<% viewer_id = local_assigns[:viewer_id] %>
+<%= tag.div id: dom_id(message), class: "message", data: {message_id: message.id, sender: message.sender_token, own: ("" if message.own?(viewer_id)), announcement: ("" if message.announcement?), removed: ("" if message.removed?), testid: "chat-message"}.compact do %>
+  <% if message.announcement? %>
+    <span class="message-avatar bg-neutral text-marigold"><%= icon :megaphone, class: "size-5" %></span>
+  <% else %>
+    <span class="message-avatar bg-marigold text-base font-extrabold text-marigold-content"><%= message.initial %></span>
+  <% end %>
+  <div class="min-w-0 max-w-[82%]">
+    <p class="message-meta mb-0.5 flex flex-wrap items-center gap-x-1.5 px-1 text-[11px] font-semibold text-ink-soft">
+      <% if message.announcement? %>
+        <span class="inline-flex items-center gap-1 text-ink"><%= icon :megaphone, class: "size-3.5" %>Announcement</span>
+      <% elsif message.team %>
+        <span><%= message.team.name %></span>
+      <% elsif message.organizer? %>
+        <span>Organizer</span>
+      <% end %>
+      <span><%= message.sender_name %></span>
+      <time datetime="<%= message.created_at.iso8601 %>" data-chat-time><%= message.created_at.strftime("%-l:%M") %></time>
+    </p>
+    <div class="message-bubble">
+      <% if message.removed? %>
+        Message removed
+      <% else %>
+        <%= message.content %>
+      <% end %>
     </div>
   </div>
-  <div class="chat-bubble bg-white/10 text-white"><%= message.content %></div>
-</div>
+  <% unless message.removed? %>
+    <%= form_with url: hunt_message_path(message.hunt.code, message), method: :delete, authenticity_token: false, class: "message-remove shrink-0", data: {turbo_confirm: "Remove this message for everyone?"} do %>
+      <button class="btn btn-ghost btn-xs btn-circle text-ink-soft" aria-label="Remove message" data-testid="chat-remove"><%= icon :x_mark, class: "size-4" %></button>
+    <% end %>
+  <% end %>
+<% end %>

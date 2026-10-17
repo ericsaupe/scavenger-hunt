@@ -1,17 +1,58 @@
-class MessagesController < ApplicationController
-  def create
-    message = Message.new(message_params)
-    hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
-    message.hunt = hunt
-    message.user_id = cookies[:user_id]
-    message.save!
+# frozen_string_literal: true
 
-    render json: {message: message}
+class MessagesController < ApplicationController
+  before_action :set_hunt
+
+  def index
+    @before = params[:before].presence&.to_i
+    if @before
+      @messages = @hunt.recent_messages(before: @before)
+      @more = @hunt.earlier_messages?(@messages.first) if @messages.any?
+    end
+    render layout: false
+  end
+
+  def create
+    return composer_error("Pick a name before you send a message.") if chat_name.blank?
+
+    organizer = @hunt.owner?(cookies[:user_id])
+    announcement = ActiveModel::Type::Boolean.new.cast(params.require(:message)[:announcement]) || false
+    return composer_error("Only the organizer can send announcements.", status: :forbidden) if announcement && !organizer
+
+    message = @hunt.messages.new(
+      content: params[:message][:content],
+      user_id: cookies[:user_id],
+      sender_name: chat_name,
+      team: chat_team(@hunt),
+      organizer:,
+      announcement:
+    )
+    return composer_error(message.errors.full_messages.to_sentence) unless message.valid?
+    return composer_error("One message a second, please.", status: :too_many_requests) unless ChatThrottle.allow?(@hunt, cookies[:user_id])
+
+    message.save!
+    render turbo_stream: [
+      turbo_stream.append(@hunt.chat_list_id, partial: "messages/message", locals: {message:, viewer_id: cookies[:user_id]}),
+      turbo_stream.update(@hunt.chat_notice_id, "")
+    ]
+  end
+
+  def destroy
+    return head :forbidden unless @hunt.owner?(cookies[:user_id])
+
+    message = @hunt.messages.find(params[:id])
+    message.remove! unless message.removed?
+    render turbo_stream: turbo_stream.replace(message, partial: "messages/message", locals: {message:, viewer_id: cookies[:user_id]})
   end
 
   private
 
-  def message_params
-    params.require(:message).permit(:content, :user_id)
+  def set_hunt
+    @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
+    head :forbidden unless @hunt.chat_available?
+  end
+
+  def composer_error(text, status: :unprocessable_content)
+    render turbo_stream: turbo_stream.update(@hunt.chat_notice_id, text), status:
   end
 end

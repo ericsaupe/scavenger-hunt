@@ -43,9 +43,6 @@ application.register("install", InstallController)
 import LiveController from "./live_controller"
 application.register("live", LiveController)
 
-import MessageController from "./message_controller"
-application.register("message", MessageController)
-
 import OfflineController from "./offline_controller"
 application.register("offline", OfflineController)
 

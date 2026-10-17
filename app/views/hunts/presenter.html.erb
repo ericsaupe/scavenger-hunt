@@ -78,9 +78,8 @@
     </div>
   <% end %>
 
-  <% if Flipper.enabled?(:chat) %>
-    <div class="w-full shrink-0 border-t border-white/10 sm:w-80 sm:border-l sm:border-t-0">
-      <%= render partial: "hunts/chat", locals: {hunt: @hunt} %>
-    </div>
-  <% end %>
 </div>
+
+<% if !@big_screen && @hunt.chat_available? %>
+  <%= render partial: "messages/chat", locals: {hunt: @hunt, offset: "bottom-32 sm:bottom-20"} %>
+<% end %>

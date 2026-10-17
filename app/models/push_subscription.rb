@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PushSubscription < ApplicationRecord
-  PREFERENCES = %i[notify_starting_soon notify_results notify_show notify_lead_change].freeze
+  PREFERENCES = %i[notify_starting_soon notify_results notify_show notify_lead_change notify_announcements].freeze
   ICON = "/android-chrome-192x192.png"
   TTL = 1.hour
   TIMEOUT = 10

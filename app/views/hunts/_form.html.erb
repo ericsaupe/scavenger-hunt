@@ -37,6 +37,15 @@
           <%= f.check_box :lock_results, class: "toggle toggle-primary", data: {test: "lock-results-switch"} %>
         <% end %>
       </div>
+      <% if Flipper.enabled?(:chat) %>
+        <%= f.label :chat_enabled, class: "flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-base-300 px-4 py-3" do %>
+          <span>
+            <span class="block font-semibold">Party chat</span>
+            <span class="block text-sm text-ink-soft">Everyone in the hunt can chat and see your announcements.</span>
+          </span>
+          <%= f.check_box :chat_enabled, class: "toggle toggle-primary", data: {test: "chat-switch"} %>
+        <% end %>
+      <% end %>
       <div>
         <%= f.label :lock_password, "Results password", class: "mb-1.5 block text-sm font-semibold" %>
         <%= f.text_field :lock_password, class: "input input-lg w-full", autocomplete: "off", placeholder: "Optional" %>

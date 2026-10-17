@@ -14,7 +14,8 @@ Rails.application.routes.draw do
       post :pending_uploads, on: :member
     end
     resources :items, only: %i[show]
-    resources :messages, only: %i[create]
+    resources :messages, only: %i[index create destroy]
+    resource :chat_name, only: %i[update]
     get :results
     get :presenter
     get "presenter/remote", to: "presentations#remote", as: :presenter_remote

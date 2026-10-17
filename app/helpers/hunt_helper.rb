@@ -30,7 +30,8 @@ module HuntHelper
       notify_starting_soon: ["Hunt starting soon", "Five minutes before the start"],
       notify_results: ["Results are up", "When the hunt ends"],
       notify_show: ["The show is starting", "When photos go up on the big screen"],
-      notify_lead_change: ["Lead changes", "When a new team takes the top spot"]
+      notify_lead_change: ["Lead changes", "When a new team takes the top spot"],
+      notify_announcements: ["Organizer announcements", "When the organizer posts in Party chat"]
     }
   end
 

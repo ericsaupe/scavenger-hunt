@@ -1,0 +1,14 @@
+<% if @before %>
+  <%= turbo_frame_tag "chat_earlier_#{@before}", class: "block" do %>
+    <% if @more %>
+      <%= render partial: "messages/earlier", locals: {hunt: @hunt, before: @messages.first.id} %>
+    <% end %>
+    <div class="mb-3 space-y-3">
+      <%= render partial: "messages/message", collection: @messages, locals: {viewer_id: cookies[:user_id]} %>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_frame_tag "chat_box_#{@hunt.id}", class: "flex min-h-0 grow flex-col" do %>
+    <%= render partial: "messages/box", locals: {hunt: @hunt} %>
+  <% end %>
+<% end %>

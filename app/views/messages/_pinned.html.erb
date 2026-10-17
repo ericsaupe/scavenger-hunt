@@ -1,0 +1,9 @@
+<div id="chat_pinned_<%= hunt.id %>" class="shrink-0" data-testid="chat-pinned">
+  <% if message %>
+    <div class="mx-4 mt-3 rounded-2xl bg-neutral px-4 py-3 text-neutral-content">
+      <p class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-marigold"><%= icon :megaphone, class: "size-4" %>From the organizer</p>
+      <p class="mt-1 text-sm leading-snug"><%= message.content %></p>
+      <p class="mt-1 text-xs text-neutral-content/70"><%= message.sender_name %>, <time datetime="<%= message.created_at.iso8601 %>" data-chat-time><%= message.created_at.strftime("%-l:%M") %></time></p>
+    </div>
+  <% end %>
+</div>

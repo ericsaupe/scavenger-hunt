@@ -148,6 +148,44 @@ class Hunt < ApplicationRecord
     "hunt_presenter_#{id}"
   end
 
+  def chat_stream
+    "hunt_chat_#{id}"
+  end
+
+  def chat_list_id
+    "hunt_chat_#{id}"
+  end
+
+  def chat_composer_id
+    "chat_composer_#{id}"
+  end
+
+  def chat_notice_id
+    "chat_notice_#{id}"
+  end
+
+  def chat_available?
+    chat_enabled? && Flipper.enabled?(:chat)
+  end
+
+  def viewer_token(user_id)
+    OpenSSL::HMAC.hexdigest("SHA256", Rails.application.key_generator.generate_key("chat viewer"), "#{id}:#{user_id}")
+  end
+
+  def latest_announcement
+    messages.announcements.visible.order(:id).last
+  end
+
+  def recent_messages(before: nil)
+    scope = messages.includes(:team).order(id: :desc)
+    scope = scope.where(id: ...before) if before
+    scope.limit(Message::PAGE_SIZE).to_a.reverse
+  end
+
+  def earlier_messages?(message)
+    messages.where(id: ...message.id).exists?
+  end
+
   def present!(slide_key)
     update!(presentation_slide: slide_key, presentation_playback: "paused", playback_started_at: nil)
     broadcast_presentation_update
