@@ -30,4 +30,20 @@ RSpec.describe "Hunts" do
     expect(response).to have_http_status(:ok)
     expect(many).to eq(few)
   end
+
+  it "creates a hunt from a template" do
+    post "/scavenger_hunts", params: {hunt: {template: "Neighborhood Navigator", name: "Maple Street"}}
+
+    hunt = Hunt.last
+    expect(response).to redirect_to("/scavenger_hunts/#{hunt.code.upcase}")
+    expect(hunt.name).to eq("Maple Street")
+    expect(hunt.items).not_to be_empty
+  end
+
+  it "only creates hunts from templates that exist" do
+    ["Popular Templates", "Load Hunts", ""].each do |template|
+      expect { post "/scavenger_hunts", params: {hunt: {template:}} }.not_to change { [Hunt.count, Templater.templates.size] }
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
