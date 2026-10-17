@@ -52,6 +52,7 @@ export default class extends Controller {
     this.updateBadge()
     this.count()
     if (this.open) {
+      this.followViewport()
       this.scrollToBottom()
     }
   }
@@ -65,6 +66,7 @@ export default class extends Controller {
     this.frameTarget.removeEventListener("turbo:before-frame-render", this.onBeforeFrameRender)
     document.removeEventListener("turbo:visit", this.onVisit)
     document.removeEventListener("turbo:load", this.onLoad)
+    this.unfollowViewport()
   }
 
   get open() {
@@ -74,6 +76,7 @@ export default class extends Controller {
   show() {
     this.opener = document.activeElement
     this.sheetTarget.classList.add("modal-open")
+    this.followViewport()
     this.markSeen()
     this.scrollToBottom()
     this.pendingFocus = true
@@ -87,10 +90,43 @@ export default class extends Controller {
   close() {
     if (!this.open) return
     this.sheetTarget.classList.remove("modal-open")
+    this.unfollowViewport()
     this.boxTarget.style.transform = ""
     const opener = this.opener?.isConnected ? this.opener : this.pillTarget
     this.opener = null
     opener.focus({ preventScroll: true })
+  }
+
+  // A phone's keyboard shrinks only the visual viewport, so a fixed sheet laid
+  // out against the layout viewport ends up underneath it. While open, the
+  // sheet covers just the part of the page that is still visible.
+  followViewport() {
+    if (!window.visualViewport || this.viewport) return
+    this.viewport = window.visualViewport
+    this.onViewportChange ||= () => this.fitToViewport()
+    this.viewport.addEventListener("resize", this.onViewportChange)
+    this.viewport.addEventListener("scroll", this.onViewportChange)
+    this.fitToViewport()
+  }
+
+  unfollowViewport() {
+    if (!this.viewport) return
+    this.viewport.removeEventListener("resize", this.onViewportChange)
+    this.viewport.removeEventListener("scroll", this.onViewportChange)
+    this.viewport = null
+    this.sheetTarget.style.top = ""
+    this.sheetTarget.style.height = ""
+    this.boxTarget.style.maxHeight = ""
+  }
+
+  fitToViewport() {
+    const { offsetTop, height } = this.viewport
+    this.sheetTarget.style.top = `${offsetTop}px`
+    this.sheetTarget.style.height = `${height}px`
+    this.boxTarget.style.maxHeight = `${height * 0.85}px`
+    if (this.atBottom) {
+      this.scrollToBottom()
+    }
   }
 
   keydown(event) {
