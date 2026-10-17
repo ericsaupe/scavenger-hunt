@@ -1,0 +1,19 @@
+{
+	local_certs
+	skip_install_trust
+}
+
+www.scavengerhunt.party {
+	tls internal
+	reverse_proxy web:3000
+}
+
+storage.scavengerhunt.party {
+	tls internal
+	reverse_proxy minio:9000
+}
+
+fcm.googleapis.com {
+	tls internal
+	reverse_proxy push:8080
+}

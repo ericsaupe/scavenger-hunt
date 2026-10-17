@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+here="$(cd "$(dirname "$0")" && pwd)"
+cd "$here"
+
+usage() {
+  cat <<USAGE
+Usage: simulation/simulate <command>
+
+  up        build the app image, start the Render-shaped stack, enable the feature flags
+  smoke     run the four-minute smoke test against the running stack
+  run       run the full 36-minute hunt with 15 browsers and write a report
+  report    rebuild the report for the newest results folder
+  down      stop the stack and delete its volumes
+USAGE
+}
+
+ensure_env() {
+  [ -f .env ] || node docker/make-env.js
+  [ -d fixtures/photos ] || { echo "simulation/fixtures/photos is missing: copy jpgs there and cut clip-20s.mp4 and clip-70s.mp4 (see README)" >&2; exit 1; }
+}
+
+case "${1:-}" in
+  up)
+    ensure_env
+    docker compose build
+    docker compose up -d
+    for _ in $(seq 1 60); do
+      docker compose exec -T web bin/rails runner 'Flipper.enable(:chat); Flipper.enable(:video_transcoding); puts "flags on"' 2>/dev/null && break
+      sleep 3
+    done
+    docker compose ps
+    ;;
+  smoke)
+    (cd bots && node smoke.js "${@:2}")
+    ;;
+  run)
+    (cd bots && node run.js "${@:2}")
+    ;;
+  report)
+    latest="$(ls -d results/20* | sort | tail -1)"
+    (cd bots && node report.js "../$latest")
+    ;;
+  down)
+    docker compose down -v
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

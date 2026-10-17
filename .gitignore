@@ -48,3 +48,9 @@ public/scavenger_hunts/*
 .env
 
 /vendor/ffmpeg/
+
+/simulation/.env
+/simulation/results/*
+/simulation/fixtures/
+/simulation/bots/node_modules
+/simulation/push-stand-in/node_modules
