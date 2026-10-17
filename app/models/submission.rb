@@ -4,6 +4,10 @@ class Submission < ApplicationRecord
   MAX_VIDEO_BYTES = 150.megabytes
   MAX_VIDEO_SECONDS = 60
   POSTER_SIZES = {small: [500, 500], large: [1500, 1500]}.freeze
+  PLACEHOLDER_IMAGE = "data:image/svg+xml," + ERB::Util.url_encode(<<~SVG.strip)
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"><rect width="4" height="3" fill="#e2e4df"/><path d="M1.1 1.1h.5l.2-.3h.4l.2.3h.5v1.1H1.1z" fill="none" stroke="#5b6470" stroke-width=".08"/><circle cx="2" cy="1.65" r=".3" fill="none" stroke="#5b6470" stroke-width=".08"/></svg>
+  SVG
+  LIBRARY_TYPES = %w[image/jpeg image/png image/gif image/webp image/heic image/heif image/avif video/mp4 video/quicktime video/webm video/3gpp].freeze
 
   has_one_attached :photo do |attachable|
     attachable.variant :small, resize_to_fit: [500, 500]
@@ -65,6 +69,7 @@ class Submission < ApplicationRecord
   def variant_url(size)
     return nil unless photo.attached?
     return media_url if video?
+    return PLACEHOLDER_IMAGE unless photo.variable?
 
     routes.rails_representation_path(photo.variant(size), only_path: true)
   end
@@ -146,6 +151,8 @@ class Submission < ApplicationRecord
       errors.add(:photo, "Videos must be #{MAX_VIDEO_BYTES / 1.megabyte} MB or smaller") if photo.byte_size > MAX_VIDEO_BYTES
     elsif !image?
       errors.add(:photo, "Only photos and videos can be uploaded")
+    elsif !photo.variable?
+      errors.add(:photo, "That image type can't be used. Take a photo instead")
     end
   end
 end

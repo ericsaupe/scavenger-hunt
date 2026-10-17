@@ -128,7 +128,7 @@ RSpec.describe "Hunts" do
         find(:button, text: first.name).click
         click_on "Choose from your photos"
       end
-      expect(page).to have_css("##{field}[accept='image/*,video/*']:not([capture])", visible: false)
+      expect(page).to have_css("##{field}[accept='#{Submission::LIBRARY_TYPES.join(",")}']:not([capture])", visible: false)
       expect(page).to have_css("li[data-found]", text: first.name)
       expect(page).to have_button(second.name)
     end
