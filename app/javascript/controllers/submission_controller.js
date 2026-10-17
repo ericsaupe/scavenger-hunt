@@ -6,6 +6,10 @@ import { enqueue } from "../uploads/queue"
 import { registerSync } from "../uploads/drain"
 import { showIdle, showPending, showQueued } from "../uploads/pending"
 
+const TYPES_BY_EXTENSION = {
+  jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", heic: "image/heic", heif: "image/heif", avif: "image/avif",
+  mp4: "video/mp4", mov: "video/quicktime", webm: "video/webm", "3gp": "video/3gpp"
+}
 const UPLOAD_FAILED = "Your photo couldn't be uploaded. Check your connection and try again."
 
 export default class extends Controller {
@@ -36,10 +40,12 @@ export default class extends Controller {
     if (problem) {
       this.submittingValue = false
       this.fieldTarget.value = ""
+      delete this.element.dataset.capturing
       addBanner(problem)
       return
     }
 
+    delete this.element.dataset.capturing
     const uploading = !!this.element.dataset.uploading
     this.retake = !!this.element.dataset.found || uploading
     showPending(this.element, file)
@@ -121,13 +127,14 @@ export default class extends Controller {
   }
 
   async mediaProblem(file) {
-    if (file.type.startsWith("image/") && !this.accepted(file)) {
+    const type = this.mediaType(file)
+    if (type.startsWith("image/") && type !== "image/unknown" && !this.accepted(type)) {
       return "That image type can't be used. Take a photo instead."
     }
-    if (file.type.startsWith("image/")) {
+    if (type.startsWith("image/")) {
       return null
     }
-    if (!file.type.startsWith("video/")) {
+    if (!type.startsWith("video/")) {
       return "Only photos and videos can be uploaded."
     }
     if (file.size > this.maxVideoBytesValue) {
@@ -140,9 +147,22 @@ export default class extends Controller {
     return null
   }
 
-  accepted(file) {
+  accepted(type) {
     const types = this.acceptedTypesValue.split(",").filter(Boolean)
-    return types.length === 0 || types.includes(file.type)
+    return types.length === 0 || types.includes(type)
+  }
+
+  // Android's camera sometimes hands back a file with no type at all, so fall back
+  // to the extension and otherwise let the server identify the bytes.
+  mediaType(file) {
+    if (file.type) {
+      return file.type
+    }
+    const extension = file.name.split(".").pop().toLowerCase()
+    if (TYPES_BY_EXTENSION[extension]) {
+      return TYPES_BY_EXTENSION[extension]
+    }
+    return (this.fieldTarget.getAttribute("accept") || "").startsWith("video/") ? "video/unknown" : "image/unknown"
   }
 
   videoDuration(file) {
