@@ -1,6 +1,7 @@
 <% description "#{@item.name} was found #{pluralize(@submissions.size, "times")} during #{@hunt.name}." %>
 <% title @item.name %>
 
+<div class="fit:flex fit:h-[calc(100dvh-11.5rem-1px)] fit:min-h-0 fit:flex-col">
 <%= render(PageHeaderComponent.new(
       title: @item.name,
       subtitle: "Found by #{pluralize(@submissions.size, "team")}. Swipe to see each one.",
@@ -9,3 +10,4 @@
     )) %>
 
 <%= render(partial: "item", locals: {item: @item, hunt: @hunt, previous_item: @previous, next_item: @next, submissions: @submissions}) %>
+</div>

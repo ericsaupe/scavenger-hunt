@@ -69,6 +69,14 @@ class Submission < ApplicationRecord
     routes.rails_representation_path(photo.variant(size), only_path: true)
   end
 
+  def media_aspect_ratio
+    metadata = photo.attached? ? photo.blob.metadata : {}
+    width, height = metadata.values_at("width", "height")
+    return "#{width.to_f} / #{height.to_f}" if width.to_f.positive? && height.to_f.positive?
+
+    video? ? "16 / 9" : "4 / 3"
+  end
+
   def media_url
     return nil unless photo.attached?
 
