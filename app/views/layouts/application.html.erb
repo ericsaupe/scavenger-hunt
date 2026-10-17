@@ -28,7 +28,7 @@
 
   <body class="min-h-dvh font-sans antialiased <%= @presenter_mode ? "stage" : "bg-base-100 text-base-content" %>">
     <% unless @presenter_mode %>
-      <header class="sticky top-0 z-30 border-b border-base-300 bg-base-100/90 backdrop-blur">
+      <header class="sticky top-0 z-30 border-b border-base-300 bg-base-100/90 backdrop-blur print:hidden">
         <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-5">
           <%= link_to root_path, class: "flex min-w-0 items-center gap-2 whitespace-nowrap text-[15px] font-extrabold tracking-tight sm:text-base" do %>
             <span class="grid size-7 shrink-0 place-items-center rounded-lg bg-neutral text-neutral-content"><%= icon :camera, class: "size-4" %></span>
@@ -52,7 +52,7 @@
     </div>
     <template id="banner_template"><%= render partial: "banners/banner", locals: {message: "", action_label: ""} %></template>
 
-    <main id="content" class="<%= "pb-32" unless @presenter_mode %>">
+    <main id="content" class="<%= "pb-32 print:pb-0" unless @presenter_mode %>">
       <%= yield %>
     </main>
 

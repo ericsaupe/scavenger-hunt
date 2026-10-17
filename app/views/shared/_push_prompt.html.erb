@@ -1,4 +1,4 @@
-<div class="fixed inset-x-0 z-30 px-4 <%= content_for?(:bottom_bar) ? "bottom-24" : "bottom-4" %>" hidden data-controller="push-prompt" data-testid="push-prompt"
+<div class="fixed inset-x-0 z-30 px-4 print:hidden <%= content_for?(:bottom_bar) ? "bottom-24" : "bottom-4" %>" hidden data-controller="push-prompt" data-testid="push-prompt"
   data-push-prompt-url-value="<%= hunt_push_subscription_path(@hunt.code) %>"
   data-push-prompt-public-key-value="<%= PushSubscription.vapid[:public_key] %>"
   data-push-prompt-code-value="<%= @hunt.code %>"

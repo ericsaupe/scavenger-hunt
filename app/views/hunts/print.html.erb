@@ -1,4 +1,4 @@
-<div class="mx-auto max-w-3xl px-6 py-8 print:px-0">
+<div class="mx-auto max-w-3xl px-6 py-8 print:p-0">
   <div class="flex items-start justify-between gap-6 border-b-2 border-current pb-4">
     <div>
       <h1 class="display text-3xl"><%= @hunt.name %></h1>
@@ -10,14 +10,16 @@
 
   <div class="mt-6 columns-2 gap-8">
     <% @hunt.categories.each do |category| %>
-      <section class="mb-6 break-inside-avoid">
+      <% items = category.items.to_a %>
+      <%# A long category kept whole jumps to the next page and leaves this one mostly blank, so long ones flow on instead. The heading stays with the first three items and the last item never sits alone. %>
+      <section class="mb-6 <%= "break-inside-avoid" if items.size <= 15 %>">
         <h2 class="flex items-baseline justify-between text-lg font-bold">
           <%= category.name %>
           <span class="text-sm font-semibold text-ink-soft"><%= pluralize(category.points, "point") %> each</span>
         </h2>
         <ul class="mt-2 space-y-1.5">
-          <% category.items.each do |item| %>
-            <li class="flex items-center gap-2">
+          <% items.each_with_index do |item, index| %>
+            <li class="flex items-center gap-2 break-inside-avoid <%= "break-before-avoid" if index < 3 || index == items.size - 1 %>">
               <span class="size-4 shrink-0 rounded-sm border-2 border-current"></span>
               <%= item.name %>
             </li>
