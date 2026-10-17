@@ -179,6 +179,19 @@ RSpec.describe "Party chat" do
       set_name("Eric")
       send_message("Great photo")
     end
+
+    it "gives a watcher the organizer's chat controls when the remote is handed to them" do
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      open_chat
+      set_name("Eric")
+      expect(page).to have_no_css("[data-testid='chat-announcement-toggle']")
+
+      hunt.reload.hand_remote_to!(viewer_id)
+
+      expect(page).to have_css("[data-testid='presenting']", text: "You have the remote")
+      expect(page).to have_css("[data-testid='chat-announcement-toggle']")
+      send_message("Taking it from here")
+    end
   end
 
   it "stays hidden when the hunt turned chat off" do

@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
+const VISIT_GRACE_MS = 10000
 const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
 
 export default class extends Controller {
@@ -33,6 +34,18 @@ export default class extends Controller {
       }
     }
     this.frameTarget.addEventListener("turbo:before-frame-render", this.onBeforeFrameRender)
+    this.onVisit = () => {
+      this.visitStartedAt = Date.now()
+    }
+    document.addEventListener("turbo:visit", this.onVisit)
+    this.onLoad = () => {
+      this.visitStartedAt = null
+      if (this.reloadAfterVisit) {
+        this.reloadAfterVisit = false
+        this.reload()
+      }
+    }
+    document.addEventListener("turbo:load", this.onLoad)
 
     this.decorate(this.element)
     this.updateBadge()
@@ -49,6 +62,8 @@ export default class extends Controller {
     document.removeEventListener("keydown", this.onKeydown)
     document.removeEventListener("turbo:before-render", this.onBeforeRender)
     this.frameTarget.removeEventListener("turbo:before-frame-render", this.onBeforeFrameRender)
+    document.removeEventListener("turbo:visit", this.onVisit)
+    document.removeEventListener("turbo:load", this.onLoad)
   }
 
   get open() {
@@ -102,7 +117,20 @@ export default class extends Controller {
     }
   }
 
+  // A page visit moves this permanent element into the new body, and Turbo
+  // restarts a frame load that was still in flight when it moved, so the
+  // sheet would render twice. Reload once after the visit lands instead.
   refresh() {
+    setTimeout(() => {
+      if (this.visitStartedAt > Date.now() - VISIT_GRACE_MS) {
+        this.reloadAfterVisit = true
+      } else {
+        this.reload()
+      }
+    })
+  }
+
+  reload() {
     const frame = this.frameTarget
     if (frame.src) {
       frame.reload()
@@ -112,15 +140,15 @@ export default class extends Controller {
   }
 
   syncWithRender(event) {
-    const fresh = event.detail.newBody?.querySelector(`#${this.frameTarget.id} [data-chat-box]`)
+    const fresh = event.detail.newBody?.querySelector(`#${this.frameTarget.id}`)
     const current = this.frameTarget.querySelector("[data-chat-box]")
     if (!fresh || !current || fresh.hasAttribute("data-chat-organizer") === current.hasAttribute("data-chat-organizer")) return
-    this.snapshotComposer()
-    current.replaceWith(fresh.cloneNode(true))
+    this.refresh()
   }
 
   snapshotComposer() {
-    this.draft = this.hasInputTarget ? this.inputTarget.value : null
+    this.draftInput = this.hasInputTarget ? this.inputTarget : null
+    this.draft = this.draftInput?.value ?? null
     this.draftAnnouncement = this.hasAnnouncementToggleTarget && this.announcementToggleTarget.getAttribute("aria-pressed") === "true"
   }
 
@@ -257,14 +285,17 @@ export default class extends Controller {
   }
 
   inputTargetConnected(input) {
-    if (this.draft != null) {
-      input.value = this.draft
+    if (input !== this.draftInput) {
+      if (this.draft != null) {
+        input.value = this.draft
+        this.count()
+      }
+      if (this.draftAnnouncement) {
+        this.setAnnouncement(true)
+      }
       this.draft = null
-      this.count()
-    }
-    if (this.draftAnnouncement) {
       this.draftAnnouncement = false
-      this.setAnnouncement(true)
+      this.draftInput = null
     }
     if (this.pendingFocus && this.open) {
       this.pendingFocus = false
