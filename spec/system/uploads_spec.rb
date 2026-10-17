@@ -14,7 +14,8 @@ RSpec.describe "Uploads" do
 
   def choose_photo
     attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-      find(:label, text: item.name).click
+      find(:button, text: item.name).click
+      click_on "Choose from your photos"
     end
   end
 
@@ -102,7 +103,8 @@ RSpec.describe "Uploads" do
       Object.defineProperty(HTMLMediaElement.prototype, "src", { set() {} })
     JS
     attach_file(Rails.root.join("spec/fixtures/video.mp4")) do
-      find(:label, text: item.name).click
+      find(:button, text: item.name).click
+      click_on "Choose from your photos"
     end
 
     choose_photo
@@ -120,7 +122,8 @@ RSpec.describe "Uploads" do
 
     expect(page).to have_text("a video up to 60 seconds")
     attach_file(Rails.root.join("spec/fixtures/video.mp4")) do
-      find(:label, text: item.name).click
+      find(:button, text: item.name).click
+      click_on "Choose from your photos"
     end
 
     expect(page).to have_text("Videos must be 60 seconds or shorter")

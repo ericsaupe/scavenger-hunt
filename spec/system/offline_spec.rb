@@ -10,7 +10,8 @@ RSpec.describe "Offline" do
 
   def choose_photo
     attach_file(Rails.root.join("spec/fixtures/test.jpg")) do
-      find(:label, text: item.name).click
+      find(:button, text: item.name).click
+      click_on "Choose from your photos"
     end
   end
 

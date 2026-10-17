@@ -42,7 +42,11 @@ RSpec.describe "Videos", :test_queue_adapter do
 
     expect(page).to have_text("Videos must be 60 seconds or shorter. Try a shorter clip.")
     expect(page).not_to have_css("li[data-found]")
-    expect(page).to have_css("label", text: item.name)
+    expect(page).to have_button(item.name)
     expect(submission.reload.photo).not_to be_attached
+
+    click_on item.name
+    expect(page).to have_css("[data-testid='capture-sheet'][open]", text: item.name)
+    expect(page).to have_button("Record a video")
   end
 end
