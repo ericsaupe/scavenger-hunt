@@ -6,20 +6,20 @@
     </div>
   </div>
 <% else %>
-  <div class="sm:flex sm:min-h-0 sm:flex-1 sm:flex-col" data-controller="carousel">
-    <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:min-h-0 sm:flex-1 sm:gap-8" data-carousel-target="track">
+  <div class="fit:flex fit:min-h-0 fit:flex-1 fit:flex-col" data-controller="carousel">
+    <div id="items" class="carousel w-full snap-x snap-mandatory gap-4 px-5 sm:gap-8 fit:min-h-0 fit:flex-1" data-carousel-target="track">
       <% submissions.each do |submission| %>
-        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center items-start justify-center sm:h-full" data-carousel-target="item">
-          <figure class="polaroid-lg relative w-full pb-5! sm:flex sm:h-full sm:w-fit sm:min-w-[30rem] sm:max-w-[min(100%,72rem)] sm:flex-col sm:items-center" style="transform: rotate(0)" data-carousel-target="card">
+        <div id="submission_<%= submission.id %>" class="carousel-item w-full snap-center items-start justify-center fit:h-full" data-carousel-target="item">
+          <figure class="polaroid-lg relative w-full pb-5! sm:max-w-[min(100%,72rem)] fit:flex fit:h-full fit:w-fit fit:min-w-[30rem] fit:flex-col fit:items-center" style="transform: rotate(0)" data-carousel-target="card">
             <% image_url = submission_attachment_url(submission, variant_size: :large) %>
-            <div class="flex min-h-48 w-full items-center justify-center bg-black sm:min-h-0 sm:w-auto sm:max-w-full sm:flex-1" style="aspect-ratio: <%= submission.media_aspect_ratio %>" data-carousel-target="media">
+            <div class="flex min-h-48 w-full items-center justify-center bg-black fit:min-h-0 fit:w-auto fit:max-w-full fit:flex-1" style="aspect-ratio: <%= submission.media_aspect_ratio %>" data-carousel-target="media">
               <% if submission.video? %>
                 <%= video_tag(submission.media_url, controls: true, playsinline: true, preload: "metadata", poster: submission.poster_url, class: "size-full object-contain") %>
               <% else %>
                 <%= image_tag(image_url, class: "size-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
               <% end %>
             </div>
-            <figcaption class="mt-4 flex w-full shrink-0 flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
+            <figcaption class="mt-4 flex w-full shrink-0 flex-wrap items-center justify-between gap-3 fit:flex-nowrap">
               <span class="display min-w-0 grow basis-40 wrap-anywhere text-2xl leading-tight text-ink"><%= submission.team.name %></span>
               <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
             </figcaption>

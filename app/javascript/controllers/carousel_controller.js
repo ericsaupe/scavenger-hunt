@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-const WIDE = "(min-width: 640px)"
+const FIT = "(min-width: 640px) and (min-height: 640px)"
 
 export default class extends Controller {
   static targets = ["track", "item", "card", "media"]
@@ -17,7 +17,7 @@ export default class extends Controller {
   }
 
   fit() {
-    const wide = window.matchMedia(WIDE).matches
+    const wide = window.matchMedia(FIT).matches
     this.cardTargets.forEach(card => { card.style.width = "" })
     if (!wide) {
       return
