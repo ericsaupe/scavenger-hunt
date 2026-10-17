@@ -46,11 +46,8 @@
     </div>
   </div>
 
-  <% if @hunt.ended? %>
-    <p class="page pt-5 text-sm text-ink-soft">The hunt is over. Everything your team found is in, so get ready for the show and the results.</p>
-  <% else %>
-    <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or a video up to <%= Submission::MAX_VIDEO_SECONDS %> seconds. Found items tick off for the whole team.</p>
-  <% end %>
+  <p class="page pt-5 text-sm text-ink-soft" data-timer-while="open" <%= "hidden" if @hunt.ended? %>>Tap an item to take a photo or a video up to <%= Submission::MAX_VIDEO_SECONDS %> seconds. Found items tick off for the whole team.</p>
+  <p class="page pt-5 text-sm text-ink-soft" data-timer-while="ended" <%= "hidden" unless @hunt.ended? %>>The hunt is over. Everything your team found is in, so get ready for the show and the results.</p>
 
   <% if @hunt.chat_available? %>
     <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_announcement} %>

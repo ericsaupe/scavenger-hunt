@@ -196,6 +196,20 @@ RSpec.describe "Hunts" do
       end
     end
 
+    describe "when the end passes while the checklist is open" do
+      it "swaps the photo instructions for the closing line without a reload" do
+        hunt.update(ends_at: 3.seconds.from_now)
+        visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+        expect(page).to have_text("Ends in")
+        expect(page).to have_text("Tap an item to take a photo")
+        expect(page).not_to have_text("The hunt is over.")
+
+        expect(page).to have_text("Hunt over. No more submissions.", wait: 6)
+        expect(page).to have_text("The hunt is over.")
+        expect(page).not_to have_text("Tap an item to take a photo")
+      end
+    end
+
     describe "when ended" do
       before do
         hunt.update(ends_at: 1.hour.ago)
