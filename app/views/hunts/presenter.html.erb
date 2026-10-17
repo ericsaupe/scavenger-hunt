@@ -52,6 +52,7 @@
             <%= icon :chevron_left, class: "size-5" %>
             Previous
           <% end %>
+          <%= render partial: "messages/chat", locals: {hunt: @hunt, position: "sm:fixed sm:right-4 sm:bottom-20"} if @hunt.chat_available? %>
           <%= link_to hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), class: "btn btn-sm btn-ghost text-white", data: {turbo_action: "replace"}, "aria-label": "Next slide" do %>
             Next
             <%= icon :chevron_right, class: "size-5" %>
@@ -83,7 +84,3 @@
 
   <%= render partial: "presentations/screen_chat", locals: {hunt: @hunt} if @screen_chat %>
 </div>
-
-<% if !@big_screen && @hunt.chat_available? %>
-  <%= render partial: "messages/chat", locals: {hunt: @hunt, offset: "bottom-32 sm:bottom-20"} %>
-<% end %>

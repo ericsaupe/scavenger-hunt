@@ -111,5 +111,5 @@
 </div>
 
 <% if @hunt.chat_available? %>
-  <%= render partial: "messages/chat", locals: {hunt: @hunt, offset: "bottom-[max(1rem,env(safe-area-inset-bottom))]"} %>
+  <%= render partial: "messages/chat", locals: {hunt: @hunt, position: "fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))]"} %>
 <% end %>
