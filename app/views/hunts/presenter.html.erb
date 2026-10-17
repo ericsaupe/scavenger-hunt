@@ -10,7 +10,7 @@
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
   <% stage = {controller: "transition"} %>
   <% stage = stage.merge(controller: "browse transition", browse_next_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), browse_previous_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.previous_key)) unless @big_screen %>
-  <%= tag.div class: "relative flex min-h-dvh grow flex-col sm:min-h-0", data: stage do %>
+  <%= tag.div class: "relative flex min-h-dvh min-w-0 grow flex-col sm:min-h-0", data: stage do %>
     <div id="print_overlay" class="pointer-events-none absolute inset-0 z-10 overflow-hidden" data-turbo-permanent data-transition-target="overlay"></div>
     <div class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-3 pt-3">
       <%= link_to hunt_results_path(@hunt.code.upcase), class: "btn btn-ghost btn-sm text-white/70 hover:text-white" do %>
@@ -58,6 +58,9 @@
           <% end %>
         </div>
       <% end %>
+      <% if @big_screen %>
+        <p class="text-lg font-semibold text-white/80" data-testid="join-line"><%= @screen_chat ? "Follow, vote and chat on your phone" : "Follow and vote on your phone" %></p>
+      <% end %>
       <% if @hunt.owner?(cookies[:user_id]) %>
         <p data-testid="presenting">You have the remote</p>
         <%= link_to "Open the remote", hunt_presenter_remote_path(@hunt.code.upcase), class: "btn btn-sm btn-ghost text-white" %>
@@ -78,6 +81,7 @@
     </div>
   <% end %>
 
+  <%= render partial: "presentations/screen_chat", locals: {hunt: @hunt} if @screen_chat %>
 </div>
 
 <% if !@big_screen && @hunt.chat_available? %>

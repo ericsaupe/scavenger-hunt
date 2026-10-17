@@ -141,6 +141,74 @@ RSpec.describe "Presenter" do
       expect(response.body).to include(%(alt="#{ERB::Util.html_escape(second_team.name)} found #{ERB::Util.html_escape(items.first.name)}"))
     end
 
+    context "with the chat column" do
+      let(:first) { found(first_team, items.first) }
+      let!(:older) { create(:message, hunt:, content: "Before the show", created_at: 2.minutes.ago) }
+      let!(:hello) { create(:message, hunt:, sender_name: "Eric", team: first_team, content: "Hello from the floor") }
+      let!(:pizza) { create(:message, hunt:, sender_name: "Host", organizer: true, announcement: true, content: "Pizza at 7") }
+      let!(:gone) { create(:message, hunt:, content: "Oops", deleted_at: Time.current) }
+
+      before do
+        Flipper.enable(:chat)
+        hunt.update!(presentation_slide: "submission:#{first.id}", screen_chat: "all")
+      end
+
+      it "shows recent messages beside the photo and subscribes to the chat" do
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+        expect(response.body).to include(%(data-testid="screen-chat"), "Party chat", "3 people, 1 team", "Chat from your phone. Messages show here for a minute.")
+        expect(response.body).to include(%(<turbo-cable-stream-source id="chat_stream" data-turbo-permanent="true"))
+        expect(response.body).to include(%(id="#{hunt.chat_list_id}"), "Hello from the floor", "Pizza at 7")
+        expect(response.body).not_to include("Before the show", "Oops")
+        expect(response.body).to include("Follow, vote and chat on your phone")
+        expect(response.body).not_to include("Follow and vote on your phone")
+      end
+
+      it "shows only announcements in announcements mode" do
+        hunt.update!(screen_chat: "announcements")
+
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+        expect(response.body).to include(%(data-screen-chat-mode-value="announcements"), "Pizza at 7")
+        expect(response.body).not_to include("Hello from the floor")
+      end
+
+      it "keeps the most recent eight" do
+        create_list(:message, 10, hunt:, content: "Filler")
+        first_filler = hunt.messages.where(content: "Filler").order(:id).first
+
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+        expect(response.body.scan("Filler").size).to eq(8)
+        expect(response.body).not_to include("Hello from the floor", %(id="message_#{first_filler.id}"))
+      end
+
+      it "stays off the title card, the finale, watchers' phones and screens with the chat off" do
+        hunt.update!(presentation_slide: "item:#{items.first.id}")
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).not_to include(%(data-testid="screen-chat"), "Hello from the floor")
+        expect(response.body).to include("Follow and vote on your phone")
+
+        hunt.update!(presentation_slide: "finale")
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).not_to include(%(data-testid="screen-chat"))
+
+        hunt.update!(presentation_slide: "submission:#{first.id}")
+        get "/scavenger_hunts/#{hunt.code}/presenter"
+        expect(response.body).not_to include(%(data-testid="screen-chat"))
+        expect(response.body).not_to include("Follow and vote on your phone")
+
+        hunt.update!(screen_chat: "off")
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).not_to include(%(data-testid="screen-chat"), %(id="chat_stream"))
+        expect(response.body).to include("Follow and vote on your phone")
+
+        hunt.update!(screen_chat: "all", chat_enabled: false)
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).not_to include(%(data-testid="screen-chat"))
+      end
+    end
+
     it "opts out of the snapshot cache and morphs refreshes" do
       found(first_team, items.first)
 

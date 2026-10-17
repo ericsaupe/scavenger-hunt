@@ -137,6 +137,45 @@ RSpec.describe "Presentations" do
     end
   end
 
+  describe "PATCH /presentation/screen_chat" do
+    def screen_chat(mode)
+      patch "/scavenger_hunts/#{hunt.code}/presentation/screen_chat", params: {screen_chat: mode}, as: :json
+    end
+
+    it "refuses anyone without the remote" do
+      cookies[:user_id] = "viewer"
+
+      screen_chat("all")
+
+      expect(response).to have_http_status(:forbidden)
+      expect(hunt.reload.screen_chat).to eq("off")
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+    end
+
+    it "starts off, then shows everything, only announcements, and nothing again, refreshing the screen each time" do
+      expect(hunt.screen_chat).to eq("off")
+
+      screen_chat("all")
+      expect(response).to have_http_status(:no_content)
+      expect(hunt.reload.screen_chat).to eq("all")
+
+      screen_chat("announcements")
+      expect(hunt.reload.screen_chat).to eq("announcements")
+
+      screen_chat("off")
+      expect(hunt.reload.screen_chat).to eq("off")
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with("hunt_presenter_#{hunt.id}", request_id: nil).exactly(3).times
+    end
+
+    it "rejects a mode it does not know" do
+      screen_chat("everyone")
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(hunt.reload.screen_chat).to eq("off")
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+    end
+  end
+
   describe "GET /presenter/remote" do
     it "sends anyone without the remote to the presentation" do
       cookies[:user_id] = "viewer"
@@ -165,6 +204,34 @@ RSpec.describe "Presentations" do
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"
 
       expect(response.body).to include("Finale 7 of 7", "First place", ERB::Util.html_escape(team.name))
+    end
+
+    it "offers the big screen chat switches, reflecting the current mode" do
+      Flipper.enable(:chat)
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      switch_tag = ->(testid) { response.body[/<input[^>]*data-testid="#{testid}"[^>]*>/] }
+
+      expect(response.body).to include("Big screen", "Show the chat", "Announcements only")
+      expect(response.body).to include(%(data-remote-screen-chat-url-value="/scavenger_hunts/#{hunt.code}/presentation/screen_chat"))
+      expect(switch_tag.call("screen-chat-switch")).not_to include("checked")
+      expect(switch_tag.call("announcements-only-switch")).to include("disabled")
+
+      hunt.update!(screen_chat: "announcements")
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(switch_tag.call("screen-chat-switch")).to include("checked")
+      expect(switch_tag.call("announcements-only-switch")).to include("checked")
+      expect(switch_tag.call("announcements-only-switch")).not_to include("disabled")
+    end
+
+    it "leaves the big screen chat switches out when the hunt has no chat" do
+      Flipper.enable(:chat)
+      hunt.update!(chat_enabled: false)
+
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).not_to include("Show the chat")
     end
 
     it "shows the video transport on a video slide" do

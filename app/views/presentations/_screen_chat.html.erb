@@ -1,0 +1,9 @@
+<aside class="screen-chat hidden w-[460px] shrink-0 flex-col border-l border-white/10 bg-[#0b0d10] sm:flex" aria-label="Party chat" data-controller="screen-chat" data-screen-chat-mode-value="<%= hunt.screen_chat %>" data-screen-chat-ttl-value="<%= Hunt::SCREEN_CHAT_TTL.in_milliseconds %>" data-screen-chat-limit-value="<%= Hunt::SCREEN_CHAT_LIMIT %>" data-screen-chat-now-value="<%= Time.current.iso8601(3) %>" data-testid="screen-chat">
+  <%= turbo_stream_from hunt.chat_stream, id: "chat_stream", data: {turbo_permanent: true} %>
+  <header class="shrink-0 px-7 pb-4 pt-7">
+    <h2 class="display text-3xl">Party chat</h2>
+    <p class="mt-1 text-lg font-semibold text-white/60" data-testid="screen-chat-summary"><%= pluralize(hunt.chatter_count, "person", plural: "people") %>, <%= pluralize(hunt.teams.size, "team") %></p>
+  </header>
+  <div id="<%= hunt.chat_list_id %>" class="flex min-h-0 grow flex-col justify-end gap-5 overflow-hidden px-7 [mask-image:linear-gradient(to_bottom,transparent,black_4rem)]" data-turbo-permanent data-screen-chat-target="list" data-testid="screen-chat-list"><%= render partial: "messages/message", collection: hunt.screen_chat_messages %></div>
+  <p class="shrink-0 px-7 pb-7 pt-5 text-base font-semibold text-white/45">Chat from your phone. Messages show here for a minute.</p>
+</aside>

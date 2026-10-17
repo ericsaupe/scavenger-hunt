@@ -5,6 +5,7 @@
   data-controller="remote live"
   data-remote-url-value="<%= hunt_presentation_path(@hunt.code.upcase) %>"
   data-remote-playback-url-value="<%= playback_hunt_presentation_path(@hunt.code.upcase) %>"
+  data-remote-screen-chat-url-value="<%= screen_chat_hunt_presentation_path(@hunt.code.upcase) %>"
   data-remote-playing-value="<%= @hunt.playing? %>"
   data-remote-video-value="<%= @slide.video? %>">
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
@@ -87,6 +88,20 @@
           <% end %>
         </div>
       </div>
+    </div>
+  <% end %>
+
+  <% if @hunt.chat_available? %>
+    <div class="rounded-3xl bg-white/5 p-4">
+      <p class="mb-1 text-sm font-semibold text-white/60">Big screen</p>
+      <label class="flex min-h-12 items-center justify-between gap-4">
+        <span class="font-semibold">Show the chat</span>
+        <%= tag.input type: "checkbox", class: "toggle toggle-lg toggle-flag", checked: !@hunt.screen_chat_off?, data: {action: "remote#screenChat", on: "all", off: "off", testid: "screen-chat-switch"} %>
+      </label>
+      <label class="flex min-h-12 items-center justify-between gap-4 <%= "opacity-50" if @hunt.screen_chat_off? %>">
+        <span class="font-semibold">Announcements only</span>
+        <%= tag.input type: "checkbox", class: "toggle toggle-lg toggle-flag", checked: @hunt.screen_chat_announcements?, disabled: @hunt.screen_chat_off?, data: {action: "remote#screenChat", on: "announcements", off: "all", testid: "announcements-only-switch"} %>
+      </label>
     </div>
   <% end %>
 
