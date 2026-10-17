@@ -120,7 +120,7 @@ RSpec.describe "Presenter" do
 
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
 
-      expect(response.body).to include("Found by 2 of 2 teams, #{hunt.categories.first.points} points each")
+      expect(response.body).to include("Found by 2 of 2 teams, #{hunt.categories.first.points} #{"point".pluralize(hunt.categories.first.points)} each")
       expect(response.body).to include(ERB::Util.html_escape(first_team.name), ERB::Util.html_escape(second_team.name))
     end
 
