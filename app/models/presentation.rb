@@ -72,7 +72,20 @@ class Presentation
   end
 
   def item_cards
-    keys.grep(/\Aitem:/).map { |key| slide(key) }
+    ids = keys.grep(/\Aitem:/).map { |key| key.delete_prefix("item:").to_i }
+    items = hunt.items.where(id: ids).index_by(&:id)
+    ids.map { |id| TitleCard.new(self, self.class.item_key(id), items.fetch(id)) }
+  end
+
+  def current_item_key
+    case (slide = current)
+    when TitleCard then slide.key
+    when PhotoSlide then self.class.item_key(slide.submission.item_id)
+    end
+  end
+
+  def found_counts
+    @found_counts ||= hunt.submissions.found.group(:item_id).count
   end
 
   def next_submission(key = current_key)
@@ -221,7 +234,7 @@ class Presentation
     end
 
     def found_count
-      submissions.size
+      presentation.found_counts.fetch(item.id, 0)
     end
 
     def team_count

@@ -208,7 +208,7 @@ RSpec.describe "Presenter" do
       click_on "Jump to any item"
     end
     within("[data-testid='item-list']") do
-      expect(page).to have_button(text: hunt.items.first.name)
+      expect(page).to have_css("[aria-current='true']", text: hunt.items.first.name)
       click_on hunt.items.second.name
     end
     expect(page).to have_css("[data-testid='progress']", text: "Item 3 of 5")
@@ -218,7 +218,14 @@ RSpec.describe "Presenter" do
       click_on "Winner reveal"
     end
     expect(page).to have_css("[data-testid='progress']", text: "Finale 5 of 5")
-    expect(page).to have_no_css("[data-testid='up-next']")
+    expect(page).to have_css("[data-testid='up-next']", text: "This is the last slide")
+
+    within("[data-testid='up-next']") { click_on "Jump to any item" }
+    within("[data-testid='item-list']") do
+      expect(page).to have_no_css("[aria-current='true']")
+      click_on hunt.items.first.name
+    end
+    expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 5")
   end
 
   it "lets a watcher browse earlier slides and come back to live" do
