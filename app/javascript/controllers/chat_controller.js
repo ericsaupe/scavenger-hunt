@@ -1,12 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 
+const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"
+
 export default class extends Controller {
-  static targets = ["sheet", "box", "badge", "scroller", "frame", "form", "input", "counter", "nameForm", "nameInput", "announcement", "announcementToggle"]
+  static targets = ["pill", "sheet", "box", "badge", "scroller", "frame", "form", "input", "counter", "nameForm", "nameInput", "announcement", "announcementToggle"]
   static values = { huntId: Number, viewer: String, url: String, max: Number }
 
   connect() {
     this.storageKey = `party_chat_seen_${this.huntIdValue}`
     this.lostConnection = false
+    this.atBottom = true
     this.source = this.element.querySelector("turbo-cable-stream-source")
     this.sourceObserver = new MutationObserver(() => this.connectionChanged())
     if (this.source) {
@@ -20,12 +23,10 @@ export default class extends Controller {
       }
     }
     document.addEventListener("visibilitychange", this.onVisibilityChange)
-    this.onKeydown = (event) => {
-      if (event.key === "Escape" && this.open) {
-        this.close()
-      }
-    }
+    this.onKeydown = (event) => this.keydown(event)
     document.addEventListener("keydown", this.onKeydown)
+    this.onBeforeRender = (event) => this.syncWithRender(event)
+    document.addEventListener("turbo:before-render", this.onBeforeRender)
 
     this.decorate(this.element)
     this.updateBadge()
@@ -40,6 +41,7 @@ export default class extends Controller {
     this.listObserver.disconnect()
     document.removeEventListener("visibilitychange", this.onVisibilityChange)
     document.removeEventListener("keydown", this.onKeydown)
+    document.removeEventListener("turbo:before-render", this.onBeforeRender)
   }
 
   get open() {
@@ -47,6 +49,7 @@ export default class extends Controller {
   }
 
   show() {
+    this.opener = document.activeElement
     this.sheetTarget.classList.add("modal-open")
     this.markSeen()
     this.scrollToBottom()
@@ -59,16 +62,60 @@ export default class extends Controller {
   }
 
   close() {
+    if (!this.open) return
     this.sheetTarget.classList.remove("modal-open")
     this.boxTarget.style.transform = ""
+    const opener = this.opener?.isConnected ? this.opener : this.pillTarget
+    this.opener = null
+    opener.focus({ preventScroll: true })
+  }
+
+  keydown(event) {
+    if (!this.open) return
+    if (event.key === "Escape") {
+      event.preventDefault()
+      this.close()
+    } else if (event.key === "Tab") {
+      this.trapFocus(event)
+    }
+  }
+
+  trapFocus(event) {
+    const focusable = Array.from(this.boxTarget.querySelectorAll(FOCUSABLE)).filter((element) => element.offsetParent !== null)
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    const inside = this.boxTarget.contains(document.activeElement)
+    if (event.shiftKey && (document.activeElement === first || !inside)) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && (document.activeElement === last || !inside)) {
+      event.preventDefault()
+      first.focus()
+    }
   }
 
   refresh() {
+    this.keepDraft()
     const frame = this.frameTarget
     if (frame.src) {
       frame.reload()
     } else {
       frame.src = this.urlValue
+    }
+  }
+
+  syncWithRender(event) {
+    const fresh = event.detail.newBody?.querySelector(`#${this.frameTarget.id} [data-chat-box]`)
+    const current = this.frameTarget.querySelector("[data-chat-box]")
+    if (!fresh || !current || fresh.hasAttribute("data-chat-organizer") === current.hasAttribute("data-chat-organizer")) return
+    this.keepDraft()
+    current.replaceWith(fresh.cloneNode(true))
+  }
+
+  keepDraft() {
+    if (this.hasInputTarget && this.inputTarget.value) {
+      this.draft = this.inputTarget.value
     }
   }
 
@@ -82,16 +129,20 @@ export default class extends Controller {
   }
 
   listChanged(mutations) {
+    let messagesAdded = false
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          this.decorate(node)
+        if (node.nodeType !== Node.ELEMENT_NODE) continue
+        this.decorate(node)
+        if (node.matches("[data-message-id]") || node.querySelector("[data-message-id]")) {
+          messagesAdded = true
         }
       }
     }
+    if (!messagesAdded) return
     if (this.open) {
       this.markSeen()
-      if (this.nearBottom) {
+      if (this.atBottom) {
         this.scrollToBottom()
       }
     } else {
@@ -144,13 +195,15 @@ export default class extends Controller {
     this.badgeTarget.textContent = unread > 99 ? "99+" : unread
   }
 
-  get nearBottom() {
+  scrolled() {
     const scroller = this.scrollerTarget
-    return scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 120
+    this.atBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 120
   }
 
   scrollToBottom() {
+    this.atBottom = true
     requestAnimationFrame(() => {
+      if (!this.hasScrollerTarget) return
       this.scrollerTarget.scrollTop = this.scrollerTarget.scrollHeight
     })
   }
@@ -199,9 +252,20 @@ export default class extends Controller {
   }
 
   inputTargetConnected(input) {
+    if (this.draft) {
+      input.value = this.draft
+      this.draft = null
+      this.count()
+    }
     if (this.pendingFocus && this.open) {
       this.pendingFocus = false
       this.focus(input)
+    }
+  }
+
+  scrollerTargetConnected() {
+    if (this.open) {
+      this.scrollToBottom()
     }
   }
 

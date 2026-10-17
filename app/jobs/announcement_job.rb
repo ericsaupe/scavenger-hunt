@@ -12,7 +12,7 @@ class AnnouncementJob < ApplicationJob
     PushNotification.new(message.hunt, :announcements,
       title: "From the organizer",
       body: message.content,
-      url: my_hunt_path,
+      url: my_hunt_path(hunt: message.hunt.code),
       except: message.user_id).deliver
   end
 end

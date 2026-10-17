@@ -53,4 +53,32 @@ RSpec.describe "My hunt" do
 
     expect(response).to redirect_to("/scavenger_hunts/join")
   end
+
+  it "opens the named hunt's team page when that is where the viewer last was" do
+    team = create(:team)
+    get team_path(team)
+
+    get "/my_hunt?hunt=#{team.hunt.code.downcase}"
+
+    expect(response).to redirect_to(team_path(team))
+  end
+
+  it "sends a viewer who last played a different hunt to the named hunt's team picker" do
+    team = create(:team)
+    other_hunt = create(:hunt)
+    get team_path(team)
+
+    get "/my_hunt?hunt=#{other_hunt.code}"
+
+    expect(response).to redirect_to("/scavenger_hunts/#{other_hunt.code}")
+  end
+
+  it "falls back to the usual routing when the named hunt does not exist" do
+    team = create(:team)
+    get team_path(team)
+
+    get "/my_hunt?hunt=NOPE"
+
+    expect(response).to redirect_to(team_path(team))
+  end
 end

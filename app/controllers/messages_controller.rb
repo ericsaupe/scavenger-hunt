@@ -5,8 +5,10 @@ class MessagesController < ApplicationController
 
   def index
     @before = params[:before].presence&.to_i
-    @messages = @hunt.recent_messages(before: @before)
-    @more = @messages.any? && @hunt.earlier_messages?(@messages.first)
+    if @before
+      @messages = @hunt.recent_messages(before: @before)
+      @more = @hunt.earlier_messages?(@messages.first) if @messages.any?
+    end
     render layout: false
   end
 

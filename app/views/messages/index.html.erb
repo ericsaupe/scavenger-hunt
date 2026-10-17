@@ -8,7 +8,7 @@
     </div>
   <% end %>
 <% else %>
-  <%= turbo_frame_tag "chat_messages_#{@hunt.id}", class: "block" do %>
-    <%= render partial: "messages/list", locals: {hunt: @hunt, messages: @messages, more: @more} %>
+  <%= turbo_frame_tag "chat_box_#{@hunt.id}", class: "flex min-h-0 grow flex-col" do %>
+    <%= render partial: "messages/box", locals: {hunt: @hunt} %>
   <% end %>
 <% end %>

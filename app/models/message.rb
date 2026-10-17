@@ -19,7 +19,8 @@ class Message < ApplicationRecord
   after_update_commit :broadcast_removal, if: :saved_change_to_deleted_at?
 
   def remove!
-    update!(deleted_at: Time.current)
+    self.deleted_at = Time.current
+    save!(validate: false)
   end
 
   def removed?

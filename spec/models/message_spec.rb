@@ -36,6 +36,17 @@ RSpec.describe Message, :test_queue_adapter do
     expect(hunt.latest_announcement).to be_nil
   end
 
+  it "removes a message from before names and limits existed" do
+    legacy = create(:message, hunt:)
+    legacy.update_columns(sender_name: nil, content: "x" * 400)
+    allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
+
+    expect { legacy.reload.remove! }.not_to raise_error
+
+    expect(legacy.reload).to be_removed
+    expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(hunt.chat_stream, hash_including(target: legacy)).once
+  end
+
   it "shows the team initial, or the sender's when there is no team" do
     team = create(:team, hunt:, name: "blue bandits")
     expect(build(:message, hunt:, team:).initial).to eq("B")

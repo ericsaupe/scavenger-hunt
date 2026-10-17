@@ -184,13 +184,15 @@ RSpec.describe "Messages" do
   describe "GET /messages" do
     before { create_list(:message, 120, hunt:) }
 
-    it "renders the latest 50 with a frame that loads the earlier ones" do
-      ids = hunt.messages.order(:id).pluck(:id)
+    it "renders the whole sheet with the latest 50 and a frame that loads the earlier ones" do
+      create(:message, hunt:, organizer: true, announcement: true, content: "Pinned for later")
 
-      get "/scavenger_hunts/#{hunt.code}/messages", headers: {"Turbo-Frame" => "chat_messages_#{hunt.id}"}
+      get "/scavenger_hunts/#{hunt.code}/messages", headers: {"Turbo-Frame" => "chat_box_#{hunt.id}"}
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to match(/<turbo-frame[^>]*id="chat_messages_#{hunt.id}"/)
+      expect(response.body).to match(/<turbo-frame[^>]*id="chat_box_#{hunt.id}"/)
+      expect(response.body).to include("Everyone in the hunt", 'data-testid="chat-pinned"', "Pinned for later", "What should we call you?")
+      ids = hunt.messages.order(:id).pluck(:id)
       expect(response.body.scan('data-testid="chat-message"').size).to eq(50)
       expect(response.body).to include(%(id="message_#{ids.last}"))
       expect(response.body).not_to include(%(id="message_#{ids[-51]}"))
@@ -207,7 +209,7 @@ RSpec.describe "Messages" do
 
       get "/scavenger_hunts/#{hunt.code}/messages?before=#{ids[-100]}"
 
-      expect(response.body.scan('data-testid="chat-message"').size).to eq(20)
+      expect(response.body.scan('data-testid="chat-message"').size).to eq(21)
       expect(response.body).not_to include("Show earlier")
     end
   end

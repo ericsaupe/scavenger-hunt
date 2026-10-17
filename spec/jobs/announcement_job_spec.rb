@@ -14,7 +14,7 @@ RSpec.describe AnnouncementJob do
     described_class.perform_now(message)
 
     expect(WebPush).to have_received(:payload_send).once
-    expect(pushed_messages.first).to include("title" => "From the organizer", "body" => "Pizza at 7 by the gazebo", "url" => "/my_hunt", "tag" => "announcements-#{hunt.id}")
+    expect(pushed_messages.first).to include("title" => "From the organizer", "body" => "Pizza at 7 by the gazebo", "url" => "/my_hunt?hunt=#{hunt.code}", "tag" => "announcements-#{hunt.id}")
   end
 
   it "stays quiet for ordinary messages, plain organizer messages and removed announcements" do
