@@ -89,6 +89,21 @@ RSpec.describe "Party chat" do
     expect(page).not_to have_css("[data-testid='chat-sheet'].modal-open")
   end
 
+  it "keeps the team count in the header current as teams join" do
+    visit checklist_path(team)
+    open_chat
+    expect(page).to have_text("Everyone in the hunt, 2 teams")
+
+    using_session(:newcomer) do
+      visit "/scavenger_hunts/#{hunt.code}"
+      fill_in "Or start a new team", with: "Yellow Yetis"
+      click_on "Join the hunt"
+      expect(page).to have_text("Yellow Yetis")
+    end
+
+    expect(page).to have_text("Everyone in the hunt, 3 teams")
+  end
+
   it "pins the organizer's announcement, shows it on the checklist and lets them remove messages" do
     visit checklist_path(team)
     hunt.update!(owner_id: viewer_id)
@@ -130,6 +145,53 @@ RSpec.describe "Party chat" do
       open_chat
       expect(page).to have_css("[data-testid='chat-message'][data-removed]", text: "Message removed")
       expect(page).not_to have_css("[data-testid='chat-remove']", visible: :visible)
+    end
+  end
+
+  describe "when a message cannot be sent" do
+    it "keeps the text in the composer when the server answers with an error page" do
+      calls = 0
+      allow_any_instance_of(MessagesController).to receive(:create).and_wrap_original do |original, *args|
+        calls += 1
+        if calls == 1
+          original.receiver.render(html: "<h1>Bad Gateway</h1>".html_safe, status: :bad_gateway)
+        else
+          original.call(*args)
+        end
+      end
+
+      visit checklist_path(team)
+      open_chat
+      set_name("Eric")
+      fill_in "message_content", with: "Anyone seen the cones?"
+      click_on "Send"
+
+      expect(page).to have_css("#chat_notice_#{hunt.id}", text: "Couldn't send. Tap send to try again.")
+      expect(page).to have_field("message_content", with: "Anyone seen the cones?")
+      expect(page).to have_css("[data-testid='chat-sheet'].modal-open")
+      expect(page).not_to have_text("Bad Gateway")
+
+      click_on "Send"
+      expect(page).to have_css("[data-testid='chat-message'][data-own]", text: "Anyone seen the cones?")
+      expect(page).not_to have_css("#chat_notice_#{hunt.id}", text: "Couldn't send")
+      expect(page).to have_field("message_content", with: "")
+    end
+
+    it "keeps the text in the composer when the request never reaches the server" do
+      visit checklist_path(team)
+      open_chat
+      set_name("Eric")
+      fill_in "message_content", with: "Anyone seen the cones?"
+      go_offline
+      click_on "Send"
+
+      expect(page).to have_css("#chat_notice_#{hunt.id}", text: "Couldn't send. Tap send to try again.")
+      expect(page).to have_field("message_content", with: "Anyone seen the cones?")
+
+      go_online
+      click_on "Send"
+      expect(page).to have_css("[data-testid='chat-message'][data-own]", text: "Anyone seen the cones?")
+      expect(page).not_to have_css("#chat_notice_#{hunt.id}", text: "Couldn't send")
     end
   end
 

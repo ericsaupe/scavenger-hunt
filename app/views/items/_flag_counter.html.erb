@@ -3,7 +3,7 @@
 
   <span id="submission_<%= submission.id %>_flags" class="contents">
     <span class="status-pill bg-base-200 text-ink-soft" title="Flags before this photo stops counting" data-testid="flag-counter">
-      <%= submission.votes.count(&:denied?) %> of <%= submission.max_downvotes_to_lose_points %> flags
+      <%= submission.shown_flag_count %> of <%= submission.max_downvotes_to_lose_points %> flags
     </span>
     <% if submission.denied_points? %>
       <%= render partial: "items/doesnt_count" %>

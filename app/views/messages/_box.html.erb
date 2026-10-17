@@ -5,7 +5,7 @@
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <h2 id="party_chat_title_<%= hunt.id %>" class="display text-2xl">Party chat</h2>
-        <p class="mt-0.5 text-sm text-ink-soft">Everyone in the hunt, <%= pluralize(hunt.teams.size, "team") %></p>
+        <p class="mt-0.5 text-sm text-ink-soft">Everyone in the hunt, <span id="<%= hunt.chat_team_count_id %>"><%= render partial: "messages/team_count", locals: {hunt:} %></span></p>
       </div>
       <button type="button" class="btn btn-ghost btn-sm btn-circle shrink-0" data-action="chat#close" aria-label="Close chat"><%= icon :x_mark, class: "size-5" %></button>
     </div>

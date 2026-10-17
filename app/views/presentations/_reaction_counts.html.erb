@@ -6,7 +6,7 @@
   <% if submission.max_downvotes_to_lose_points&.positive? %>
     <span class="status-pill bg-ink text-base text-white" data-testid="flag-count">
       <%= icon :flag, solid: true, class: "size-5 text-flag" %>
-      <%= submission.votes.count(&:denied?) %> of <%= submission.max_downvotes_to_lose_points %> flags
+      <%= submission.shown_flag_count %> of <%= submission.max_downvotes_to_lose_points %> flags
     </span>
     <% if submission.denied_points? %>
       <%= render partial: "items/doesnt_count" %>

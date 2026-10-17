@@ -54,6 +54,9 @@ export default class extends Controller {
 
   setState(state) {
     this.containerTarget.dataset.state = state
+    document.querySelectorAll("[data-timer-while]").forEach(element => {
+      element.hidden = (element.dataset.timerWhile === "ended") !== (state === "ended")
+    })
   }
 
   toggleFieldsets(disabled) {

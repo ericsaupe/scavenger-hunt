@@ -196,6 +196,20 @@ RSpec.describe "Hunts" do
       end
     end
 
+    describe "when the end passes while the checklist is open" do
+      it "swaps the photo instructions for the closing line without a reload" do
+        hunt.update(ends_at: 3.seconds.from_now)
+        visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+        expect(page).to have_text("Ends in")
+        expect(page).to have_text("Tap an item to take a photo")
+        expect(page).not_to have_text("The hunt is over.")
+
+        expect(page).to have_text("Hunt over. No more submissions.", wait: 6)
+        expect(page).to have_text("The hunt is over.")
+        expect(page).not_to have_text("Tap an item to take a photo")
+      end
+    end
+
     describe "when ended" do
       before do
         hunt.update(ends_at: 1.hour.ago)
@@ -209,6 +223,28 @@ RSpec.describe "Hunts" do
       it "shows the view results button" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
         expect(page).to have_text("View results")
+      end
+
+      it "tells the team the hunt is over instead of how to take photos" do
+        visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+        expect(page).to have_text("The hunt is over.")
+        expect(page).not_to have_text("Tap an item to take a photo")
+      end
+
+      it "keeps the progress text and the timer pill on one line each on a phone" do
+        30.times { |i| create(:item, category: hunt.categories.first, name: "Thing #{i + 1}") }
+        emulate_viewport(390, 844)
+        visit "/scavenger_hunts/#{hunt.code.upcase}/teams/#{team.id}"
+        expect(page).to have_text("0 of 33 found")
+        expect(page).to have_text("Hunt over. No more submissions.")
+
+        lines = page.evaluate_script(<<~JS)
+          ["[data-checklist-target='progress']", "[data-timer-target='countdown']"].map((selector) => {
+            const element = document.querySelector(selector)
+            return Math.round(element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))
+          })
+        JS
+        expect(lines).to eq([1, 1])
       end
     end
   end

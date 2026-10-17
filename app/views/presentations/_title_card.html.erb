@@ -19,9 +19,9 @@
               <%= image_tag submission_attachment_url(submission), class: "size-full object-cover", alt: "", loading: "lazy" %>
             <% end %>
           </div>
-          <figcaption class="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold text-ink-soft sm:text-xs">
+          <figcaption class="mt-1 flex items-center justify-center gap-1 text-[10px] font-semibold leading-tight text-ink-soft sm:text-xs">
             <%= team_avatar(submission.team, size: 16) %>
-            <span class="truncate"><%= submission.team.name %></span>
+            <span class="line-clamp-2 min-w-0 break-words text-balance"><%= submission.team.name %></span>
           </figcaption>
         </figure>
       <% end %>

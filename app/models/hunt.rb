@@ -168,6 +168,10 @@ class Hunt < ApplicationRecord
     "chat_notice_#{id}"
   end
 
+  def chat_team_count_id
+    "chat_team_count_#{id}"
+  end
+
   def chat_available?
     chat_enabled? && Flipper.enabled?(:chat)
   end

@@ -200,6 +200,27 @@ RSpec.describe "Presenter" do
     expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 5")
   end
 
+  it "fits a long team name in the title card captions on the big screen and on a phone" do
+    team.update!(name: "Green Machine")
+    hunt.update!(presentation_slide: "item:#{hunt.items.first.id}")
+    overflow = <<~JS
+      (() => {
+        const caption = document.querySelector("[data-testid='title-card'] figcaption span")
+        return caption.scrollWidth > caption.clientWidth + 1 || caption.scrollHeight > caption.clientHeight + 1
+      })()
+    JS
+
+    emulate_viewport(1920, 1080)
+    visit "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+    expect(page).to have_css("[data-testid='title-card'] figcaption", text: "Green Machine")
+    expect(page.evaluate_script(overflow)).to be(false)
+
+    emulate_viewport(390, 844)
+    visit "/scavenger_hunts/#{hunt.code}/presenter"
+    expect(page).to have_css("[data-testid='title-card'] figcaption", text: "Green Machine")
+    expect(page.evaluate_script(overflow)).to be(false)
+  end
+
   it "shows the host what is coming next and jumps to any item" do
     visit "/scavenger_hunts/#{hunt.code}/presenter"
     click_on "Take the remote"
