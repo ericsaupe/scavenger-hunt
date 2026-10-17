@@ -45,6 +45,10 @@
 
   <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or video. Found items tick off for the whole team.</p>
 
+  <% if @hunt.chat_available? %>
+    <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_organizer_message} %>
+  <% end %>
+
   <div data-checklist-target="list">
     <%= render partial: "hunts/checklist" %>
   </div>
@@ -53,3 +57,7 @@
     <span class="absolute bottom-0 right-0 grid size-5 place-items-center rounded-tl-lg bg-base-100 text-ink-soft" data-testid="queued-badge"><%= icon :cloud, class: "size-3.5" %></span>
   </template>
 </div>
+
+<% if @hunt.chat_available? %>
+  <%= render partial: "messages/chat", locals: {hunt: @hunt} %>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_100300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -208,6 +208,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_230000) do
     t.datetime "lead_announced_at"
     t.datetime "lead_recheck_at"
     t.string "presentation_slide"
+    t.boolean "chat_enabled", default: true, null: false
     t.index ["code"], name: "index_hunts_on_code"
     t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end
@@ -226,7 +227,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_230000) do
     t.string "content", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "sender_name", limit: 40
+    t.bigint "team_id"
+    t.boolean "organizer", default: false, null: false
+    t.datetime "deleted_at"
+    t.index ["hunt_id", "organizer", "id"], name: "index_messages_on_hunt_id_and_organizer_and_id"
     t.index ["hunt_id"], name: "index_messages_on_hunt_id"
+    t.index ["team_id"], name: "index_messages_on_team_id"
   end
 
   create_table "push_subscriptions", force: :cascade do |t|
@@ -242,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_230000) do
     t.boolean "notify_lead_change", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "notify_announcements", default: true, null: false
     t.index ["hunt_id", "user_id"], name: "index_push_subscriptions_on_hunt_id_and_user_id", unique: true
     t.index ["hunt_id"], name: "index_push_subscriptions_on_hunt_id"
   end
@@ -300,6 +308,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_230000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "messages", "hunts"
+  add_foreign_key "messages", "teams"
   add_foreign_key "push_subscriptions", "hunts"
   add_foreign_key "votes", "submissions"
 end

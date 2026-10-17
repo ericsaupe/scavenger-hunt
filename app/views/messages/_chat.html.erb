@@ -1,0 +1,34 @@
+<% offset = local_assigns.fetch(:offset, "bottom-4") %>
+<%= tag.div id: "party_chat_#{hunt.id}", class: "contents", data: {turbo_permanent: true, controller: "chat", chat_hunt_id_value: hunt.id, chat_viewer_id_value: cookies[:user_id], chat_url_value: hunt_messages_path(hunt.code), chat_max_value: Message::MAX_CONTENT_LENGTH, chat_organizer: ("" if hunt.owner?(cookies[:user_id]))}.compact do %>
+  <%= turbo_stream_from hunt.chat_stream %>
+
+  <button type="button" class="fixed right-4 z-40 inline-flex items-center gap-2 rounded-full bg-neutral py-2.5 pl-3.5 pr-4 text-sm font-bold text-neutral-content shadow-lg ring-1 ring-base-content/10 transition active:scale-95 <%= offset %>" data-action="chat#show" data-testid="chat-pill" aria-haspopup="dialog" aria-controls="party_chat_sheet_<%= hunt.id %>">
+    <%= icon :chat_bubble, class: "size-5 text-marigold" %>
+    Party chat
+    <span class="grid h-5 min-w-5 place-items-center rounded-full bg-marigold px-1.5 text-xs font-extrabold tabular-nums text-marigold-content" data-chat-target="badge" data-testid="chat-unread" hidden></span>
+  </button>
+
+  <div id="party_chat_sheet_<%= hunt.id %>" class="modal modal-bottom sm:modal-middle" role="dialog" aria-modal="true" aria-labelledby="party_chat_title_<%= hunt.id %>" data-chat-target="sheet" data-testid="chat-sheet">
+    <div class="modal-box flex h-[85dvh] max-h-[85dvh] flex-col p-0 sm:h-[36rem] sm:max-w-lg" data-chat-target="box">
+      <div class="shrink-0 border-b border-base-300 px-5 pb-3 pt-2">
+        <div class="mx-auto mb-3 h-1.5 w-10 cursor-grab touch-none rounded-full bg-base-300 sm:hidden" data-chat-target="handle" data-action="pointerdown->chat#dragStart pointermove->chat#dragMove pointerup->chat#dragEnd pointercancel->chat#dragEnd" aria-hidden="true"></div>
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 id="party_chat_title_<%= hunt.id %>" class="display text-2xl">Party chat</h2>
+            <p class="mt-0.5 text-sm text-ink-soft">Everyone in the hunt, <%= pluralize(hunt.teams.size, "team") %></p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm btn-circle shrink-0" data-action="chat#close" aria-label="Close chat"><%= icon :x_mark, class: "size-5" %></button>
+        </div>
+      </div>
+      <%= render partial: "messages/pinned", locals: {hunt:, message: hunt.latest_organizer_message} %>
+      <div class="grow overflow-y-auto overscroll-contain px-4 py-3" data-chat-target="scroller">
+        <% messages = hunt.recent_messages %>
+        <%= turbo_frame_tag "chat_messages_#{hunt.id}", class: "block", data: {chat_target: "frame"} do %>
+          <%= render partial: "messages/list", locals: {hunt:, messages:, more: messages.any? && hunt.earlier_messages?(messages.first)} %>
+        <% end %>
+      </div>
+      <%= render partial: "messages/composer", locals: {hunt:, name: chat_name} %>
+    </div>
+    <button type="button" class="modal-backdrop" data-action="chat#close" aria-label="Close chat">close</button>
+  </div>
+<% end %>
