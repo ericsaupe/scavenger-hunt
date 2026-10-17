@@ -47,10 +47,12 @@ RSpec.describe Message, :test_queue_adapter do
     expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(hunt.chat_stream, hash_including(target: legacy)).once
   end
 
-  it "shows the team initial, or the sender's when there is no team" do
-    team = create(:team, hunt:, name: "blue bandits")
-    expect(build(:message, hunt:, team:).initial).to eq("B")
-    expect(build(:message, hunt:, sender_name: "eric").initial).to eq("E")
+  it "links to a thumbs avatar seeded from the sender token, never the user id" do
+    message = build(:message, hunt:, user_id: "viewer")
+
+    expect(message.avatar_url).to eq(Avatar.for(:person, message.sender_token))
+    expect(message.avatar_url).not_to include("viewer")
+    expect(message.avatar_url(still: true)).to end_with("?still=1")
   end
 
   it "knows whose message it is" do

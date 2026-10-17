@@ -24,9 +24,9 @@ class Hunt < ApplicationRecord
   after_commit :schedule_starting_soon_notification, if: :saved_change_to_starts_at?
   after_commit :schedule_results_notification, if: :saved_change_to_ends_at?
 
-  def start_a_new_team(team_name)
+  def start_a_new_team(team_name, avatar_seed: nil)
     ActiveRecord::Base.transaction do
-      team = teams.find_or_create_by(name: team_name)
+      team = teams.find_or_create_by(name: team_name) { |new_team| new_team.avatar_seed = avatar_seed }
       # rubocop:disable Rails/SkipsModelValidations
       # Yeah, probably not the best but it's nicer on the frontend and the
       # joint updates if all the records are created here.
@@ -85,7 +85,7 @@ class Hunt < ApplicationRecord
     ranked = teams.map do |team|
       score = scores.fetch(team.id, 0)
       total_score = total_scores.fetch(team.id, 0)
-      [team, {team_id: team.id, name: team.name, score:, total_score:, deductions: total_score - score, submissions: found_counts.fetch(team.id, 0)}]
+      [team, {team_id: team.id, name: team.name, team:, score:, total_score:, deductions: total_score - score, submissions: found_counts.fetch(team.id, 0)}]
     end.sort_by { |_, result| result[:score] }.reverse
 
     winner, winning_result = ranked.first

@@ -61,7 +61,7 @@ RSpec.describe "Party chat" do
       open_chat
       expect(page).to have_css("[data-testid='chat-message']:not([data-own])", text: "Found the fountain!")
       expect(page).to have_css("[data-testid='chat-unread']", visible: :hidden)
-      expect(page).to have_css(".message-avatar", text: "B")
+      expect(page).to have_css("[data-testid='sender-avatar'][src='#{hunt.messages.sole.avatar_url}']")
       set_name("Dana")
       send_message("Nice one")
     end
@@ -96,6 +96,8 @@ RSpec.describe "Party chat" do
     send_message("Pizza at 7 by the gazebo")
     expect(page).to have_css("[data-testid='chat-pinned']", text: "Pizza at 7 by the gazebo")
     expect(page).to have_css("[data-testid='chat-message'][data-announcement]", text: "Announcement")
+    expect(page).to have_css("[data-testid='chat-message'][data-announcement] .message-avatar [data-testid='sender-avatar']", visible: :all)
+    expect(page).to have_css("[data-testid='chat-message'][data-announcement] .message-avatar [data-testid='announcement-badge']", visible: :all)
     expect(page).to have_css("[data-testid='chat-announcement-toggle'][aria-pressed='false']")
 
     using_session(:other) do

@@ -3,14 +3,16 @@
   <div class="pointer-events-none absolute inset-0" aria-hidden="true" data-testid="confetti"><%= static_confetti %></div>
   <div id="finale_card" class="relative z-10 flex w-full max-w-6xl flex-col items-center gap-10 lg:flex-row lg:justify-center lg:gap-16" style="--tilt: 0deg" data-print data-controller="finale">
     <div class="text-center lg:text-left">
+      <%= team_avatar(winner[:team], size: 160, class: "mb-6 ring-4 ring-white/20", img_class: "size-28 sm:size-40") %>
       <p class="text-sm font-extrabold uppercase tracking-[0.3em] text-flag sm:text-lg">First place</p>
       <h2 class="display mt-4 text-5xl text-white sm:text-7xl lg:text-8xl" data-testid="winner-name"><%= winner[:name] %></h2>
       <p class="mt-4 text-2xl font-extrabold text-white/80 sm:text-4xl"><%= pluralize(winner[:score], "point") %></p>
       <% if slide.runners_up.any? %>
         <ol class="mt-8 space-y-2 text-lg font-semibold text-white/70 sm:text-2xl" data-testid="runners-up">
           <% slide.runners_up.each_with_index do |result, i| %>
-            <li class="flex items-baseline gap-4 lg:justify-start justify-center">
+            <li class="flex items-center gap-4 lg:justify-start justify-center">
               <span class="w-8 shrink-0 text-right tabular-nums text-white/40"><%= i + 2 %></span>
+              <%= team_avatar(result[:team], size: 32) %>
               <span class="min-w-0 truncate text-white"><%= result[:name] %></span>
               <span class="shrink-0 tabular-nums"><%= pluralize(result[:score], "point") %></span>
             </li>

@@ -125,7 +125,7 @@ RSpec.describe "Presenter" do
       expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 5")
       expect(page).to have_css("[data-testid='title-card']", text: /next up/i)
       expect(page).to have_css("[data-testid='title-card']", text: hunt.items.first.name)
-      expect(page).to have_css("[data-testid='title-card-summary']", text: "Found by 1 of 1 team, #{points} points each")
+      expect(page).to have_css("[data-testid='title-card-summary']", text: "Found by 1 of 1 team, #{points} #{"point".pluralize(points)} each")
       expect(page).to have_css("[data-testid='title-card'] figure img, [data-testid='title-card'] figure svg")
     end
 
@@ -186,7 +186,7 @@ RSpec.describe "Presenter" do
     using_session(:big_screen) do
       expect(page).to have_css("#finale_card.print-enter", text: /first place/i)
       expect(page).to have_css("[data-testid='winner-name']", text: team.name)
-      expect(page).to have_css("[data-testid='finale']", text: "#{team.score} points")
+      expect(page).to have_css("[data-testid='finale']", text: "#{team.score} #{"point".pluralize(team.score)}")
       expect(page).to have_css("[data-testid='most-loved']", text: "1 love")
       expect(page).to have_css("[data-testid='confetti'] .confetti", visible: :all, minimum: 10)
       expect(page).to have_link("Results", href: "/scavenger_hunts/#{hunt.code}/results")

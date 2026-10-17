@@ -1,10 +1,11 @@
 <% viewer_id = local_assigns[:viewer_id] %>
 <%= tag.div id: dom_id(message), class: "message", data: {message_id: message.id, sender: message.sender_token, own: ("" if message.own?(viewer_id)), announcement: ("" if message.announcement?), removed: ("" if message.removed?), testid: "chat-message"}.compact do %>
-  <% if message.announcement? %>
-    <span class="message-avatar bg-neutral text-marigold"><%= icon :megaphone, class: "size-5" %></span>
-  <% else %>
-    <span class="message-avatar bg-marigold text-base font-extrabold text-marigold-content"><%= message.initial %></span>
-  <% end %>
+  <span class="message-avatar relative">
+    <%= sender_avatar(message, size: 36) %>
+    <% if message.announcement? %>
+      <span class="absolute -bottom-0.5 -right-1 grid size-4 place-items-center rounded-full bg-neutral text-marigold ring-2 ring-base-100" data-testid="announcement-badge"><%= icon :megaphone, class: "size-2.5" %></span>
+    <% end %>
+  </span>
   <div class="min-w-0 max-w-[82%]">
     <p class="message-meta mb-0.5 flex flex-wrap items-center gap-x-1.5 px-1 text-[11px] font-semibold text-ink-soft">
       <% if message.announcement? %>

@@ -1,5 +1,5 @@
 <%= label_tag "team_id_#{team.id}", class: "row-tap cursor-pointer has-checked:bg-primary/5" do %>
   <%= radio_button_tag :team_id, team.id, false, class: "radio radio-primary", id: "team_id_#{team.id}" %>
-  <span class="grid size-10 shrink-0 place-items-center rounded-full bg-marigold font-extrabold text-marigold-content"><%= team.name.first.upcase %></span>
+  <%= team_avatar(team, size: 40) %>
   <span class="grow text-lg font-semibold"><%= team.name %></span>
 <% end %>

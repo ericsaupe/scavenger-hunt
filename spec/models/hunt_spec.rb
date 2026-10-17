@@ -45,7 +45,7 @@ RSpec.describe Hunt do
 
       results = hunt.results
 
-      expect(results.map { |result| result.except(:victory_photo_url, :team_id) }).to eq([
+      expect(results.map { |result| result.except(:victory_photo_url, :team_id, :team) }).to eq([
         {name: "Leaders", score: 15, total_score: 15, deductions: 0, submissions: 3},
         {name: "Trailers", score: 10, total_score: 15, deductions: 5, submissions: 3},
         {name: "Empty", score: 0, total_score: 0, deductions: 0, submissions: 0}

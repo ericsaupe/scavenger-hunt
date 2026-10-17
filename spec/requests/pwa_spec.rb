@@ -57,6 +57,16 @@ RSpec.describe "PWA" do
       )
     end
 
+    it "caches avatars offline once seen, but never a fallback, and leaves the precache list alone" do
+      get "/service-worker.js"
+
+      expect(response.body).to include('avatars: "avatars-v1"')
+      expect(response.body).to include('url.pathname.startsWith("/avatars/")')
+      expect(response.body).to include("cacheFirst(request, CACHES.avatars, immutable)")
+      expect(response.body).to include('includes("immutable")')
+      expect(JSON.parse(response.body[/const PRECACHE = (\[.*?\])/m, 1])).not_to include(a_string_matching(%r{/avatars/}))
+    end
+
     it "shows pushes as notifications that open their url" do
       get "/service-worker.js"
 

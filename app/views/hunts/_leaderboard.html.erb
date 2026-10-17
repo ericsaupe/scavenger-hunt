@@ -8,6 +8,7 @@
         <div class="grid aspect-[4/3] w-full place-items-center bg-marigold text-marigold-content"><%= icon :trophy, class: "size-16" %></div>
       <% end %>
       <figcaption class="mt-4 text-center">
+        <%= team_avatar(winner[:team], size: 64, class: "mb-2 ring-4 ring-marigold/40") %>
         <span class="block text-sm font-semibold text-ink-soft">First place</span>
         <span class="display block text-3xl text-ink"><%= winner[:name] %></span>
       </figcaption>
@@ -42,7 +43,12 @@
               <%= i + 1 %>
             <% end %>
           </td>
-          <td class="font-semibold"><%= result[:name] %></td>
+          <td class="font-semibold">
+            <span class="flex items-center gap-2.5">
+              <%= team_avatar(result[:team], size: 32) %>
+              <span><%= result[:name] %></span>
+            </span>
+          </td>
           <td class="text-right tabular-nums"><%= result[:submissions] %></td>
           <% if with_deductions %>
             <td class="text-right tabular-nums"><%= result[:total_score] %></td>

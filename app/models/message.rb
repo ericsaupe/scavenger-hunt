@@ -35,8 +35,8 @@ class Message < ApplicationRecord
     hunt.viewer_token(user_id)
   end
 
-  def initial
-    (team&.name.presence || sender_name).to_s.first.upcase
+  def avatar_url(still: false)
+    Avatar.for(:person, sender_token, still:)
   end
 
   private

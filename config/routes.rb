@@ -7,10 +7,12 @@ Rails.application.routes.draw do
   get "service-worker", to: "rails/pwa#service_worker", as: :pwa_service_worker
   get "offline", to: "pwa#offline"
   get "my_hunt", to: "my_hunt#show", as: :my_hunt
+  get "avatars/:kind/:digest", to: "avatars#show", as: :avatar, constraints: {kind: /team|person/, digest: /\h{64}/}, defaults: {format: :svg}
 
   resources :hunts, only: %i[index new create show], param: :code, path: "scavenger_hunts" do
     get :join, on: :collection
     resources :teams, only: %i[create show] do
+      get :avatar, on: :collection
       post :pending_uploads, on: :member
     end
     resources :items, only: %i[show]

@@ -143,6 +143,10 @@ class Presentation
       nil
     end
 
+    def team
+      nil
+    end
+
     def video?
       false
     end
@@ -179,6 +183,10 @@ class Presentation
 
     def subtitle
       submission.team.name
+    end
+
+    def team
+      submission.team
     end
   end
 
@@ -234,6 +242,10 @@ class Presentation
 
     def subtitle
       winner&.fetch(:name)
+    end
+
+    def team
+      winner&.fetch(:team)
     end
 
     def results

@@ -7,8 +7,11 @@ class Team < ApplicationRecord
 
   PENDING_UPLOADS_TTL = 5.minutes
   MAX_PENDING_REPORTERS = 25
+  AVATAR_SEED_FORMAT = /\A\h{16}\z/
 
   validates :name, uniqueness: {scope: :hunt, case_sensitive: false}
+
+  before_validation :assign_avatar_seed, on: :create
 
   after_create_commit { broadcast_append_to("teams_#{hunt_id}") }
   after_update_commit { broadcast_replace(partial: "teams/score") }
@@ -17,6 +20,10 @@ class Team < ApplicationRecord
     Rails.cache.read_multi(*teams.map { |team| team.pending_uploads_cache_key }).values.sum do |reports|
       live_pending_reports(reports).values.sum { |count, _reported_at| count }
     end
+  end
+
+  def self.new_avatar_seed
+    SecureRandom.hex(8)
   end
 
   def self.live_pending_reports(reports)
@@ -38,6 +45,14 @@ class Team < ApplicationRecord
 
   def pending_uploads_cache_key
     "teams/#{id}/pending_uploads"
+  end
+
+  def avatar_url(still: false)
+    Avatar.for(:team, avatar_seed, initial: name, still:)
+  end
+
+  def shuffle_avatar!
+    update!(avatar_seed: self.class.new_avatar_seed)
   end
 
   def score
@@ -65,5 +80,11 @@ class Team < ApplicationRecord
 
     winning_photo ||= submissions.found.sample
     winning_photo&.video? ? winning_photo.poster_url : winning_photo&.large_variant_url
+  end
+
+  private
+
+  def assign_avatar_seed
+    self.avatar_seed = self.class.new_avatar_seed unless avatar_seed.to_s.match?(AVATAR_SEED_FORMAT)
   end
 end
