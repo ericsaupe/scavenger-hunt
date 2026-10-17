@@ -78,6 +78,21 @@ RSpec.describe "Party chat" do
     expect(page).not_to have_css("[data-testid='chat-sheet'].modal-open")
   end
 
+  it "keeps the team count in the header current as teams join" do
+    visit checklist_path(team)
+    open_chat
+    expect(page).to have_text("Everyone in the hunt, 2 teams")
+
+    using_session(:newcomer) do
+      visit "/scavenger_hunts/#{hunt.code}"
+      fill_in "Or start a new team", with: "Yellow Yetis"
+      click_on "Join the hunt"
+      expect(page).to have_text("Yellow Yetis")
+    end
+
+    expect(page).to have_text("Everyone in the hunt, 3 teams")
+  end
+
   it "pins the organizer's announcement, shows it on the checklist and lets them remove messages" do
     visit checklist_path(team)
     hunt.update!(owner_id: viewer_id)

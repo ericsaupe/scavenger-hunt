@@ -23,6 +23,19 @@ RSpec.describe Team do
     end
   end
 
+  describe "joining" do
+    it "refreshes the team count in every open party chat" do
+      hunt = create(:hunt)
+      create(:team, hunt:)
+      allow(Turbo::StreamsChannel).to receive(:broadcast_update_to)
+
+      create(:team, hunt:)
+
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_update_to)
+        .with(hunt.chat_stream, hash_including(target: hunt.chat_team_count_id, partial: "messages/team_count"))
+    end
+  end
+
   describe "avatars" do
     it "gives every team a random sixteen-character seed, so same-named teams in other hunts look different" do
       team = create(:team, name: "Owls")
