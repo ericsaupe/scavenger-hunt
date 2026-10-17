@@ -23,6 +23,14 @@ class Team < ApplicationRecord
     end
   end
 
+  def ensure_submissions!
+    missing = hunt.items.where.not(id: submissions.select(:item_id)).pluck(:id)
+    return if missing.empty?
+
+    now = Time.current
+    Submission.upsert_all(missing.map { |item_id| {item_id:, team_id: id, created_at: now, updated_at: now} }) # rubocop:disable Rails/SkipsModelValidations
+  end
+
   def self.new_avatar_seed
     SecureRandom.hex(8)
   end

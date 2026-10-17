@@ -14,6 +14,21 @@ RSpec.describe "Teams" do
     team.submissions.find_by(item:).photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
   end
 
+  it "fills in a submission row for any item the team is missing before it renders the checklist" do
+    hunt = create(:hunt)
+    team = create(:team, hunt:)
+    item = hunt.items.last
+    team.submissions.find_by(item:).destroy!
+
+    get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
+
+    expect(response).to have_http_status(:ok)
+    submission = team.submissions.find_by(item:)
+    expect(submission).to be_present
+    expect(response.body).to include("submission_#{submission.id}_photo")
+    expect(response.body).not_to include('id="new_submission"')
+  end
+
   it "offers a fresh critter for a new team and hands out another on shuffle" do
     hunt = create(:hunt)
 
