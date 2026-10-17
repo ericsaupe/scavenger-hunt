@@ -140,7 +140,13 @@ export default class extends Controller {
   }
 
   syncWithRender(event) {
-    const fresh = event.detail.newBody?.querySelector(`#${this.frameTarget.id}`)
+    const root = event.detail.newBody?.querySelector(`#${this.element.id}`)
+    if (!root) return
+    const pill = root.querySelector("[data-chat-target~='pill']")
+    if (pill) {
+      this.pillTarget.className = pill.className
+    }
+    const fresh = root.querySelector(`#${this.frameTarget.id}`)
     if (!fresh || fresh.dataset.chatRole === this.shownRole) return
     this.frameTarget.dataset.chatRole = fresh.dataset.chatRole
     this.refresh()

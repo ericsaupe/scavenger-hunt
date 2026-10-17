@@ -247,9 +247,13 @@ RSpec.describe "Party chat" do
       expect(page).to have_css("[data-testid='chat-pill']")
       expect(page).to have_css("#party_chat_#{hunt.id} turbo-cable-stream-source[connected]", visible: :all)
       expect(page).to have_css("[data-chat-box][data-chat-organizer]", visible: :all)
+      expect(find("[data-testid='chat-pill']")[:class]).to include("bottom-[max(1rem,env(safe-area-inset-bottom))]")
       expect(overlap?("[data-testid='chat-pill']", "button", text: "Next")).to be(false)
 
       open_chat
+      find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).send_keys(:arrow_right)
+      expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 3")
+      expect(hunt.reload.presentation_slide).to eq("submission:#{hunt.submissions.first.id}")
       set_name("Host")
       expect(page).to have_text("Sending as Host, Organizer")
       find("[data-testid='chat-announcement-toggle']").click
@@ -261,8 +265,11 @@ RSpec.describe "Party chat" do
       expect(hunt.messages.sole).to have_attributes(organizer: true, announcement: true, team: nil)
 
       find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).click
-      click_on "Next"
+      expect(page).not_to have_css("[data-testid='chat-sheet'].modal-open")
+      find("body").send_keys(:arrow_right)
       expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 3")
+      click_on "Next"
+      expect(page).to have_css("[data-testid='progress']", text: "Finale 3 of 3")
       expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
       expect(page).to have_css("[data-testid='chat-pill']")
     end
@@ -285,8 +292,11 @@ RSpec.describe "Party chat" do
   it "lets an organizer chat from the hunt page without borrowing a team's name" do
     visit checklist_path(team)
     hunt.update!(owner_id: viewer_id)
-    visit "/scavenger_hunts/#{hunt.code}"
+    visit checklist_path(team)
+    expect(page).to have_css("[data-testid='chat-pill'].bottom-4")
+    click_on "Teams"
     expect(page).to have_button("Join the hunt")
+    expect(page).to have_css("[data-testid='chat-pill'].bottom-24")
     expect(overlap?("[data-testid='chat-pill']", ".bottom-bar")).to be(false)
 
     open_chat
