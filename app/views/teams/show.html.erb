@@ -46,7 +46,7 @@
   <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or video. Found items tick off for the whole team.</p>
 
   <% if @hunt.chat_available? %>
-    <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_organizer_message} %>
+    <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_announcement} %>
   <% end %>
 
   <div data-checklist-target="list">

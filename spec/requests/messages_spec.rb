@@ -18,8 +18,8 @@ RSpec.describe "Messages" do
     patch "/scavenger_hunts/#{hunt.code}/chat_name", params: {name:}, headers: turbo
   end
 
-  def send_message(content)
-    post "/scavenger_hunts/#{hunt.code}/messages", params: {message: {content:}}, headers: turbo
+  def send_message(content, announcement: nil)
+    post "/scavenger_hunts/#{hunt.code}/messages", params: {message: {content:, announcement:}.compact}, headers: turbo
   end
 
   describe "POST /messages" do
@@ -46,14 +46,35 @@ RSpec.describe "Messages" do
       expect(message).to have_attributes(sender_name: "Eric", team:, user_id: "viewer", organizer: false)
     end
 
-    it "flags the organizer's messages" do
+    it "signs the organizer's ordinary messages as the organizer" do
       cookies[:user_id] = "organizer"
       set_name("Host")
 
       send_message("Welcome!")
 
-      expect(hunt.messages.last).to be_organizer
-      expect(response.body).to include("Organizer")
+      expect(hunt.messages.last).to have_attributes(organizer: true, announcement: false)
+      expect(response.body).to include("Organizer", "Welcome!")
+      expect(response.body).not_to include("data-announcement", "Announcement")
+    end
+
+    it "lets the organizer mark a message as an announcement" do
+      cookies[:user_id] = "organizer"
+      set_name("Host")
+
+      send_message("Pizza at 7", announcement: "1")
+
+      expect(hunt.messages.last).to have_attributes(organizer: true, announcement: true)
+      expect(response.body).to include("data-announcement", "Announcement")
+    end
+
+    it "rejects an announcement from anyone but the organizer" do
+      set_name("Eric")
+
+      send_message("Free pizza for everyone", announcement: "1")
+
+      expect(response).to have_http_status(:forbidden)
+      expect(response.body).to include("Only the organizer can send announcements")
+      expect(hunt.messages.count).to eq(0)
     end
 
     it "rejects a message over 280 characters" do
@@ -89,16 +110,19 @@ RSpec.describe "Messages" do
       expect(hunt.messages.pluck(:content)).to eq(%w[One Three Four])
     end
 
-    it "broadcasts the message and the organizer pin to the hunt's chat stream" do
+    it "broadcasts the message and, for an announcement, the pin to the hunt's chat stream" do
       allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
       allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
       cookies[:user_id] = "organizer"
       set_name("Host")
 
       send_message("Welcome!")
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_replace_to)
+
+      send_message("Pizza at 7", announcement: "1")
 
       expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to)
-        .with(hunt.chat_stream, hash_including(target: "hunt_chat_#{hunt.id}", partial: "messages/message")).once
+        .with(hunt.chat_stream, hash_including(target: "hunt_chat_#{hunt.id}", partial: "messages/message")).twice
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to)
         .with(hunt.chat_stream, hash_including(target: "chat_pinned_#{hunt.id}", partial: "messages/pinned")).once
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to)
@@ -189,15 +213,27 @@ RSpec.describe "Messages" do
   end
 
   describe "GET /teams/:id" do
-    it "shows the chat with the latest organizer message pinned and the 'From the organizer' card" do
-      create(:message, hunt:, organizer: true, content: "Old news")
-      create(:message, hunt:, organizer: true, content: "Pizza at 7")
+    it "shows the chat with the latest announcement pinned and on the 'From the organizer' card" do
+      create(:message, hunt:, organizer: true, announcement: true, content: "Old news")
+      create(:message, hunt:, organizer: true, announcement: true, content: "Pizza at 7")
+      create(:message, hunt:, organizer: true, content: "Just chatting")
 
       get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
 
       expect(response.body).to include('data-testid="chat-pill"', "What should we call you?")
       expect(response.body.scan("Pizza at 7").size).to eq(3)
       expect(response.body.scan("Old news").size).to eq(1)
+      expect(response.body.scan("Just chatting").size).to eq(1)
+    end
+
+    it "shows the announcement megaphone to the organizer only" do
+      set_name("Eric")
+      get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
+      expect(response.body).not_to include('data-testid="chat-announcement-toggle"')
+
+      cookies[:user_id] = "organizer"
+      get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
+      expect(response.body).to include('data-testid="chat-announcement-toggle"', 'aria-pressed="false"')
     end
 
     it "hides the chat when the hunt turned it off or the kill switch is down" do

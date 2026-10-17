@@ -1,5 +1,5 @@
 <% offset = local_assigns.fetch(:offset, "bottom-4") %>
-<%= tag.div id: "party_chat_#{hunt.id}", class: "contents", data: {turbo_permanent: true, controller: "chat", chat_hunt_id_value: hunt.id, chat_viewer_id_value: cookies[:user_id], chat_url_value: hunt_messages_path(hunt.code), chat_max_value: Message::MAX_CONTENT_LENGTH, chat_organizer: ("" if hunt.owner?(cookies[:user_id]))}.compact do %>
+<%= tag.div id: "party_chat_#{hunt.id}", class: "contents", data: {turbo_permanent: true, controller: "chat", chat_hunt_id_value: hunt.id, chat_viewer_value: hunt.viewer_token(cookies[:user_id]), chat_url_value: hunt_messages_path(hunt.code), chat_max_value: Message::MAX_CONTENT_LENGTH, chat_organizer: ("" if hunt.owner?(cookies[:user_id]))}.compact do %>
   <%= turbo_stream_from hunt.chat_stream %>
 
   <button type="button" class="fixed right-4 z-40 inline-flex items-center gap-2 rounded-full bg-neutral py-2.5 pl-3.5 pr-4 text-sm font-bold text-neutral-content shadow-lg ring-1 ring-base-content/10 transition active:scale-95 <%= offset %>" data-action="chat#show" data-testid="chat-pill" aria-haspopup="dialog" aria-controls="party_chat_sheet_<%= hunt.id %>">
@@ -20,7 +20,7 @@
           <button type="button" class="btn btn-ghost btn-sm btn-circle shrink-0" data-action="chat#close" aria-label="Close chat"><%= icon :x_mark, class: "size-5" %></button>
         </div>
       </div>
-      <%= render partial: "messages/pinned", locals: {hunt:, message: hunt.latest_organizer_message} %>
+      <%= render partial: "messages/pinned", locals: {hunt:, message: hunt.latest_announcement} %>
       <div class="grow overflow-y-auto overscroll-contain px-4 py-3" data-chat-target="scroller">
         <% messages = hunt.recent_messages %>
         <%= turbo_frame_tag "chat_messages_#{hunt.id}", class: "block", data: {chat_target: "frame"} do %>

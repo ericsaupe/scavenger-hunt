@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_100300) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_100400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -231,7 +231,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100300) do
     t.bigint "team_id"
     t.boolean "organizer", default: false, null: false
     t.datetime "deleted_at"
-    t.index ["hunt_id", "organizer", "id"], name: "index_messages_on_hunt_id_and_organizer_and_id"
+    t.boolean "announcement", default: false, null: false
+    t.index ["hunt_id", "announcement", "id"], name: "index_messages_on_hunt_id_and_announcement_and_id"
     t.index ["hunt_id"], name: "index_messages_on_hunt_id"
     t.index ["team_id"], name: "index_messages_on_team_id"
   end

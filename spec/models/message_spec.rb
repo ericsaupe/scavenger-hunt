@@ -17,21 +17,23 @@ RSpec.describe Message, :test_queue_adapter do
     expect(build(:message, hunt:, sender_name: "n" * 41)).not_to be_valid
   end
 
-  it "is not from the organizer unless flagged, and only announcements are pushed" do
+  it "is neither from the organizer nor an announcement unless flagged, and only announcements are pushed" do
     expect { create(:message, hunt:) }.not_to have_enqueued_job(AnnouncementJob)
-    expect { create(:message, hunt:, organizer: true) }.to have_enqueued_job(AnnouncementJob)
-    expect(hunt.messages.where(organizer: true).count).to eq(1)
+    expect { create(:message, hunt:, organizer: true) }.not_to have_enqueued_job(AnnouncementJob)
+    expect { create(:message, hunt:, organizer: true, announcement: true) }.to have_enqueued_job(AnnouncementJob)
+    expect(hunt.messages.announcements.count).to eq(1)
   end
 
-  it "soft deletes and drops out of the organizer pin" do
-    announcement = create(:message, hunt:, organizer: true)
-    expect(hunt.latest_organizer_message).to eq(announcement)
+  it "pins the latest announcement, not the latest organizer message, and drops it when removed" do
+    announcement = create(:message, hunt:, organizer: true, announcement: true)
+    create(:message, hunt:, organizer: true)
+    expect(hunt.latest_announcement).to eq(announcement)
 
     announcement.remove!
 
     expect(announcement.reload).to be_removed
     expect(described_class.visible).not_to include(announcement)
-    expect(hunt.latest_organizer_message).to be_nil
+    expect(hunt.latest_announcement).to be_nil
   end
 
   it "shows the team initial, or the sender's when there is no team" do

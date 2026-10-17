@@ -426,7 +426,7 @@
   .message[data-own] .message-bubble {
     @apply rounded-bl-2xl rounded-br-md bg-cobalt text-primary-content;
   }
-  .message[data-organizer] .message-bubble {
+  .message[data-announcement] .message-bubble {
     @apply bg-neutral text-neutral-content;
   }
   .message[data-removed] .message-bubble {

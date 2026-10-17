@@ -7,7 +7,7 @@ class AnnouncementJob < ApplicationJob
   discard_on ActiveJob::DeserializationError
 
   def perform(message)
-    return if message.removed? || !message.organizer?
+    return if message.removed? || !message.announcement?
 
     PushNotification.new(message.hunt, :announcements,
       title: "From the organizer",

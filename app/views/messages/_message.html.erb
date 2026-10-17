@@ -1,16 +1,18 @@
 <% viewer_id = local_assigns[:viewer_id] %>
-<%= tag.div id: dom_id(message), class: "message", data: {message_id: message.id, sender_id: message.user_id, own: ("" if message.own?(viewer_id)), organizer: ("" if message.organizer?), removed: ("" if message.removed?), testid: "chat-message"}.compact do %>
-  <% if message.organizer? %>
+<%= tag.div id: dom_id(message), class: "message", data: {message_id: message.id, sender: message.sender_token, own: ("" if message.own?(viewer_id)), announcement: ("" if message.announcement?), removed: ("" if message.removed?), testid: "chat-message"}.compact do %>
+  <% if message.announcement? %>
     <span class="message-avatar bg-neutral text-marigold"><%= icon :megaphone, class: "size-5" %></span>
   <% else %>
     <span class="message-avatar bg-marigold text-base font-extrabold text-marigold-content"><%= message.initial %></span>
   <% end %>
   <div class="min-w-0 max-w-[82%]">
     <p class="message-meta mb-0.5 flex flex-wrap items-center gap-x-1.5 px-1 text-[11px] font-semibold text-ink-soft">
-      <% if message.organizer? %>
-        <span class="inline-flex items-center gap-1 text-ink"><%= icon :megaphone, class: "size-3.5" %>Organizer</span>
+      <% if message.announcement? %>
+        <span class="inline-flex items-center gap-1 text-ink"><%= icon :megaphone, class: "size-3.5" %>Announcement</span>
       <% elsif message.team %>
         <span><%= message.team.name %></span>
+      <% elsif message.organizer? %>
+        <span>Organizer</span>
       <% end %>
       <span><%= message.sender_name %></span>
       <time datetime="<%= message.created_at.iso8601 %>" data-chat-time><%= message.created_at.strftime("%-l:%M") %></time>

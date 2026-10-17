@@ -13,6 +13,10 @@
 
   <%= form_with model: hunt.messages.new, url: hunt_messages_path(hunt.code), class: ("hidden" if name.blank?), data: {chat_target: "form", action: "turbo:submit-end->chat#sent"} do |f| %>
     <div class="flex items-center gap-2">
+      <% if hunt.owner?(cookies[:user_id]) %>
+        <%= f.hidden_field :announcement, value: "0", data: {chat_target: "announcement"} %>
+        <button type="button" class="btn btn-circle btn-ghost shrink-0 text-ink-soft aria-pressed:bg-neutral aria-pressed:text-marigold" aria-pressed="false" aria-label="Send as an announcement" title="Send as an announcement" data-action="chat#toggleAnnouncement" data-chat-target="announcementToggle" data-testid="chat-announcement-toggle"><%= icon :megaphone, class: "size-5" %></button>
+      <% end %>
       <%= f.text_field :content, maxlength: Message::MAX_CONTENT_LENGTH, required: true, autocomplete: "off", enterkeyhint: "send", placeholder: "Say something to everyone", "aria-label": "Message", class: "input grow", data: {chat_target: "input", action: "input->chat#count"} %>
       <%= f.button class: "btn btn-circle btn-primary", title: "Send", "aria-label": "Send" do %>
         <%= icon :send, class: "size-5" %>

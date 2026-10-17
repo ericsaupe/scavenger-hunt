@@ -13,12 +13,17 @@ class MessagesController < ApplicationController
   def create
     return composer_error("Pick a name before you send a message.") if chat_name.blank?
 
+    organizer = @hunt.owner?(cookies[:user_id])
+    announcement = ActiveModel::Type::Boolean.new.cast(params.require(:message)[:announcement]) || false
+    return composer_error("Only the organizer can send announcements.", status: :forbidden) if announcement && !organizer
+
     message = @hunt.messages.new(
-      content: params.require(:message)[:content],
+      content: params[:message][:content],
       user_id: cookies[:user_id],
       sender_name: chat_name,
       team: chat_team(@hunt),
-      organizer: @hunt.owner?(cookies[:user_id])
+      organizer:,
+      announcement:
     )
     return composer_error(message.errors.full_messages.to_sentence) unless message.valid?
     return composer_error("One message a second, please.", status: :too_many_requests) unless ChatThrottle.allow?(@hunt, cookies[:user_id])

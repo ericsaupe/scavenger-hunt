@@ -168,8 +168,12 @@ class Hunt < ApplicationRecord
     chat_enabled? && Flipper.enabled?(:chat)
   end
 
-  def latest_organizer_message
-    messages.from_organizer.visible.order(:id).last
+  def viewer_token(user_id)
+    OpenSSL::HMAC.hexdigest("SHA256", Rails.application.key_generator.generate_key("chat viewer"), "#{id}:#{user_id}")
+  end
+
+  def latest_announcement
+    messages.announcements.visible.order(:id).last
   end
 
   def recent_messages(before: nil)

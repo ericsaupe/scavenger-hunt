@@ -1,8 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["sheet", "box", "badge", "scroller", "frame", "form", "input", "counter", "nameForm", "nameInput"]
-  static values = { huntId: Number, viewerId: String, url: String, max: Number }
+  static targets = ["sheet", "box", "badge", "scroller", "frame", "form", "input", "counter", "nameForm", "nameInput", "announcement", "announcementToggle"]
+  static values = { huntId: Number, viewer: String, url: String, max: Number }
 
   connect() {
     this.storageKey = `party_chat_seen_${this.huntIdValue}`
@@ -102,7 +102,7 @@ export default class extends Controller {
   decorate(root) {
     const messages = root.matches?.("[data-message-id]") ? [root] : root.querySelectorAll("[data-message-id]")
     for (const message of messages) {
-      if (message.dataset.senderId === this.viewerIdValue) {
+      if (message.dataset.sender === this.viewerValue) {
         message.setAttribute("data-own", "")
       }
     }
@@ -138,7 +138,7 @@ export default class extends Controller {
   updateBadge() {
     const seen = this.seenId
     const unread = this.open ? 0 : this.messageElements.filter((element) =>
-      Number(element.dataset.messageId) > seen && element.dataset.senderId !== this.viewerIdValue
+      Number(element.dataset.messageId) > seen && element.dataset.sender !== this.viewerValue
     ).length
     this.badgeTarget.hidden = unread === 0
     this.badgeTarget.textContent = unread > 99 ? "99+" : unread
@@ -169,9 +169,22 @@ export default class extends Controller {
   sent(event) {
     if (!event.detail.success) return
     this.formTarget.reset()
+    this.setAnnouncement(false)
     this.count()
     this.scrollToBottom()
     this.focus(this.inputTarget)
+  }
+
+  toggleAnnouncement() {
+    this.setAnnouncement(this.announcementToggleTarget.getAttribute("aria-pressed") !== "true")
+    this.focus(this.inputTarget)
+  }
+
+  setAnnouncement(on) {
+    if (!this.hasAnnouncementToggleTarget) return
+    this.announcementToggleTarget.setAttribute("aria-pressed", String(on))
+    this.announcementTarget.value = on ? "1" : "0"
+    this.inputTarget.placeholder = on ? "Announce something to everyone" : "Say something to everyone"
   }
 
   editName() {

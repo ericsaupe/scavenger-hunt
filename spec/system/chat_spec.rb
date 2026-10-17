@@ -25,7 +25,7 @@ RSpec.describe "Party chat" do
   end
 
   def send_message(text)
-    fill_in "Say something to everyone", with: text
+    fill_in "message_content", with: text
     click_on "Send"
     expect(page).to have_css("[data-testid='chat-message'][data-own]", text: text)
   end
@@ -87,15 +87,24 @@ RSpec.describe "Party chat" do
 
     open_chat
     set_name("Host")
+    send_message("Hi all, Host here")
+    expect(page).to have_css("[data-testid='chat-message']:not([data-announcement])", text: "Hi all, Host here")
+    expect(page).not_to have_css("[data-testid='chat-pinned']", text: "Hi all")
+
+    find("[data-testid='chat-announcement-toggle']").click
+    expect(page).to have_css("[data-testid='chat-announcement-toggle'][aria-pressed='true']")
     send_message("Pizza at 7 by the gazebo")
     expect(page).to have_css("[data-testid='chat-pinned']", text: "Pizza at 7 by the gazebo")
-    expect(page).to have_css("[data-testid='chat-message'][data-organizer]", text: "Organizer")
+    expect(page).to have_css("[data-testid='chat-message'][data-announcement]", text: "Announcement")
+    expect(page).to have_css("[data-testid='chat-announcement-toggle'][aria-pressed='false']")
 
     using_session(:other) do
       visit checklist_path(other_team)
       expect(page).to have_css("[data-testid='organizer-card']", text: /from the organizer/i)
       expect(page).to have_css("[data-testid='organizer-card']", text: "Pizza at 7 by the gazebo")
-      expect(page).to have_css("[data-testid='chat-unread']", text: "2")
+      expect(page).not_to have_css("[data-testid='organizer-card']", text: "Hi all")
+      expect(page).to have_css("[data-testid='chat-unread']", text: "3")
+      expect(page).not_to have_css("[data-testid='chat-announcement-toggle']")
     end
 
     accept_confirm do
