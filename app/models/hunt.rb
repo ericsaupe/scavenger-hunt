@@ -255,7 +255,7 @@ class Hunt < ApplicationRecord
   end
 
   def broadcast_presentation_update
-    broadcast_refresh_later_to(presenter_stream)
+    broadcast_refresh_to(presenter_stream)
   end
 
   def owner_password_matches?(candidate)
