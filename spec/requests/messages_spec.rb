@@ -107,7 +107,7 @@ RSpec.describe "Messages" do
         expect(response).to have_http_status(:ok)
       end
 
-      expect(hunt.messages.pluck(:content)).to eq(%w[One Three Four])
+      expect(hunt.messages.order(:id).pluck(:content)).to eq(%w[One Three Four])
     end
 
     it "broadcasts the message and, for an announcement, the pin to the hunt's chat stream" do

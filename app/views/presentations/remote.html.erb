@@ -43,7 +43,12 @@
     <div class="min-w-0">
       <p class="text-sm font-semibold text-white/60" data-testid="progress"><%= @slide.label %> <%= @slide.position %> of <%= @slide.count %></p>
       <p class="display mt-1 truncate text-2xl" data-testid="current-item"><%= @slide.title %></p>
-      <p class="mt-1 truncate font-semibold text-white/70"><%= @slide.subtitle %></p>
+      <p class="mt-1 flex items-center gap-1.5 font-semibold text-white/70">
+        <% if @slide.team %>
+          <%= team_avatar(@slide.team, size: 20) %>
+        <% end %>
+        <span class="truncate"><%= @slide.subtitle %></span>
+      </p>
     </div>
   </div>
 

@@ -53,6 +53,7 @@ group :test do
   gem "capybara", ">= 3.26"
   gem "selenium-webdriver"
   gem "shoulda-matchers", "~> 8.0"
+  gem "webmock", "~> 3.34"
 end
 
 gem "web-push", "~> 3.1"

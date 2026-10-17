@@ -14,6 +14,30 @@ RSpec.describe "Teams" do
     team.submissions.find_by(item:).photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
   end
 
+  it "offers a fresh critter for a new team and hands out another on shuffle" do
+    hunt = create(:hunt)
+
+    get "/scavenger_hunts/#{hunt.code}"
+    seed = response.body[/name="avatar_seed"[^>]*value="(\h{16})"/, 1]
+    expect(seed).to be_present
+    expect(response.body).to include(Avatar.for(:team, seed))
+
+    get "/scavenger_hunts/#{hunt.code}/teams/avatar", headers: {"Turbo-Frame" => "new_team_avatar"}
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('<turbo-frame id="new_team_avatar">')
+    shuffled = response.body[/name="avatar_seed"[^>]*value="(\h{16})"/, 1]
+    expect(shuffled).to be_present
+    expect(shuffled).not_to eq(seed)
+
+    post "/scavenger_hunts/#{hunt.code}/teams", params: {name: "Owls", avatar_seed: shuffled}
+    team = hunt.teams.find_by!(name: "Owls")
+    expect(team.avatar_seed).to eq(shuffled)
+    expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/teams/#{team.id}")
+
+    follow_redirect!
+    expect(response.body).to include(%(src="#{team.avatar_url}" width="48" height="48" loading="lazy" alt="" data-testid="team-avatar" class="avatar-img"))
+  end
+
   it "renders the checklist with the same number of queries however many items there are" do
     hunt = create(:hunt)
     team = create(:team, hunt:)

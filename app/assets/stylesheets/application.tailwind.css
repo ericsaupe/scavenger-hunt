@@ -416,6 +416,10 @@
   .message-avatar {
     @apply grid size-9 shrink-0 place-items-center rounded-full;
   }
+  .avatar-img {
+    @apply inline-block shrink-0 rounded-full bg-marigold object-cover align-middle;
+    aspect-ratio: 1;
+  }
   .message[data-own] .message-avatar {
     display: none;
   }

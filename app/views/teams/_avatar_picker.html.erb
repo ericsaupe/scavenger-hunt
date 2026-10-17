@@ -1,0 +1,8 @@
+<div class="flex items-center gap-2" data-testid="avatar-picker">
+  <%= avatar_image(Avatar.for(:team, seed), size: 48, data: {testid: "new-team-avatar"}) %>
+  <%= hidden_field_tag :avatar_seed, seed %>
+  <%= link_to avatar_hunt_teams_path(hunt.code), class: "btn btn-ghost btn-sm", data: {turbo_prefetch: false, testid: "shuffle-avatar"} do %>
+    <%= icon :retake, class: "size-4" %>
+    Shuffle
+  <% end %>
+</div>

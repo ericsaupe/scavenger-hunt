@@ -20,7 +20,8 @@ const NOTIFICATION_ICON = "<%= PushSubscription::ICON %>"
 const CACHES = {
   precache: `precache-${VERSION}`,
   pages: `pages-${VERSION}`,
-  runtime: `runtime-${VERSION}`
+  runtime: `runtime-${VERSION}`,
+  avatars: "avatars-v1"
 }
 const MAX_PAGES = 40
 const PRECACHED = new Set(PRECACHE.map((path) => new URL(path, self.location.origin).href))
@@ -53,6 +54,8 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(cacheFirst(request, CACHES.precache))
   } else if (url.hostname === "fonts.gstatic.com" || (url.origin === self.location.origin && url.pathname.startsWith("/assets/"))) {
     event.respondWith(cacheFirst(request, CACHES.runtime))
+  } else if (url.origin === self.location.origin && url.pathname.startsWith("/avatars/")) {
+    event.respondWith(cacheFirst(request, CACHES.avatars, immutable))
   } else if (url.origin === self.location.origin && wantsHTML(request)) {
     event.respondWith(networkFirst(event))
   }
@@ -123,16 +126,20 @@ function wantsHTML(request) {
   return request.mode === "navigate" || (request.headers.get("Accept") || "").includes("text/html")
 }
 
-async function cacheFirst(request, cacheName) {
+async function cacheFirst(request, cacheName, storable = () => true) {
   const cache = await caches.open(cacheName)
   const cached = await cache.match(request, { ignoreVary: true })
   if (cached) return cached
 
   const response = await fetch(request)
-  if (response.ok) {
+  if (response.ok && storable(response)) {
     await cache.put(request, response.clone())
   }
   return response
+}
+
+function immutable(response) {
+  return (response.headers.get("Cache-Control") || "").includes("immutable")
 }
 
 async function networkFirst(event) {

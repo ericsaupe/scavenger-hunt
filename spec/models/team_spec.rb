@@ -23,6 +23,43 @@ RSpec.describe Team do
     end
   end
 
+  describe "avatars" do
+    it "gives every team a random sixteen-character seed, so same-named teams in other hunts look different" do
+      team = create(:team, name: "Owls")
+      twin = create(:team, name: "Owls")
+
+      expect(team.avatar_seed).to match(/\A\h{16}\z/)
+      expect(twin.avatar_seed).not_to eq(team.avatar_seed)
+      expect(twin.avatar_url).not_to eq(team.avatar_url)
+    end
+
+    it "keeps a seed chosen on the form and replaces anything that is not one" do
+      hunt = create(:hunt)
+      chosen = Team.new_avatar_seed
+
+      expect(hunt.start_a_new_team("Owls", avatar_seed: chosen).avatar_seed).to eq(chosen)
+      expect(hunt.start_a_new_team("Crows", avatar_seed: "../not-a-seed").avatar_seed).to match(/\A\h{16}\z/)
+      expect(hunt.start_a_new_team("Owls", avatar_seed: Team.new_avatar_seed).avatar_seed).to eq(chosen)
+    end
+
+    it "shuffles to a new seed and a new avatar" do
+      team = create(:team)
+      before = [team.avatar_seed, team.avatar_url]
+
+      team.shuffle_avatar!
+
+      expect(team.reload.avatar_seed).not_to eq(before.first)
+      expect(team.avatar_url).not_to eq(before.last)
+    end
+
+    it "links to a critter whose fallback carries the team's initial, without exposing the seed" do
+      team = create(:team, name: "owls")
+
+      expect(team.avatar_url).to eq("/avatars/team/#{Avatar.digest("team", team.avatar_seed)}.svg?initial=O")
+      expect(team.avatar_url).not_to include(team.avatar_seed)
+    end
+  end
+
   describe "#score and #total_score" do
     let(:hunt) { create(:hunt) }
     let(:team) { create(:team, hunt:) }

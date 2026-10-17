@@ -12,13 +12,18 @@ class TeamsController < ApplicationController
     team = if params[:team_id].present?
       hunt.teams.find(params[:team_id])
     elsif params[:name].present?
-      hunt.start_a_new_team(params[:name])
+      hunt.start_a_new_team(params[:name], avatar_seed: params[:avatar_seed])
     else
       flash[:error] = "Please select a team or enter a team name"
       redirect_to hunt_path(hunt.code) and return
     end
 
     redirect_to hunt_team_path(hunt.code, team)
+  end
+
+  def avatar
+    @hunt = hunt
+    @seed = Team.new_avatar_seed
   end
 
   def pending_uploads

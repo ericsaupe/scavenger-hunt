@@ -186,7 +186,7 @@ RSpec.describe "Presenter" do
     using_session(:big_screen) do
       expect(page).to have_css("#finale_card.print-enter", text: /first place/i)
       expect(page).to have_css("[data-testid='winner-name']", text: team.name)
-      expect(page).to have_css("[data-testid='finale']", text: "#{team.score} points")
+      expect(page).to have_css("[data-testid='finale']", text: "#{team.score} #{"point".pluralize(team.score)}")
       expect(page).to have_css("[data-testid='most-loved']", text: "1 love")
       expect(page).to have_css("[data-testid='confetti'] .confetti", visible: :all, minimum: 10)
       expect(page).to have_link("Results", href: "/scavenger_hunts/#{hunt.code}/results")

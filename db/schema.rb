@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_100400) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100400) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "avatars", force: :cascade do |t|
+    t.string "kind", null: false
+    t.string "digest", limit: 64, null: false
+    t.text "svg", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kind", "digest"], name: "index_avatars_on_kind_and_digest", unique: true
   end
 
   create_table "categories", force: :cascade do |t|
@@ -292,6 +301,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_100400) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "avatar_seed", limit: 16, default: -> { "substr(md5((random())::text), 1, 16)" }, null: false
     t.index ["hunt_id", "name"], name: "index_teams_on_hunt_id_and_name", unique: true
     t.index ["hunt_id"], name: "index_teams_on_hunt_id"
   end
