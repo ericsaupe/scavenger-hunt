@@ -134,17 +134,30 @@ RSpec.describe "Party chat" do
     expect(page).not_to have_link("Show earlier")
   end
 
-  it "re-fetches the list when the tab becomes visible again" do
+  it "re-fetches the sheet when the tab becomes visible again, keeping the draft and announcement mode" do
+    visit checklist_path(team)
+    hunt.update!(owner_id: viewer_id)
     visit checklist_path(team)
     open_chat
-    create(:message, hunt:, content: "Missed while away").tap { |message| page.execute_script("document.getElementById('#{ActionView::RecordIdentifier.dom_id(message)}')?.remove()") }
+    set_name("Host")
+    Message.suppressing_turbo_broadcasts { create(:message, hunt:, content: "Missed while away") }
     expect(page).not_to have_text("Missed while away")
+    find("[data-testid='chat-announcement-toggle']").click
+    fill_in "message_content", with: "Half a thought"
 
     page.execute_script(<<~JS)
+      document.body.dataset.stale = "1"
       Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true })
       document.dispatchEvent(new Event("visibilitychange"))
     JS
+    expect(page).to have_no_css("body[data-stale]")
     expect(page).to have_text("Missed while away")
+    expect(page).to have_field("message_content", with: "Half a thought")
+    expect(page).to have_css("[data-testid='chat-announcement-toggle'][aria-pressed='true']")
+
+    click_on "Send"
+    expect(page).to have_css("[data-testid='chat-pinned']", text: "Half a thought")
+    expect(page).to have_css("[data-testid='chat-announcement-toggle'][aria-pressed='false']")
   end
 
   context "in the presenter" do

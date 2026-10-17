@@ -27,6 +27,12 @@ export default class extends Controller {
     document.addEventListener("keydown", this.onKeydown)
     this.onBeforeRender = (event) => this.syncWithRender(event)
     document.addEventListener("turbo:before-render", this.onBeforeRender)
+    this.onBeforeFrameRender = (event) => {
+      if (event.target === this.frameTarget) {
+        this.snapshotComposer()
+      }
+    }
+    this.frameTarget.addEventListener("turbo:before-frame-render", this.onBeforeFrameRender)
 
     this.decorate(this.element)
     this.updateBadge()
@@ -42,6 +48,7 @@ export default class extends Controller {
     document.removeEventListener("visibilitychange", this.onVisibilityChange)
     document.removeEventListener("keydown", this.onKeydown)
     document.removeEventListener("turbo:before-render", this.onBeforeRender)
+    this.frameTarget.removeEventListener("turbo:before-frame-render", this.onBeforeFrameRender)
   }
 
   get open() {
@@ -96,7 +103,6 @@ export default class extends Controller {
   }
 
   refresh() {
-    this.keepDraft()
     const frame = this.frameTarget
     if (frame.src) {
       frame.reload()
@@ -109,14 +115,13 @@ export default class extends Controller {
     const fresh = event.detail.newBody?.querySelector(`#${this.frameTarget.id} [data-chat-box]`)
     const current = this.frameTarget.querySelector("[data-chat-box]")
     if (!fresh || !current || fresh.hasAttribute("data-chat-organizer") === current.hasAttribute("data-chat-organizer")) return
-    this.keepDraft()
+    this.snapshotComposer()
     current.replaceWith(fresh.cloneNode(true))
   }
 
-  keepDraft() {
-    if (this.hasInputTarget && this.inputTarget.value) {
-      this.draft = this.inputTarget.value
-    }
+  snapshotComposer() {
+    this.draft = this.hasInputTarget ? this.inputTarget.value : null
+    this.draftAnnouncement = this.hasAnnouncementToggleTarget && this.announcementToggleTarget.getAttribute("aria-pressed") === "true"
   }
 
   connectionChanged() {
@@ -252,10 +257,14 @@ export default class extends Controller {
   }
 
   inputTargetConnected(input) {
-    if (this.draft) {
+    if (this.draft != null) {
       input.value = this.draft
       this.draft = null
       this.count()
+    }
+    if (this.draftAnnouncement) {
+      this.draftAnnouncement = false
+      this.setAnnouncement(true)
     }
     if (this.pendingFocus && this.open) {
       this.pendingFocus = false
