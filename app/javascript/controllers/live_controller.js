@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
 const CAPTURE_GRACE_MS = 3000
+const CATCH_UP_RETRY_MS = 1000
 
 export default class extends Controller {
   static values = { interval: Number }
@@ -20,12 +21,13 @@ export default class extends Controller {
     }
     document.addEventListener("visibilitychange", this.onVisibilityChange)
     this.onSubmitEnd = (event) => {
-      if (event.detail.success && this.refreshAfterUpload) {
-        this.refreshAfterUpload = false
-        this.refresh()
+      if (event.detail.success) {
+        this.catchUp()
       }
     }
     document.addEventListener("turbo:submit-end", this.onSubmitEnd)
+    this.onUploadLanded = () => this.catchUp()
+    document.addEventListener("uploads:landed", this.onUploadLanded)
     if (this.intervalValue > 0) {
       this.timer = setInterval(() => this.refresh(), this.intervalValue)
     }
@@ -35,8 +37,10 @@ export default class extends Controller {
     this.observer.disconnect()
     document.removeEventListener("visibilitychange", this.onVisibilityChange)
     document.removeEventListener("turbo:submit-end", this.onSubmitEnd)
+    document.removeEventListener("uploads:landed", this.onUploadLanded)
     clearInterval(this.timer)
     clearTimeout(this.captureTimer)
+    clearTimeout(this.catchUpTimer)
   }
 
   connectionChanged() {
@@ -48,15 +52,28 @@ export default class extends Controller {
     }
   }
 
-  refresh() {
-    if (document.querySelector("[data-uploading]")) {
+  catchUp() {
+    clearTimeout(this.catchUpTimer)
+    if (!this.refreshAfterUpload) {
       return
     }
-    if (this.waitForCapture()) {
+    if (this.refresh()) {
+      this.refreshAfterUpload = false
       return
+    }
+    this.catchUpTimer = setTimeout(() => this.catchUp(), CATCH_UP_RETRY_MS)
+  }
+
+  refresh() {
+    if (document.querySelector("[data-uploading]")) {
+      return false
+    }
+    if (this.waitForCapture()) {
+      return false
     }
     this.keepBanners()
     Turbo.visit(window.location.href, { action: "replace" })
+    return true
   }
 
   // Opening the camera backgrounds the page, so the return fires visibilitychange

@@ -143,13 +143,13 @@ RSpec.describe "Hunts" do
       click_on "Take a photo"
       expect(page).to have_css("li[data-capturing]", visible: :all)
 
-      page.execute_script("window.visitCount = 0; document.addEventListener('turbo:visit', () => { window.visitCount += 1; document.body.dataset.visits = window.visitCount })")
+      page.execute_script("window.visitCount = 0; document.addEventListener('turbo:visit', () => { window.visitCount += 1; document.documentElement.dataset.visits = window.visitCount })")
       page.execute_script("document.dispatchEvent(new Event('visibilitychange'))")
       attach_file(field, Rails.root.join("spec/fixtures/test.jpg"), make_visible: true)
 
       expect(page).to have_css("li[data-found]", text: item.name)
       expect(page).not_to have_css("li[data-capturing]", visible: :all)
-      expect(page).to have_css("body[data-visits='1']", wait: 5)
+      expect(page).to have_css("html[data-visits='1']", wait: 5)
     end
 
     it "holds the refresh while the page is still hidden behind the camera" do

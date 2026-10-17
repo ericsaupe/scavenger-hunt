@@ -81,6 +81,7 @@ async function send(entry) {
     if (response.status === 422) {
       await noteRefusal(entry, html)
     }
+    document.dispatchEvent(new CustomEvent("uploads:landed"))
     return true
   }
 
