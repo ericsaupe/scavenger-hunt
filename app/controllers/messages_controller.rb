@@ -15,7 +15,7 @@ class MessagesController < ApplicationController
   def create
     return composer_error("Pick a name before you send a message.") if chat_name.blank?
 
-    organizer = @hunt.owner?(cookies[:user_id])
+    organizer = @hunt.organizer?(cookies[:user_id])
     announcement = ActiveModel::Type::Boolean.new.cast(params.require(:message)[:announcement]) || false
     return composer_error("Only the organizer can send announcements.", status: :forbidden) if announcement && !organizer
 
@@ -23,7 +23,7 @@ class MessagesController < ApplicationController
       content: params[:message][:content],
       user_id: cookies[:user_id],
       sender_name: chat_name,
-      team: chat_team(@hunt),
+      team: (chat_team(@hunt) unless organizer),
       organizer:,
       announcement:
     )
@@ -38,7 +38,7 @@ class MessagesController < ApplicationController
   end
 
   def destroy
-    return head :forbidden unless @hunt.owner?(cookies[:user_id])
+    return head :forbidden unless @hunt.organizer?(cookies[:user_id])
 
     message = @hunt.messages.find(params[:id])
     message.remove! unless message.removed?

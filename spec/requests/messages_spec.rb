@@ -46,15 +46,39 @@ RSpec.describe "Messages" do
       expect(message).to have_attributes(sender_name: "Eric", team:, user_id: "viewer", organizer: false)
     end
 
-    it "signs the organizer's ordinary messages as the organizer" do
+    it "signs the organizer's ordinary messages as the organizer, never with a team they peeked at" do
       cookies[:user_id] = "organizer"
+      get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
       set_name("Host")
+      expect(response.body).to include("Sending as <strong", "Host", "Organizer")
+      expect(response.body).not_to include("Blue Bandits")
 
       send_message("Welcome!")
 
-      expect(hunt.messages.last).to have_attributes(organizer: true, announcement: false)
+      expect(hunt.messages.last).to have_attributes(organizer: true, announcement: false, team: nil)
       expect(response.body).to include("Organizer", "Welcome!")
-      expect(response.body).not_to include("data-announcement", "Announcement")
+      expect(response.body).not_to include("data-announcement", "Announcement", "Blue Bandits")
+    end
+
+    it "gives whoever holds the remote the megaphone without taking it from the organizer" do
+      hunt.update!(remote_holder_id: "phone")
+
+      cookies[:user_id] = "phone"
+      set_name("Host on the phone")
+      send_message("Pizza at 7", announcement: "1")
+      expect(response).to have_http_status(:ok)
+      expect(hunt.messages.last).to have_attributes(organizer: true, announcement: true, user_id: "phone")
+
+      cookies[:user_id] = "organizer"
+      set_name("Host")
+      send_message("Still me on the laptop", announcement: "1")
+      expect(response).to have_http_status(:ok)
+      expect(hunt.messages.last).to have_attributes(organizer: true, announcement: true, user_id: "organizer")
+
+      cookies[:user_id] = "viewer"
+      set_name("Eric")
+      send_message("Me too?", announcement: "1")
+      expect(response).to have_http_status(:forbidden)
     end
 
     it "lets the organizer mark a message as an announcement" do
@@ -166,6 +190,16 @@ RSpec.describe "Messages" do
       expect(message.reload).not_to be_removed
     end
 
+    it "lets whoever holds the remote remove a message" do
+      hunt.update!(remote_holder_id: "phone")
+      cookies[:user_id] = "phone"
+
+      delete "/scavenger_hunts/#{hunt.code}/messages/#{message.id}", headers: turbo
+
+      expect(response).to have_http_status(:ok)
+      expect(message.reload).to be_removed
+    end
+
     it "soft deletes and replaces the bubble for the organizer" do
       allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
       cookies[:user_id] = "organizer"
@@ -250,6 +284,15 @@ RSpec.describe "Messages" do
       expect(response.body).to include('data-testid="chat-announcement-toggle"', 'aria-pressed="false"')
     end
 
+    it "shows the organizer's role on the checklist to the remote holder as well" do
+      hunt.update!(remote_holder_id: "phone")
+      cookies[:user_id] = "phone"
+
+      get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
+
+      expect(response.body).to match(/<turbo-frame[^>]*data-chat-role="organizer"/)
+    end
+
     it "hides the chat when the hunt turned it off or the kill switch is down" do
       hunt.update!(chat_enabled: false)
       get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
@@ -258,6 +301,44 @@ RSpec.describe "Messages" do
       hunt.update!(chat_enabled: true)
       Flipper.disable(:chat)
       get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
+      expect(response.body).not_to include('data-testid="chat-pill"')
+    end
+  end
+
+  describe "GET /scavenger_hunts/:code" do
+    it "offers the organizer the chat above the join bar, but not a guest who has no team yet" do
+      get "/scavenger_hunts/#{hunt.code}"
+      expect(response.body).not_to include('data-testid="chat-pill"')
+
+      cookies[:user_id] = "organizer"
+      get "/scavenger_hunts/#{hunt.code}"
+      expect(response.body).to match(/<button[^>]*bottom-24[^>]*data-testid="chat-pill"/)
+      expect(response.body).to match(/<turbo-frame[^>]*data-chat-role="organizer"/)
+
+      cookies[:user_id] = "phone"
+      hunt.update!(remote_holder_id: "phone")
+      get "/scavenger_hunts/#{hunt.code}"
+      expect(response.body).to include('data-testid="chat-pill"')
+
+      hunt.update!(chat_enabled: false)
+      cookies[:user_id] = "organizer"
+      get "/scavenger_hunts/#{hunt.code}"
+      expect(response.body).not_to include('data-testid="chat-pill"')
+    end
+  end
+
+  describe "GET /results" do
+    it "offers everyone the chat, locked or not" do
+      get "/scavenger_hunts/#{hunt.code}/results"
+      expect(response.body).to include('data-testid="chat-pill"')
+      expect(response.body).to match(/<turbo-frame[^>]*data-chat-role="guest"/)
+
+      hunt.update!(lock_password: "hunter2")
+      get "/scavenger_hunts/#{hunt.code}/results"
+      expect(response.body).to include("Results are not yet available", 'data-testid="chat-pill"')
+
+      hunt.update!(chat_enabled: false)
+      get "/scavenger_hunts/#{hunt.code}/results"
       expect(response.body).not_to include('data-testid="chat-pill"')
     end
   end

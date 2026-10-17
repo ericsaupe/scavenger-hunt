@@ -3,13 +3,17 @@
 require "rails_helper"
 
 RSpec.describe "Presenter" do
-  let(:hunt) { create(:hunt, owner_id: "host") }
+  let(:hunt) { create(:hunt, owner_id: "host", remote_holder_id: "host") }
   let(:team) { create(:team, hunt:) }
 
   before do
     @video = create(:video_submission, item: hunt.items.first, team:)
     @photo = create(:photo_submission, item: hunt.items.second, team:)
     hunt.update!(presentation_slide: "submission:#{@video.id}")
+  end
+
+  def viewer_id
+    page.driver.browser.manage.cookie_named("user_id")[:value]
   end
 
   def video_paused?
@@ -105,7 +109,7 @@ RSpec.describe "Presenter" do
     expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
     expect(page).to have_button("Next")
     expect(page).to have_button("Play on the big screen")
-    expect(hunt.reload.owner_id).to be_present
+    expect(hunt.reload).to have_attributes(remote_holder_id: viewer_id, owner_id: "host")
     expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
 
     click_on "Next"

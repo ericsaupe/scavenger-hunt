@@ -50,3 +50,7 @@
 
   <p class="page mt-12 text-center text-xs text-ink-soft" data-testid="avatar-credit">Team and chat avatars by <a href="https://www.dicebear.com" class="link" target="_blank" rel="noopener">DiceBear</a>, in the Critters and Thumbs styles (CC0).</p>
 <% end %>
+
+<% if @hunt.chat_available? %>
+  <%= render partial: "messages/chat", locals: {hunt: @hunt} %>
+<% end %>

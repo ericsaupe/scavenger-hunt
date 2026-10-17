@@ -220,7 +220,7 @@ RSpec.describe "Presenter" do
 
     it "renders the vote menu inline and offers the remote to anyone who does not hold it" do
       submission = found(first_team, items.first)
-      hunt.update!(presentation_slide: "submission:#{submission.id}")
+      hunt.update!(presentation_slide: "submission:#{submission.id}", remote_holder_id: "owner")
       cookies[:user_id] = "viewer"
 
       get "/scavenger_hunts/#{hunt.code}/presenter"
@@ -229,10 +229,16 @@ RSpec.describe "Presenter" do
       expect(response.body).not_to include("turbo-frame")
     end
 
-    it "tells the owner they have the remote" do
+    it "offers the remote to the organizer until they take it, then tells them they have it" do
       found(first_team, items.first)
       cookies[:user_id] = "owner"
 
+      get "/scavenger_hunts/#{hunt.code}/presenter"
+
+      expect(response.body).to include("No one has the remote yet", "Take the remote")
+      expect(response.body).not_to include("You have the remote")
+
+      hunt.update!(remote_holder_id: "owner")
       get "/scavenger_hunts/#{hunt.code}/presenter"
 
       expect(response.body).to include("You have the remote", "Open the remote")
@@ -309,7 +315,7 @@ RSpec.describe "Presenter" do
       post "/scavenger_hunts/#{hunt.code}/presentation/claim"
 
       expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/presenter/remote")
-      expect(hunt.reload.owner_id).to eq("viewer")
+      expect(hunt.reload).to have_attributes(remote_holder_id: "viewer", owner_id: "owner")
       expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with("hunt_presenter_#{hunt.id}").once
     end
 
@@ -323,7 +329,7 @@ RSpec.describe "Presenter" do
 
         expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/presenter")
         expect(flash[:warning]).to eq("Incorrect password")
-        expect(hunt.reload.owner_id).to eq("owner")
+        expect(hunt.reload).to have_attributes(remote_holder_id: nil, owner_id: "owner")
       end
 
       it "hands over the remote with the password" do
@@ -332,7 +338,7 @@ RSpec.describe "Presenter" do
         post "/scavenger_hunts/#{hunt.code}/presentation/claim", params: {password: "hunter2"}
 
         expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/presenter/remote")
-        expect(hunt.reload.owner_id).to eq("viewer")
+        expect(hunt.reload).to have_attributes(remote_holder_id: "viewer", owner_id: "owner")
       end
 
       it "asks for the password on the presenter page" do
