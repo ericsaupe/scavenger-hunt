@@ -1,8 +1,8 @@
-<% offset = local_assigns.fetch(:offset, "bottom-4") %>
+<% position = local_assigns.fetch(:position, "fixed right-4 bottom-4") %>
 <%= tag.div id: "party_chat_#{hunt.id}", class: "contents", data: {turbo_permanent: true, controller: "chat", chat_hunt_id_value: hunt.id, chat_viewer_value: hunt.viewer_token(cookies[:user_id]), chat_url_value: hunt_messages_path(hunt.code), chat_max_value: Message::MAX_CONTENT_LENGTH} do %>
-  <%= turbo_stream_from hunt.chat_stream %>
+  <%= turbo_stream_from hunt.chat_stream, class: "hidden" %>
 
-  <button type="button" class="fixed right-4 z-40 inline-flex items-center gap-2 rounded-full bg-neutral py-2.5 pl-3.5 pr-4 text-sm font-bold text-neutral-content shadow-lg ring-1 ring-base-content/10 transition active:scale-95 <%= offset %>" data-action="chat#show" data-chat-target="pill" data-testid="chat-pill" aria-haspopup="dialog" aria-controls="party_chat_sheet_<%= hunt.id %>">
+  <button type="button" class="z-40 inline-flex shrink-0 items-center gap-2 rounded-full bg-neutral py-2.5 pl-3.5 pr-4 text-sm font-bold text-neutral-content shadow-lg ring-1 ring-base-content/10 transition active:scale-95 <%= position %>" data-action="chat#show" data-chat-target="pill" data-testid="chat-pill" aria-haspopup="dialog" aria-controls="party_chat_sheet_<%= hunt.id %>">
     <%= icon :chat_bubble, class: "size-5 text-marigold" %>
     Party chat
     <span class="grid h-5 min-w-5 place-items-center rounded-full bg-marigold px-1.5 text-xs font-extrabold tabular-nums text-marigold-content" data-chat-target="badge" data-testid="chat-unread" hidden></span>

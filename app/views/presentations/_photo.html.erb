@@ -1,5 +1,5 @@
 <% submission = slide.submission %>
-<div id="current_slide" class="flex grow flex-col items-center justify-center px-4 pb-28 pt-14 sm:px-10 sm:py-10" data-testid="photo-slide">
+<div id="current_slide" class="flex grow flex-col items-center justify-center px-4 pb-6 pt-14 sm:px-10 sm:py-10" data-testid="photo-slide">
   <figure id="submission_<%= submission.id %>_print"
     class="polaroid-lg relative w-full max-w-md pb-5! sm:w-auto sm:max-w-[min(92vw,calc((100dvh-10rem)*0.9))]"
     style="--tilt: <%= print_tilt(submission) %>deg"

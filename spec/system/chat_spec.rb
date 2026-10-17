@@ -45,6 +45,24 @@ RSpec.describe "Party chat" do
     a["left"] < b["right"] && b["left"] < a["right"] && a["top"] < b["bottom"] && b["top"] < a["bottom"]
   end
 
+  def emulate_phone(width, height)
+    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width:, height:, deviceScaleFactor: 2, mobile: true)
+    expect(page.evaluate_script("[window.innerWidth, window.innerHeight]")).to eq([width, height])
+  end
+
+  def box(selector)
+    page.evaluate_script(<<~JS)
+      (() => {
+        const rect = document.querySelector(#{selector.to_json}).getBoundingClientRect()
+        return {top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, viewport: window.innerHeight}
+      })()
+    JS
+  end
+
+  def on_screen?(rect)
+    rect["top"] >= 0 && rect["bottom"] <= rect["viewport"]
+  end
+
   it "sends a named, team-coloured message that another viewer sees with an unread badge" do
     visit checklist_path(team)
     using_session(:other) do
@@ -174,10 +192,9 @@ RSpec.describe "Party chat" do
   end
 
   context "in the presenter" do
-    before do
-      create(:photo_submission, item: hunt.items.first, team:)
-      hunt.update!(presentation_slide: "submission:#{hunt.submissions.first.id}")
-    end
+    let!(:photo) { create(:photo_submission, item: hunt.items.first, team:) }
+
+    before { hunt.update!(presentation_slide: "submission:#{photo.id}") }
 
     it "shows the chat on a watcher's phone but never on the big screen" do
       visit "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
@@ -272,6 +289,40 @@ RSpec.describe "Party chat" do
       expect(page).to have_css("[data-testid='progress']", text: "Finale 3 of 3")
       expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
       expect(page).to have_css("[data-testid='chat-pill']")
+    end
+
+    it "keeps the pill clear of the slide, the controls and the most-loved print on a phone" do
+      create(:vote, submission: photo)
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      emulate_phone(390, 844)
+      expect(page).to have_css("#presenter_stream[connected]", visible: :all)
+      expect(page).to have_css("[data-testid='photo-slide'] figure img[src]")
+
+      pill = box("[data-testid='chat-pill']")
+      expect(on_screen?(pill)).to be(true)
+      expect(overlap?("[data-testid='chat-pill']", "[data-testid='photo-slide'] figure")).to be(false)
+
+      hunt.reload.present!("finale")
+      expect(page).to have_css("[data-testid='most-loved']")
+      expect(overlap?("[data-testid='chat-pill']", "[data-testid='most-loved']")).to be(false)
+
+      click_on "Previous"
+      expect(page).to have_css("[data-testid='live-pill']", text: "Browsing")
+      expect(page).to have_css("[data-testid='photo-slide'] figure img[src]")
+      expect(page).to have_css("[data-testid='back-to-live']")
+
+      pill = box("[data-testid='chat-pill']")
+      back = box("[data-testid='back-to-live']")
+      expect(overlap?("[data-testid='chat-pill']", "[data-testid='back-to-live']")).to be(false)
+      expect(overlap?("[data-testid='chat-pill']", "[data-testid='photo-slide'] figure")).to be(false)
+      expect(on_screen?(pill)).to be(true)
+      expect(on_screen?(back)).to be(true)
+      expect(on_screen?(box("a[aria-label='Previous slide']"))).to be(true)
+      expect(on_screen?(box("a[aria-label='Next slide']"))).to be(true)
+
+      open_chat
+    ensure
+      page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
     end
 
     it "reloads the chat for a handover that lands before the sheet has loaded" do
