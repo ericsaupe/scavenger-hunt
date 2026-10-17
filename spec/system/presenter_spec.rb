@@ -125,7 +125,7 @@ RSpec.describe "Presenter" do
       expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 5")
       expect(page).to have_css("[data-testid='title-card']", text: /next up/i)
       expect(page).to have_css("[data-testid='title-card']", text: hunt.items.first.name)
-      expect(page).to have_css("[data-testid='title-card-summary']", text: "Found by 1 of 1 team, #{points} points each")
+      expect(page).to have_css("[data-testid='title-card-summary']", text: "Found by 1 of 1 team, #{points} #{"point".pluralize(points)} each")
       expect(page).to have_css("[data-testid='title-card'] figure img, [data-testid='title-card'] figure svg")
     end
 
@@ -194,6 +194,31 @@ RSpec.describe "Presenter" do
 
     click_on "Next"
     expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 5")
+  end
+
+  it "shows the host what is coming next and jumps to any item" do
+    visit "/scavenger_hunts/#{hunt.code}/presenter"
+    click_on "Take the remote"
+    expect(page).to have_css("[data-testid='progress']", text: "Video 2 of 5")
+
+    within("[data-testid='up-next']") do
+      expect(page).to have_button(text: hunt.items.second.name)
+      expect(page).to have_button(text: /#{team.name}, photo 4 of 5/)
+      expect(page).to have_button(text: "Winner reveal")
+      click_on "Jump to any item"
+    end
+    within("[data-testid='item-list']") do
+      expect(page).to have_button(text: hunt.items.first.name)
+      click_on hunt.items.second.name
+    end
+    expect(page).to have_css("[data-testid='progress']", text: "Item 3 of 5")
+    expect(page).to have_no_css("[data-testid='item-list']", visible: :visible)
+
+    within("[data-testid='up-next']") do
+      click_on "Winner reveal"
+    end
+    expect(page).to have_css("[data-testid='progress']", text: "Finale 5 of 5")
+    expect(page).to have_no_css("[data-testid='up-next']")
   end
 
   it "lets a watcher browse earlier slides and come back to live" do

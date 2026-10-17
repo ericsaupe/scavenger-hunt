@@ -1,0 +1,54 @@
+<% upcoming = presentation.upcoming %>
+<% if upcoming.any? %>
+  <div data-testid="up-next">
+    <div class="flex items-baseline justify-between">
+      <h2 class="text-lg font-bold">Up next</h2>
+      <button type="button" class="btn btn-ghost btn-sm text-white/70 hover:text-white" data-action="remote#openItems" data-testid="jump-to-item">Jump to any item</button>
+    </div>
+    <ul class="mt-2 divide-y divide-white/10 rounded-2xl bg-white/5">
+      <% upcoming.each do |slide| %>
+        <li>
+          <button type="button" class="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-white/10" data-action="remote#jump" data-slide="<%= slide.key %>" data-remote-target="button">
+            <%= render partial: "presentations/remote_thumb", locals: {slide:} %>
+            <span class="min-w-0 grow">
+              <span class="block truncate font-semibold"><%= slide.title %></span>
+              <span class="block truncate text-sm text-white/60">
+                <% if slide.is_a?(Presentation::TitleCard) %>
+                  Item, <%= pluralize(slide.found_count, "team") %>
+                <% elsif slide.is_a?(Presentation::Finale) %>
+                  Winner reveal
+                <% else %>
+                  <%= slide.subtitle %>, <%= slide.label.downcase %> <%= slide.position %> of <%= slide.count %>
+                <% end %>
+              </span>
+            </span>
+            <%= icon :chevron_right, class: "size-4 shrink-0 text-white/40" %>
+          </button>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <dialog class="modal modal-bottom sm:modal-middle" data-remote-target="items">
+    <div class="modal-box max-h-[85dvh] bg-[#1b1f24] p-0 text-white sm:max-w-md">
+      <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <h3 class="text-lg font-bold">Jump to an item</h3>
+        <button type="button" class="btn btn-circle btn-ghost btn-sm" data-action="remote#closeItems" aria-label="Close">
+          <%= icon :x_mark, class: "size-5" %>
+        </button>
+      </div>
+      <ul class="divide-y divide-white/10" data-testid="item-list">
+        <% presentation.item_cards.each_with_index do |card, index| %>
+          <li>
+            <button type="button" class="flex w-full items-center gap-3 px-5 py-3 text-left hover:bg-white/10 <%= "bg-white/10" if card.key == presentation.current_key %>" data-action="remote#jump" data-slide="<%= card.key %>">
+              <span class="w-6 shrink-0 text-sm font-semibold tabular-nums text-white/50"><%= index + 1 %></span>
+              <span class="min-w-0 grow truncate font-semibold"><%= card.title %></span>
+              <span class="shrink-0 text-sm text-white/60"><%= pluralize(card.found_count, "team") %></span>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button type="submit" aria-label="Close">close</button></form>
+  </dialog>
+<% end %>

@@ -1,0 +1,18 @@
+<% size = local_assigns.fetch(:size, "size-11") %>
+<span class="grid <%= size %> shrink-0 place-items-center overflow-hidden rounded-xl bg-black">
+  <% if (submission = slide.submission) %>
+    <% if submission.video? %>
+      <% if (poster = submission.poster_url(:small)) %>
+        <%= image_tag poster, class: "size-full object-cover", alt: "", loading: "lazy" %>
+      <% else %>
+        <%= icon :video, class: "size-5 text-white/70" %>
+      <% end %>
+    <% else %>
+      <%= image_tag submission_attachment_url(submission), class: "size-full object-cover", alt: "", loading: "lazy" %>
+    <% end %>
+  <% elsif slide.is_a?(Presentation::Finale) %>
+    <span class="grid size-full place-items-center bg-flag text-flag-content"><%= icon :trophy, class: "size-5" %></span>
+  <% else %>
+    <span class="grid size-full place-items-center bg-[#1b1f24] text-flag"><%= icon :flag, solid: true, class: "size-5" %></span>
+  <% end %>
+</span>
