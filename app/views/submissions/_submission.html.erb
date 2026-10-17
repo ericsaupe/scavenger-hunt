@@ -8,7 +8,7 @@
     <%= form_with model: submission, authenticity_token: false, html: {class: "contents", data: {"submission-target": "form", action: "turbo:submit-end->submission#submitEnd"}} do |form| %>
       <%= form.hidden_field :captured_at, value: nil, data: {"submission-target": "capturedAt"} %>
       <%= field_set_tag(nil, class: "submission-fieldset contents", disabled: !submission.hunt.in_progress?) do %>
-        <%= form.file_field :photo, id: field_id, class: "sr-only", accept: "image/*,video/*", data: {action: "change->submission#submitForm change->hunt#closeModal", "submission-target": "field", direct_upload_url: rails_direct_uploads_path} %>
+        <%= form.file_field :photo, id: field_id, hidden: true, accept: "image/*,video/*", data: {action: "change->submission#submitForm change->hunt#closeModal", "submission-target": "field", direct_upload_url: rails_direct_uploads_path} %>
       <% end %>
     <% end %>
   <% end %>

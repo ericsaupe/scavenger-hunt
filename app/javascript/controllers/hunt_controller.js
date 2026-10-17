@@ -52,9 +52,9 @@ export default class extends Controller {
   }
 
   capture(event) {
-    const field = document.getElementById(this.fieldId)
+    const field = this.field
     this.closeCapture()
-    if (!field || field.disabled) {
+    if (!field) {
       return
     }
     const { accept, capture } = event.currentTarget.dataset
@@ -68,13 +68,17 @@ export default class extends Controller {
   }
 
   showCapture() {
-    const field = document.getElementById(this.fieldId)
-    if (!field || field.disabled) {
+    if (!this.field) {
       return
     }
     if (!this.captureTarget.open) {
       this.captureTarget.showModal()
     }
+  }
+
+  get field() {
+    const field = document.getElementById(this.fieldId)
+    return field && !field.matches(":disabled") ? field : null
   }
 
   closeCapture() {

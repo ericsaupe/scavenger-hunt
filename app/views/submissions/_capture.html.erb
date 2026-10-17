@@ -1,7 +1,7 @@
-<dialog class="modal modal-bottom sm:modal-middle" data-hunt-target="capture" data-testid="capture-sheet">
+<dialog class="modal modal-bottom sm:modal-middle" aria-labelledby="capture_sheet_title" data-hunt-target="capture" data-testid="capture-sheet">
   <div class="modal-box p-5 sm:max-w-md">
     <p class="text-sm font-semibold text-ink-soft">Found it?</p>
-    <h3 class="mt-0.5 text-xl font-bold" data-hunt-target="captureTitle"></h3>
+    <h3 id="capture_sheet_title" class="mt-0.5 text-xl font-bold" data-hunt-target="captureTitle"></h3>
     <div class="mt-4 grid gap-2">
       <button type="button" class="btn btn-lg btn-primary justify-start gap-3" data-action="hunt#capture" data-accept="image/*" data-capture="environment">
         <%= icon :camera, class: "size-5" %>
