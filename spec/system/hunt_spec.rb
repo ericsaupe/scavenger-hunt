@@ -127,6 +127,14 @@ RSpec.describe "Hunts" do
       expect(page).to have_css(".qr-code")
     end
 
+    it "prints a long list on one page" do
+      27.times { |i| create(:item, category: hunt.categories.first, name: "Thing #{i + 1}") }
+      visit "/scavenger_hunts/#{hunt.code.upcase}/print"
+      expect(page).to have_css("li", count: 30)
+      pdf = Base64.decode64(page.driver.browser.print_page)
+      expect(pdf[%r{/Count (\d+)}, 1].to_i).to eq(1)
+    end
+
     context "when remembering" do
       it "remembers past hunts" do
         visit "/scavenger_hunts/#{hunt.code.upcase}"
