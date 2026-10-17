@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     resource :presentation, only: %i[update] do
       post :claim
       patch :playback
+      patch :screen_chat
     end
     resource :push_subscription, only: %i[create update destroy]
     get :print

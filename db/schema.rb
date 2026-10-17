@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -218,6 +218,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_110000) do
     t.datetime "lead_recheck_at"
     t.string "presentation_slide"
     t.boolean "chat_enabled", default: true, null: false
+    t.string "screen_chat", default: "off", null: false
     t.index ["code"], name: "index_hunts_on_code"
     t.index ["owner_id"], name: "index_hunts_on_owner_id"
   end

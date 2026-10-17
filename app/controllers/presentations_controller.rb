@@ -36,6 +36,14 @@ class PresentationsController < ApplicationController
     head :no_content
   end
 
+  def screen_chat
+    mode = params[:screen_chat]
+    return head :unprocessable_content unless Hunt.screen_chats.key?(mode)
+
+    @hunt.screen_chat!(mode)
+    head :no_content
+  end
+
   def claim
     if @hunt.owner_password_matches?(params[:password])
       @hunt.hand_remote_to!(cookies[:user_id])

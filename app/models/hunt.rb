@@ -9,6 +9,8 @@ class Hunt < ApplicationRecord
   STARTING_SOON_LEAD = 5.minutes
   LEAD_CHANGE_INTERVAL = 5.minutes
   PLAYBACK_COMMANDS = %w[play pause replay mute unmute].freeze
+  SCREEN_CHAT_TTL = 60.seconds
+  SCREEN_CHAT_LIMIT = 8
 
   has_many :categories, dependent: :destroy
   has_many :items, through: :categories
@@ -19,6 +21,8 @@ class Hunt < ApplicationRecord
   belongs_to :victory_item, class_name: "Item", optional: true
 
   has_one_attached :archive
+
+  enum :screen_chat, %w[off all announcements].index_by(&:itself), prefix: true, scopes: false
 
   before_save :generate_code, if: :new_record?
   after_commit :schedule_starting_soon_notification, if: :saved_change_to_starts_at?
@@ -182,6 +186,20 @@ class Hunt < ApplicationRecord
     scope.limit(Message::PAGE_SIZE).to_a.reverse
   end
 
+  def screen_chat_visible?
+    chat_available? && !screen_chat_off?
+  end
+
+  def screen_chat_messages
+    scope = messages.visible.includes(:team).where(created_at: SCREEN_CHAT_TTL.ago..)
+    scope = scope.announcements if screen_chat_announcements?
+    scope.order(id: :desc).limit(SCREEN_CHAT_LIMIT).to_a.reverse
+  end
+
+  def chatter_count
+    messages.visible.distinct.count(:user_id)
+  end
+
   def earlier_messages?(message)
     messages.where(id: ...message.id).exists?
   end
@@ -202,6 +220,11 @@ class Hunt < ApplicationRecord
     else raise ArgumentError, "unknown playback command #{command.inspect}"
     end
     save!
+    broadcast_presentation_update
+  end
+
+  def screen_chat!(mode)
+    update!(screen_chat: mode)
     broadcast_presentation_update
   end
 

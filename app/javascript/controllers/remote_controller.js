@@ -5,6 +5,7 @@ export default class extends Controller {
   static values = {
     url: String,
     playbackUrl: String,
+    screenChatUrl: String,
     playing: Boolean,
     video: Boolean,
   }
@@ -86,9 +87,17 @@ export default class extends Controller {
     this.send(this.playbackUrlValue, { playback: { action } })
   }
 
+  async screenChat(event) {
+    const toggle = event.target
+    const sent = await this.send(this.screenChatUrlValue, { screen_chat: toggle.checked ? toggle.dataset.on : toggle.dataset.off })
+    if (!sent) {
+      toggle.checked = !toggle.checked
+    }
+  }
+
   async send(url, body) {
     if (this.inFlight) {
-      return
+      return false
     }
 
     this.inFlight = true
@@ -106,8 +115,10 @@ export default class extends Controller {
       if (!response.ok) {
         console.error(`Remote command failed with status ${response.status}`)
       }
+      return response.ok
     } catch (error) {
       console.error(error)
+      return false
     } finally {
       this.inFlight = false
       this.buttonTargets.forEach(button => button.disabled = false)
