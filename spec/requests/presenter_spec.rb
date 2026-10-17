@@ -33,7 +33,7 @@ RSpec.describe "Presenter" do
       second = found(second_team, items.first)
       hunt.update!(presentation_slide: "submission:#{second.id}")
       cookies[:user_id] = "owner"
-      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
+      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
 
       get "/scavenger_hunts/#{hunt.code}/presenter?screen=big&slide=submission:#{first.id}"
 
@@ -41,7 +41,7 @@ RSpec.describe "Presenter" do
       expect(response.body).to include("Photo 3 of 4", %(id="submission_#{second.id}_photo"))
       expect(response.body).not_to include(%(id="submission_#{first.id}_photo"), "Browsing")
       expect(hunt.reload.presentation_slide).to eq("submission:#{second.id}")
-      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_later_to)
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
     end
 
     it "lets a watcher browse another slide without leaving live for everyone else" do
@@ -304,13 +304,13 @@ RSpec.describe "Presenter" do
 
     it "hands the remote to the viewer, tells every screen and sends them to it" do
       cookies[:user_id] = "viewer"
-      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_later_to)
+      allow(Turbo::StreamsChannel).to receive(:broadcast_refresh_to)
 
       post "/scavenger_hunts/#{hunt.code}/presentation/claim"
 
       expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/presenter/remote")
       expect(hunt.reload.owner_id).to eq("viewer")
-      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_later_to).with("hunt_presenter_#{hunt.id}", request_id: nil).once
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with("hunt_presenter_#{hunt.id}").once
     end
 
     context "when the results are locked with a password" do

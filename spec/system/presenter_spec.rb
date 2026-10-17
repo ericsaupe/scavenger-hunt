@@ -200,6 +200,8 @@ RSpec.describe "Presenter" do
     visit "/scavenger_hunts/#{hunt.code}/presenter"
     click_on "Take the remote"
     expect(page).to have_css("[data-testid='progress']", text: "Video 2 of 5")
+    expect(page).to have_css("[data-testid='up-next']")
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
 
     within("[data-testid='up-next']") do
       expect(page).to have_button(text: hunt.items.second.name)

@@ -122,7 +122,7 @@ RSpec.describe "Big screen chat" do
       expect(style_of("[data-testid='screen-chat'] [data-announcement]", "backgroundColor")).to eq("rgb(27, 31, 36)")
       expect(width_of("[data-testid='screen-chat'] [data-testid='announcement-badge']")).to eq(44)
       eventually { style_of("[data-testid='screen-chat'] [data-message-id]", "opacity") == "0.45" }
-      expect(style_of("[data-testid='screen-chat'] [data-announcement]", "opacity")).to eq("1")
+      eventually { style_of("[data-testid='screen-chat'] [data-announcement]", "opacity") == "1" }
     end
 
     visit "/scavenger_hunts/#{hunt.code}/presenter/remote"
