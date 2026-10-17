@@ -154,4 +154,4 @@ assert.deepEqual((await api("GET", "/admin/deliveries")).json, []);
 
 agent.destroy();
 server.close();
-console.log(`selftest passed on port ${port}: decrypted payload ${JSON.stringify(delivery.payload)}, vapidValid=${delivery.vapidValid}, vapidKeyMatches=${delivery.vapidKeyMatches}, expired subscription answered ${goneStatus}`);
+console.log(`selftest passed on port ${port}: payload decrypted, VAPID verified, expired subscription answered ${goneStatus}`);
