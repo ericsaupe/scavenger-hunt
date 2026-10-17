@@ -19,6 +19,13 @@ export default class extends Controller {
       }
     }
     document.addEventListener("visibilitychange", this.onVisibilityChange)
+    this.onSubmitEnd = (event) => {
+      if (event.detail.success && this.refreshAfterUpload) {
+        this.refreshAfterUpload = false
+        this.refresh()
+      }
+    }
+    document.addEventListener("turbo:submit-end", this.onSubmitEnd)
     if (this.intervalValue > 0) {
       this.timer = setInterval(() => this.refresh(), this.intervalValue)
     }
@@ -27,6 +34,7 @@ export default class extends Controller {
   disconnect() {
     this.observer.disconnect()
     document.removeEventListener("visibilitychange", this.onVisibilityChange)
+    document.removeEventListener("turbo:submit-end", this.onSubmitEnd)
     clearInterval(this.timer)
     clearTimeout(this.captureTimer)
   }
@@ -59,6 +67,7 @@ export default class extends Controller {
     if (!capturing) {
       return false
     }
+    this.refreshAfterUpload = true
     clearTimeout(this.captureTimer)
     if (document.visibilityState === "hidden") {
       return true
@@ -73,6 +82,7 @@ export default class extends Controller {
         return
       }
       capturing.removeAttribute("data-capturing")
+      this.refreshAfterUpload = false
       this.refresh()
     }, CAPTURE_GRACE_MS)
     return true
