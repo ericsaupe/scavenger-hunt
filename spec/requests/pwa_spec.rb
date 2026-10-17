@@ -21,14 +21,14 @@ RSpec.describe "PWA" do
       expect(manifest["icons"].pluck("src")).to all(satisfy { |src| Rails.public_path.join(src.delete_prefix("/")).exist? })
     end
 
-    it "offers Join a hunt and My hunt shortcuts with maskable icons" do
+    it "offers Join a hunt and My hunt shortcuts with icons Android will show" do
       get "/manifest.json"
 
       shortcuts = response.parsed_body["shortcuts"]
       expect(shortcuts.pluck("name", "url")).to eq([["Join a hunt", "/scavenger_hunts/join"], ["My hunt", "/my_hunt"]])
       shortcuts.each do |shortcut|
         icon = shortcut["icons"].sole
-        expect(icon).to include("sizes" => "96x96", "type" => "image/png", "purpose" => "maskable")
+        expect(icon).to include("sizes" => "96x96", "type" => "image/png", "purpose" => "any")
         image = Vips::Image.new_from_file(Rails.public_path.join(icon["src"].delete_prefix("/")).to_s)
         expect([image.width, image.height]).to eq([96, 96])
       end
