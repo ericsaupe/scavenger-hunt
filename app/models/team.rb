@@ -24,11 +24,15 @@ class Team < ApplicationRecord
   end
 
   def ensure_submissions!
-    missing = hunt.items.where.not(id: submissions.select(:item_id)).pluck(:id)
-    return if missing.empty?
+    return if missing_item_ids.empty?
 
-    now = Time.current
-    Submission.upsert_all(missing.map { |item_id| {item_id:, team_id: id, created_at: now, updated_at: now} }) # rubocop:disable Rails/SkipsModelValidations
+    with_lock do
+      missing = missing_item_ids
+      next if missing.empty?
+
+      now = Time.current
+      Submission.upsert_all(missing.map { |item_id| {item_id:, team_id: id, created_at: now, updated_at: now} }) # rubocop:disable Rails/SkipsModelValidations
+    end
   end
 
   def self.new_avatar_seed
@@ -92,6 +96,10 @@ class Team < ApplicationRecord
   end
 
   private
+
+  def missing_item_ids
+    hunt.items.where.not(id: submissions.select(:item_id)).pluck(:id)
+  end
 
   def assign_avatar_seed
     self.avatar_seed = self.class.new_avatar_seed unless avatar_seed.to_s.match?(AVATAR_SEED_FORMAT)
