@@ -30,7 +30,7 @@ RSpec.describe "Videos", :test_queue_adapter do
     expect(page).to have_css("dialog[open] video[src*='/rails/active_storage/blobs/'][poster*='/rails/active_storage/representations/']")
   end
 
-  it "takes a video back with a banner when it turns out to be too long", ffprobe_duration: 31 do
+  it "takes a video back with a banner when it turns out to be too long", ffprobe_duration: 61 do
     submission = team.submissions.find_by(item:)
     submission.photo.attach(io: Rails.root.join("spec/fixtures/video.mp4").open, filename: "clip.mp4")
 
@@ -40,7 +40,7 @@ RSpec.describe "Videos", :test_queue_adapter do
 
     TranscodeVideoJob.perform_now(submission)
 
-    expect(page).to have_text("Videos must be 30 seconds or shorter. Try a shorter clip.")
+    expect(page).to have_text("Videos must be 60 seconds or shorter. Try a shorter clip.")
     expect(page).not_to have_css("li[data-found]")
     expect(page).to have_css("label", text: item.name)
     expect(submission.reload.photo).not_to be_attached

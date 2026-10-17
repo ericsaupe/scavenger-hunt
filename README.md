@@ -36,7 +36,7 @@ Photos and videos go straight from the browser to the storage service with Activ
 
 Add every origin the app is served from (staging, custom domains) to `AllowedOrigins`. Without the rule the browser blocks the upload and teams see the "couldn't be uploaded" banner on every attempt. Development and test use the Disk service, which needs no CORS setup.
 
-Videos are limited to 50 MB and 30 seconds (`Submission::MAX_VIDEO_BYTES`, `Submission::MAX_VIDEO_SECONDS`); the browser checks both before uploading, the server checks the size when the upload lands, and the worker probes the duration with ffprobe before converting and refuses clips that are too long with a banner on the team's page. Photos are compressed in the browser before upload. A photo captured before the hunt ended is still accepted for 15 minutes after the end (`Hunt::LATE_UPLOAD_GRACE`) so slow connections do not lose last-minute finds.
+Videos are limited to 150 MB and 60 seconds (`Submission::MAX_VIDEO_BYTES`, `Submission::MAX_VIDEO_SECONDS`); the browser checks both before uploading, the server checks the size when the upload lands, and the worker probes the duration with ffprobe before converting and refuses clips that are too long with a banner on the team's page. Photos are compressed in the browser before upload. A photo captured before the hunt ended is still accepted for 15 minutes after the end (`Hunt::LATE_UPLOAD_GRACE`) so slow connections do not lose last-minute finds.
 
 ### Videos
 

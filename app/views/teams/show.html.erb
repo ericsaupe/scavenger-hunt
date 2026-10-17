@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or video. Found items tick off for the whole team.</p>
+  <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or a video up to <%= Submission::MAX_VIDEO_SECONDS %> seconds. Found items tick off for the whole team.</p>
 
   <% if @hunt.chat_available? %>
     <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_announcement} %>

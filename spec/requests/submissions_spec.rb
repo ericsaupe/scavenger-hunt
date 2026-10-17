@@ -127,29 +127,29 @@ RSpec.describe "Submissions" do
   end
 
   describe "media limits" do
-    it "accepts a video of fifty megabytes" do
-      send_photo(direct_uploaded(content_type: "video/mp4", byte_size: 50.megabytes))
+    it "accepts a video of 150 megabytes" do
+      send_photo(direct_uploaded(content_type: "video/mp4", byte_size: 150.megabytes))
 
       expect(response).to have_http_status(:ok)
       expect(submission.photo).to be_attached
     end
 
-    it "refuses a video over fifty megabytes" do
-      send_photo(direct_uploaded(content_type: "video/mp4", byte_size: 50.megabytes + 1))
+    it "refuses a video over 150 megabytes" do
+      send_photo(direct_uploaded(content_type: "video/mp4", byte_size: 150.megabytes + 1))
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("Videos must be 50 MB or smaller")
+      expect(response.body).to include("Videos must be 150 MB or smaller")
       expect(submission.photo).not_to be_attached
     end
 
     it "discards the uploaded file when refusing it" do
-      signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 50.megabytes + 1)
+      signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 150.megabytes + 1)
       send_photo(signed_id)
 
       expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
     end
 
-    it "accepts a video longer than thirty seconds and lets the worker take it back", ffprobe_duration: 31 do
+    it "accepts a video longer than sixty seconds and lets the worker take it back", ffprobe_duration: 61 do
       allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
       signed_id = direct_uploaded(content_type: "video/mp4", byte_size: 1.megabyte)
       send_photo(signed_id)
@@ -158,7 +158,7 @@ RSpec.describe "Submissions" do
       expect(submission.photo).not_to be_attached
       expect(ActiveStorage::Blob.find_signed(signed_id)).to be_nil
       expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{team.id}",
-        hash_including(target: "flash", locals: {message: "Videos must be 30 seconds or shorter. Try a shorter clip."}))
+        hash_including(target: "flash", locals: {message: "Videos must be 60 seconds or shorter. Try a shorter clip."}))
     end
 
     it "takes back a video whose upload did not match its checksum" do

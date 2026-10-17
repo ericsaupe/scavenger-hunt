@@ -115,14 +115,15 @@ RSpec.describe "Uploads" do
 
   it "refuses a video that is too long before uploading it" do
     page.execute_script(<<~JS)
-      Object.defineProperty(HTMLMediaElement.prototype, "duration", { get: () => 31 })
+      Object.defineProperty(HTMLMediaElement.prototype, "duration", { get: () => 61 })
     JS
 
+    expect(page).to have_text("a video up to 60 seconds")
     attach_file(Rails.root.join("spec/fixtures/video.mp4")) do
       find(:label, text: item.name).click
     end
 
-    expect(page).to have_text("Videos must be 30 seconds or shorter")
+    expect(page).to have_text("Videos must be 60 seconds or shorter")
     expect(page).not_to have_css("li[data-uploading]")
     expect(page).not_to have_css("li[data-found]")
   end

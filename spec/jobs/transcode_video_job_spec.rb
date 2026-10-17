@@ -30,7 +30,7 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     original = conversion[conversion.index("-i") + 1]
     expect(original).to end_with(".mp4")
     expect(conversion).to eq(VideoTranscoder.new(original, conversion.last).command.drop(VideoTranscoder::NICE.size + 1))
-    expect(conversion).to include("-t", "31", "-c:v", "libx264", "-movflags", "+faststart")
+    expect(conversion).to include("-t", "61", "-c:v", "libx264", "-movflags", "+faststart")
     expect(submission.reload.playback).to be_attached
     expect(submission.playback.blob).to have_attributes(filename: have_attributes(to_s: "playback.mp4"), content_type: "video/mp4", byte_size: Rails.root.join("spec/fixtures/video.mp4").size)
     expect(submission.photo.blob.filename.to_s).to eq("video.mp4")
@@ -71,16 +71,16 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
   end
 
   it "measures a clip whose length the probe could not read and keeps it when it fits", ffprobe_duration: "none" do
-    ENV["FAKE_FFPROBE_PLAYBACK_DURATION"] = "30.0"
+    ENV["FAKE_FFPROBE_PLAYBACK_DURATION"] = "60.0"
 
     described_class.perform_now(submission)
 
     expect(submission.reload.playback).to be_attached
-    expect(ffmpeg_calls.find { |args| args.last.end_with?("/playback.mp4") }).to include("-t", "31")
+    expect(ffmpeg_calls.find { |args| args.last.end_with?("/playback.mp4") }).to include("-t", "61")
   end
 
   it "takes back a clip whose length the probe could not read when it runs past the limit", ffprobe_duration: "none" do
-    ENV["FAKE_FFPROBE_PLAYBACK_DURATION"] = "30.5"
+    ENV["FAKE_FFPROBE_PLAYBACK_DURATION"] = "60.5"
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
 
     described_class.perform_now(submission)
@@ -88,7 +88,7 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     expect(submission.reload.photo).not_to be_attached
     expect(submission.playback).not_to be_attached
     expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{submission.team_id}",
-      hash_including(locals: {message: "Videos must be 30 seconds or shorter. Try a shorter clip."}))
+      hash_including(locals: {message: "Videos must be 60 seconds or shorter. Try a shorter clip."}))
   end
 
   it "restricts the poster frame to plain video files too" do
@@ -100,7 +100,7 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     expect(ffmpeg_calls.find { |args| args.last.end_with?("/playback.mp4") }).not_to include("nice")
   end
 
-  it "probes every upload and takes back a video longer than thirty seconds", ffprobe_duration: 31 do
+  it "probes every upload and takes back a video longer than sixty seconds", ffprobe_duration: 61 do
     allow(Turbo::StreamsChannel).to receive(:broadcast_append_to)
     submission.photo.blob.update!(metadata: {analyzed: true, duration: 1})
     blob = submission.photo.blob
@@ -111,7 +111,7 @@ RSpec.describe TranscodeVideoJob, :test_queue_adapter do
     expect(ActiveStorage::Blob.exists?(blob.id)).to be(false)
     expect(ffmpeg_calls).to be_empty
     expect(Turbo::StreamsChannel).to have_received(:broadcast_append_to).with("submissions_#{submission.team_id}",
-      target: "flash", partial: "banners/banner", locals: {message: "Videos must be 30 seconds or shorter. Try a shorter clip."})
+      target: "flash", partial: "banners/banner", locals: {message: "Videos must be 60 seconds or shorter. Try a shorter clip."})
   end
 
   it "takes back a video whose upload did not match its checksum" do
