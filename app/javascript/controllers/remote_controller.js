@@ -13,7 +13,7 @@ export default class extends Controller {
   connect() {
     this.inFlight = false
     this.onKeydown = (event) => {
-      if (event.target.closest("input, textarea")) {
+      if (event.target.closest("input, textarea") || document.querySelector(".modal-open")) {
         return
       }
       if (event.key === "ArrowRight") {

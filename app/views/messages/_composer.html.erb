@@ -1,4 +1,5 @@
-<% team = chat_team(hunt) %>
+<% organizer = hunt.organizer?(cookies[:user_id]) %>
+<% team = chat_team(hunt) unless organizer %>
 <div id="<%= hunt.chat_composer_id %>" class="shrink-0 border-t border-base-300 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3" data-chat-target="composer">
   <p id="<%= hunt.chat_notice_id %>" class="mb-2 text-xs font-semibold text-error empty:hidden" role="status" aria-live="polite"><%= local_assigns[:error] %></p>
 
@@ -13,7 +14,7 @@
 
   <%= form_with model: hunt.messages.new, url: hunt_messages_path(hunt.code), class: ("hidden" if name.blank?), data: {chat_target: "form", action: "turbo:submit-end->chat#sent"} do |f| %>
     <div class="flex items-center gap-2">
-      <% if hunt.owner?(cookies[:user_id]) %>
+      <% if organizer %>
         <%= f.hidden_field :announcement, value: "0", data: {chat_target: "announcement"} %>
         <button type="button" class="btn btn-circle btn-ghost shrink-0 text-ink-soft aria-pressed:bg-neutral aria-pressed:text-marigold" aria-pressed="false" aria-label="Send as an announcement" title="Send as an announcement" data-action="chat#toggleAnnouncement" data-chat-target="announcementToggle" data-testid="chat-announcement-toggle"><%= icon :megaphone, class: "size-5" %></button>
       <% end %>
@@ -23,7 +24,7 @@
       <% end %>
     </div>
     <p class="mt-1.5 flex items-center justify-between gap-3 text-xs text-ink-soft">
-      <span class="min-w-0 truncate">Sending as <strong class="text-ink"><%= name %></strong><% if team %>, <%= team.name %><% end %></span>
+      <span class="min-w-0 truncate">Sending as <strong class="text-ink"><%= name %></strong><% if organizer %>, Organizer<% elsif team %>, <%= team.name %><% end %></span>
       <span class="flex shrink-0 items-center gap-2">
         <span class="tabular-nums" data-chat-target="counter" data-testid="chat-counter">0/<%= Message::MAX_CONTENT_LENGTH %></span>
         <button type="button" class="link font-semibold" data-action="chat#editName">Change name</button>

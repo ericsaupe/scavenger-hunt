@@ -65,6 +65,10 @@
   </div>
 </section>
 
+<% if @hunt.chat_available? && @hunt.organizer?(cookies[:user_id]) %>
+  <%= render partial: "messages/chat", locals: {hunt: @hunt, offset: "bottom-24"} %>
+<% end %>
+
 <% content_for :bottom_bar do %>
   <div class="bottom-bar">
     <div class="page flex items-center gap-3 pt-3">

@@ -257,6 +257,39 @@ RSpec.describe Hunt, "notifications", :test_queue_adapter do
     end
   end
 
+  describe "organizer and remote holder" do
+    let(:hunt) { create(:hunt, owner_id: "laptop") }
+
+    it "keeps the organizer when the remote is handed to another device" do
+      allow(hunt).to receive(:broadcast_presentation_update)
+
+      hunt.hand_remote_to!("phone")
+
+      expect(hunt).to have_attributes(owner_id: "laptop", remote_holder_id: "phone")
+      expect(hunt.owner?("laptop")).to be(true)
+      expect(hunt.owner?("phone")).to be(false)
+      expect(hunt.remote_holder?("phone")).to be(true)
+      expect(hunt.remote_holder?("laptop")).to be(false)
+    end
+
+    it "treats the owner and the current remote holder as organizers" do
+      hunt.update!(remote_holder_id: "phone")
+
+      expect(hunt.organizer?("laptop")).to be(true)
+      expect(hunt.organizer?("phone")).to be(true)
+      expect(hunt.organizer?("guest")).to be(false)
+      expect(hunt.organizer?(nil)).to be(false)
+    end
+
+    it "never mistakes a missing cookie for an ownerless hunt's organizer" do
+      hunt.update!(owner_id: nil)
+
+      expect(hunt.owner?(nil)).to be(false)
+      expect(hunt.organizer?("")).to be(false)
+      expect(hunt.remote_held?).to be(false)
+    end
+  end
+
   describe "#leader" do
     let(:hunt) { create(:hunt) }
 

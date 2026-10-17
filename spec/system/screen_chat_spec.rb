@@ -62,7 +62,7 @@ RSpec.describe "Big screen chat" do
     end
 
     visit "/scavenger_hunts/#{hunt.code}/presenter"
-    hunt.update!(owner_id: viewer_id)
+    hunt.update!(remote_holder_id: viewer_id)
     visit "/scavenger_hunts/#{hunt.code}/presenter/remote"
     expect(page).to have_css("[data-testid='announcements-only-switch']:disabled")
     find("[data-testid='screen-chat-switch']").click
@@ -182,7 +182,7 @@ RSpec.describe "Big screen chat" do
   end
 
   it "keeps eight messages, drops each after its minute and loses removed ones at once" do
-    hunt.update!(screen_chat: "all", owner_id: "host")
+    hunt.update!(screen_chat: "all", remote_holder_id: "host")
     create_list(:message, 9, hunt:, content: "Warm-up")
     earliest = hunt.messages.order(:id).first
 
@@ -206,7 +206,7 @@ RSpec.describe "Big screen chat" do
   end
 
   it "brings back eligible recent messages when the mode changes" do
-    hunt.update!(screen_chat: "all", owner_id: "host")
+    hunt.update!(screen_chat: "all", remote_holder_id: "host")
     create(:message, hunt:, sender_name: "Host", organizer: true, announcement: true, content: "Pizza at 7")
     create_list(:message, 8, hunt:, content: "Warm-up")
 

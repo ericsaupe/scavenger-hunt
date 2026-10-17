@@ -229,7 +229,7 @@ class Hunt < ApplicationRecord
   end
 
   def hand_remote_to!(user_id)
-    update!(owner_id: user_id)
+    update!(remote_holder_id: user_id)
     broadcast_presentation_update
     announce_show!
   end
@@ -263,7 +263,19 @@ class Hunt < ApplicationRecord
   end
 
   def owner?(user_id)
-    owner_id == user_id
+    user_id.present? && owner_id == user_id
+  end
+
+  def remote_holder?(user_id)
+    user_id.present? && remote_holder_id == user_id
+  end
+
+  def remote_held?
+    remote_holder_id.present?
+  end
+
+  def organizer?(user_id)
+    owner?(user_id) || remote_holder?(user_id)
   end
 
   private

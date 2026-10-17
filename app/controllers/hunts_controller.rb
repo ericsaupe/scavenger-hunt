@@ -54,7 +54,7 @@ class HuntsController < ApplicationController
   def unlock_leaderboard
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]
-      @hunt.update(password_entered_for_leaderboard: true, owner_id: cookies[:user_id])
+      @hunt.update(password_entered_for_leaderboard: true)
       flash.now[:success] = "Leaderboard unlocked!"
     else
       flash[:warning] = "Incorrect password"
@@ -65,7 +65,7 @@ class HuntsController < ApplicationController
   def unlock_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
     if @hunt.password == params[:password]
-      @hunt.update(password_entered: true, owner_id: cookies[:user_id])
+      @hunt.update(password_entered: true)
       flash.now[:success] = "Results unlocked!"
     else
       flash[:warning] = "Incorrect password"

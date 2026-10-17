@@ -34,6 +34,17 @@ RSpec.describe "Party chat" do
     page.driver.browser.manage.cookie_named("user_id")[:value]
   end
 
+  def style_of(selector, property)
+    find(selector).evaluate_script("getComputedStyle(this).#{property}")
+  end
+
+  def overlap?(selector, other, **options)
+    rect = ->(element) { element.evaluate_script("this.getBoundingClientRect().toJSON()") }
+    a = rect.call(find(selector))
+    b = rect.call(find(other, **options))
+    a["left"] < b["right"] && b["left"] < a["right"] && a["top"] < b["bottom"] && b["top"] < a["bottom"]
+  end
+
   it "sends a named, team-coloured message that another viewer sees with an unread badge" do
     visit checklist_path(team)
     using_session(:other) do
@@ -193,9 +204,27 @@ RSpec.describe "Party chat" do
       send_message("Taking it from here")
     end
 
-    it "takes the organizer's chat controls away when they hand the remote over" do
+    it "keeps the organizer's megaphone when another phone takes the remote" do
       visit "/scavenger_hunts/#{hunt.code}/presenter"
       hunt.update!(owner_id: viewer_id)
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      expect(page).to have_css("#presenter_stream[connected]", visible: :all)
+      open_chat
+      set_name("Host")
+      expect(page).to have_css("[data-testid='chat-announcement-toggle']")
+
+      hunt.reload.hand_remote_to!("the host's phone")
+
+      expect(page).to have_css("[data-testid='presenting']", text: "Someone else has the remote")
+      expect(page).to have_css("[data-testid='chat-announcement-toggle']")
+      find("[data-testid='chat-announcement-toggle']").click
+      send_message("Still announcing from the laptop")
+      expect(page).to have_css("[data-testid='chat-pinned']", text: "Still announcing from the laptop")
+    end
+
+    it "takes a stand-in host's chat controls away when they hand the remote over" do
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      hunt.update!(remote_holder_id: viewer_id)
       create(:message, hunt:, content: "Who took the cones?", sender_name: "Dana", team: other_team)
       visit "/scavenger_hunts/#{hunt.code}/presenter"
       expect(page).to have_css("#presenter_stream[connected]", visible: :all)
@@ -210,6 +239,41 @@ RSpec.describe "Party chat" do
       expect(page).to have_no_css("[data-testid='chat-remove']", visible: :visible)
     end
 
+    it "lets the host announce from the remote without leaving it" do
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      click_on "Take the remote"
+      expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+      expect(page).to have_css("[data-testid='chat-pill']")
+      expect(page).to have_css("#party_chat_#{hunt.id} turbo-cable-stream-source[connected]", visible: :all)
+      expect(page).to have_css("[data-chat-box][data-chat-organizer]", visible: :all)
+      expect(find("[data-testid='chat-pill']")[:class]).to include("bottom-[max(1rem,env(safe-area-inset-bottom))]")
+      expect(overlap?("[data-testid='chat-pill']", "button", text: "Next")).to be(false)
+
+      open_chat
+      find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).send_keys(:arrow_right)
+      expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 3")
+      expect(hunt.reload.presentation_slide).to eq("submission:#{hunt.submissions.first.id}")
+      set_name("Host")
+      expect(page).to have_text("Sending as Host, Organizer")
+      find("[data-testid='chat-announcement-toggle']").click
+      send_message("Pizza at 7 by the gazebo")
+      expect(page).to have_css("[data-testid='chat-pinned']", text: "Pizza at 7 by the gazebo")
+      expect(page).to have_css("[data-testid='chat-message'][data-announcement]", text: "Announcement")
+      expect(page).to have_css("#party_chat_title_#{hunt.id}", text: "Party chat")
+      expect(style_of("#party_chat_title_#{hunt.id}", "color")).to eq(style_of("[data-testid='chat-sheet'] strong", "color"))
+      expect(hunt.messages.sole).to have_attributes(organizer: true, announcement: true, team: nil)
+
+      find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).click
+      expect(page).not_to have_css("[data-testid='chat-sheet'].modal-open")
+      find("body").send_keys(:arrow_right)
+      expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 3")
+      click_on "Next"
+      expect(page).to have_css("[data-testid='progress']", text: "Finale 3 of 3")
+      expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
+      expect(page).to have_css("[data-testid='chat-pill']")
+    end
+
     it "reloads the chat for a handover that lands before the sheet has loaded" do
       visit "/scavenger_hunts/#{hunt.code}/presenter"
       expect(page).to have_css("#presenter_stream[connected]", visible: :all)
@@ -222,6 +286,38 @@ RSpec.describe "Party chat" do
       open_chat
       set_name("Eric")
       expect(page).to have_css("[data-testid='chat-announcement-toggle']")
+    end
+  end
+
+  it "lets an organizer chat from the hunt page without borrowing a team's name" do
+    visit checklist_path(team)
+    hunt.update!(owner_id: viewer_id)
+    visit checklist_path(team)
+    expect(page).to have_css("[data-testid='chat-pill'].bottom-4")
+    click_on "Teams"
+    expect(page).to have_button("Join the hunt")
+    expect(page).to have_css("[data-testid='chat-pill'].bottom-24")
+    expect(overlap?("[data-testid='chat-pill']", ".bottom-bar")).to be(false)
+
+    open_chat
+    set_name("Host")
+    expect(page).to have_text("Sending as Host, Organizer")
+    send_message("Welcome, everyone")
+    within("[data-testid='chat-message']") do
+      expect(page).to have_text("Organizer")
+      expect(page).not_to have_text("Blue Bandits")
+    end
+
+    using_session(:other) do
+      visit "/scavenger_hunts/#{hunt.code}"
+      expect(page).to have_button("Join the hunt")
+      expect(page).not_to have_css("[data-testid='chat-pill']")
+
+      visit "/scavenger_hunts/#{hunt.code}/results"
+      expect(page).to have_css("[data-testid='chat-unread']", text: "1")
+      open_chat
+      expect(page).to have_css("[data-testid='chat-message']:not([data-own])", text: "Welcome, everyone")
+      expect(page).not_to have_css("[data-testid='chat-announcement-toggle']")
     end
   end
 

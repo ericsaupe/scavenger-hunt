@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Presentations" do
-  let(:hunt) { create(:hunt, owner_id: "owner") }
+  let(:hunt) { create(:hunt, owner_id: "owner", remote_holder_id: "owner") }
   let(:items) { hunt.items.order(:id).to_a }
   let(:team) { create(:team, hunt:) }
   let!(:first) { found(items.first) }
@@ -30,6 +30,15 @@ RSpec.describe "Presentations" do
       expect(response).to have_http_status(:forbidden)
       expect(hunt.reload.presentation_slide).to be_nil
       expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
+    end
+
+    it "refuses the organizer until they take the remote" do
+      hunt.update!(remote_holder_id: nil)
+
+      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "submission:#{second.id}"}, as: :json
+
+      expect(response).to have_http_status(:forbidden)
+      expect(hunt.reload.presentation_slide).to be_nil
     end
 
     it "jumps to a slide and broadcasts a single refresh" do
@@ -242,6 +251,31 @@ RSpec.describe "Presentations" do
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"
 
       expect(response.body).not_to include("Show the chat")
+    end
+
+    it "carries the party chat with the megaphone for whoever holds the remote" do
+      Flipper.enable(:chat)
+      cookies[:user_id] = "viewer"
+      hunt.update!(remote_holder_id: "viewer")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('data-testid="chat-pill"', "Next")
+      expect(response.body).to match(/<turbo-frame[^>]*data-chat-role="organizer"/)
+
+      get "/scavenger_hunts/#{hunt.code}/messages", headers: {"Turbo-Frame" => "chat_box_#{hunt.id}"}
+
+      expect(response.body).to include('data-testid="chat-announcement-toggle"')
+    end
+
+    it "leaves the party chat out when the hunt has no chat" do
+      Flipper.enable(:chat)
+      hunt.update!(chat_enabled: false)
+
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).not_to include('data-testid="chat-pill"')
     end
 
     it "shows the video transport on a video slide" do

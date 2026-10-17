@@ -2,7 +2,7 @@
 
 class PresentationsController < ApplicationController
   before_action :set_hunt
-  before_action :require_owner, except: :claim
+  before_action :require_remote, except: :claim
 
   def remote
     @presentation = @hunt.presentation
@@ -60,8 +60,8 @@ class PresentationsController < ApplicationController
     @hunt = Hunt.find_by!(code: params[:hunt_code].upcase)
   end
 
-  def require_owner
-    return if @hunt.owner?(cookies[:user_id])
+  def require_remote
+    return if @hunt.remote_holder?(cookies[:user_id])
 
     respond_to do |format|
       format.html do

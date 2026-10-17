@@ -61,11 +61,11 @@
       <% if @big_screen %>
         <p class="text-lg font-semibold text-white/80" data-testid="join-line"><%= @screen_chat ? "Follow, vote and chat on your phone" : "Follow and vote on your phone" %></p>
       <% end %>
-      <% if @hunt.owner?(cookies[:user_id]) %>
+      <% if @hunt.remote_holder?(cookies[:user_id]) %>
         <p data-testid="presenting">You have the remote</p>
         <%= link_to "Open the remote", hunt_presenter_remote_path(@hunt.code.upcase), class: "btn btn-sm btn-ghost text-white" %>
       <% else %>
-        <p data-testid="presenting"><%= @hunt.owner_id.present? ? "Someone else has the remote" : "No one has the remote yet" %></p>
+        <p data-testid="presenting"><%= @hunt.remote_held? ? "Someone else has the remote" : "No one has the remote yet" %></p>
         <% if @hunt.lock_password.present? %>
           <details class="group">
             <summary class="btn btn-sm btn-ghost list-none text-white">Take the remote</summary>

@@ -35,7 +35,7 @@ RSpec.describe "Avatars" do
   it "puts critters on the leaderboard, the finale and the remote, with a DiceBear credit" do
     create(:photo_submission, item: hunt.items.first, team:)
     runner_up = create(:team, hunt:, name: "Red Rockets")
-    hunt.update!(presentation_slide: "finale", owner_id: "host")
+    hunt.update!(presentation_slide: "finale", remote_holder_id: "host")
 
     visit "/scavenger_hunts/#{hunt.code}/results"
     expect(page).to have_css("[data-testid='winner'] [data-testid='team-avatar'][src='#{team.avatar_url}']")
