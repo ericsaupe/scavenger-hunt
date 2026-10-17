@@ -28,8 +28,8 @@
       </div>
     </div>
     <div class="page pb-3 pt-2">
-      <div class="flex items-center justify-between gap-3 text-xs font-semibold text-ink-soft">
-        <span data-checklist-target="progress"></span>
+      <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-xs font-semibold text-ink-soft">
+        <span class="whitespace-nowrap" data-checklist-target="progress"></span>
         <% if @hunt.timer? %>
           <%= render partial: "hunts/timer", locals: {hunt: @hunt} %>
         <% end %>
@@ -46,7 +46,11 @@
     </div>
   </div>
 
-  <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or a video up to <%= Submission::MAX_VIDEO_SECONDS %> seconds. Found items tick off for the whole team.</p>
+  <% if @hunt.ended? %>
+    <p class="page pt-5 text-sm text-ink-soft">The hunt is over. Everything your team found is in, so get ready for the show and the results.</p>
+  <% else %>
+    <p class="page pt-5 text-sm text-ink-soft">Tap an item to take a photo or a video up to <%= Submission::MAX_VIDEO_SECONDS %> seconds. Found items tick off for the whole team.</p>
+  <% end %>
 
   <% if @hunt.chat_available? %>
     <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_announcement} %>
