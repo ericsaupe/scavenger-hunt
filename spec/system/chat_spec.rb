@@ -279,8 +279,8 @@ RSpec.describe "Party chat" do
 
       open_chat
       find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).send_keys(:arrow_right)
-      expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 3")
-      expect(hunt.reload.presentation_slide).to eq("submission:#{hunt.submissions.first.id}")
+      expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 3")
+      expect(hunt.reload.presentation_slide).to eq("submission:#{photo.id}")
       set_name("Host")
       expect(page).to have_text("Sending as Host, Organizer")
       find("[data-testid='chat-announcement-toggle']").click
@@ -294,9 +294,9 @@ RSpec.describe "Party chat" do
       find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).click
       expect(page).not_to have_css("[data-testid='chat-sheet'].modal-open")
       find("body").send_keys(:arrow_right)
-      expect(page).to have_css("[data-testid='progress']", text: "Photo 2 of 3")
-      click_on "Next"
       expect(page).to have_css("[data-testid='progress']", text: "Finale 3 of 3")
+      click_on "Next"
+      expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 3")
       expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
       expect(page).to have_css("[data-testid='chat-pill']")
     end
