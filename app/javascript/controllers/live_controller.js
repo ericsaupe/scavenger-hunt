@@ -60,12 +60,15 @@ export default class extends Controller {
       return false
     }
     clearTimeout(this.captureTimer)
+    if (document.visibilityState === "hidden") {
+      return true
+    }
     this.captureTimer = setTimeout(() => {
       const field = capturing.querySelector("input[type=file]")
       if (capturing.isConnected && !capturing.hasAttribute("data-capturing")) {
         return
       }
-      if (field?.files.length) {
+      if (field?.files.length || document.visibilityState === "hidden") {
         this.waitForCapture()
         return
       }
