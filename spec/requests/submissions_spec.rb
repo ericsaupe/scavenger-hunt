@@ -67,6 +67,25 @@ RSpec.describe "Submissions" do
       expect(submission.reload.photo).not_to be_attached
     end
 
+    it "refuses an SVG and keeps the row rendering" do
+      svg = ActiveStorage::Blob.create_and_upload!(io: Rails.root.join("spec/fixtures/avatar.svg").open, filename: "avatar.svg", content_type: "image/svg+xml").signed_id
+      send_photo(svg)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("That image type can&#39;t be used. Take a photo instead")
+      expect(submission.reload.photo).not_to be_attached
+    end
+
+    it "renders a checklist whose photo cannot be transformed" do
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/avatar.svg").open, filename: "avatar.svg", content_type: "image/svg+xml")
+      submission.save!(validate: false)
+
+      get "/scavenger_hunts/#{hunt.code}/teams/#{team.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("/rails/active_storage/blobs/redirect/")
+    end
+
     it "refuses a photo posted directly as a file after the end" do
       hunt.update!(ends_at: 5.minutes.ago)
       patch "/submissions/#{submission.id}", params: {submission: {photo: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/test.jpg"), "image/jpeg"), captured_at: 1.minute.ago.iso8601}}, headers: headers

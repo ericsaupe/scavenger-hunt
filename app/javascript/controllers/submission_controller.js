@@ -120,6 +120,9 @@ export default class extends Controller {
   }
 
   async mediaProblem(file) {
+    if (file.type === "image/svg+xml") {
+      return "That image type can't be used. Take a photo instead."
+    }
     if (file.type.startsWith("image/")) {
       return null
     }

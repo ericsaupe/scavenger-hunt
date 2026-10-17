@@ -59,6 +59,25 @@ RSpec.describe Submission do
     it "is nil without a photo" do
       expect(create(:submission).small_variant_url).to be_nil
     end
+
+    it "serves an image that cannot be transformed as it is" do
+      submission = create(:submission)
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/avatar.svg").open, filename: "avatar.svg", content_type: "image/svg+xml")
+      submission.save!(validate: false)
+
+      expect(submission.small_variant_url).to eq(submission.media_url)
+      expect(submission.large_variant_url).to start_with("/rails/active_storage/blobs/redirect/")
+    end
+  end
+
+  describe "photo validation" do
+    it "refuses an image type that cannot be transformed" do
+      submission = create(:submission)
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/avatar.svg").open, filename: "avatar.svg", content_type: "image/svg+xml")
+
+      expect(submission).not_to be_valid
+      expect(submission.errors[:photo]).to include("That image type can't be used. Take a photo instead")
+    end
   end
 
   describe "#media_url" do
