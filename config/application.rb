@@ -26,5 +26,6 @@ module ScavengerHunt
     end
 
     config.active_job.queue_adapter = :good_job
+    config.active_storage.service_urls_expire_in = 15.minutes
   end
 end
