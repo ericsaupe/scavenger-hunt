@@ -59,6 +59,16 @@ RSpec.describe "Party chat" do
     JS
   end
 
+  def swipe_left(selector)
+    page.execute_script(<<~JS, selector)
+      const target = document.querySelector(arguments[0])
+      const touch = (x) => new Touch({identifier: 1, target, clientX: x, clientY: 300})
+      for (const [type, x] of [["touchstart", 300], ["touchend", 100]]) {
+        target.dispatchEvent(new TouchEvent(type, {bubbles: true, changedTouches: [touch(x)], touches: type === "touchstart" ? [touch(x)] : []}))
+      }
+    JS
+  end
+
   def on_screen?(rect)
     rect["top"] >= 0 && rect["bottom"] <= rect["viewport"]
   end
@@ -323,6 +333,22 @@ RSpec.describe "Party chat" do
       open_chat
     ensure
       page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+    end
+
+    it "ignores swipes that start inside the open chat sheet" do
+      visit "/scavenger_hunts/#{hunt.code}/presenter"
+      expect(page).to have_css("[data-testid='live-pill']", text: "Live")
+      open_chat
+      expect(page).to have_css("[data-chat-box]")
+
+      swipe_left("[data-chat-box]")
+      sleep 0.5
+      expect(page).to have_css("[data-testid='live-pill']", text: "Live")
+      expect(page).to have_css("[data-testid='chat-sheet'].modal-open")
+
+      find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).click
+      swipe_left("[data-testid='photo-slide']")
+      expect(page).to have_css("[data-testid='live-pill']", text: "Browsing")
     end
 
     it "reloads the chat for a handover that lands before the sheet has loaded" do

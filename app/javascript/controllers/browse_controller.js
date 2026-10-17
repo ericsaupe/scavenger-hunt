@@ -11,6 +11,10 @@ export default class extends Controller {
 
   connect() {
     this.onTouchStart = (event) => {
+      if (event.target.closest("[role='dialog']")) {
+        this.start = null
+        return
+      }
       const touch = event.changedTouches[0]
       this.start = { x: touch.clientX, y: touch.clientY }
     }
