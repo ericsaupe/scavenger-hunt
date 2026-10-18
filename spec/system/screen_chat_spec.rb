@@ -152,18 +152,34 @@ RSpec.describe "Big screen chat" do
       end
     end
 
+    using_session(:big_screen) do
+      find("[data-testid='screen-chat'] [data-testid='chat-message']", text: "Plenty").execute_script("this.dataset.shownSince = 'photo'")
+    end
+
     hunt.reload.present!("item:#{hunt.items.first.id}")
     using_session(:big_screen) do
       expect(page).to have_css("[data-testid='title-card']")
-      expect(page).not_to have_css("[data-testid='screen-chat']")
-      expect(page).to have_css("[data-testid='join-line']", text: "Follow and vote on your phone")
+      expect(page).to have_css("[data-testid='join-line']", text: "Follow, vote and chat on your phone")
+      within("[data-testid='screen-chat']") do
+        expect(page).to have_css("[data-shown-since='photo']", text: "Plenty")
+        expect(page).not_to have_text("Any left?")
+      end
+    end
+
+    hunt.reload.present!("finale")
+    using_session(:big_screen) do
+      expect(page).to have_css("[data-testid='finale']")
+      expect(page).to have_css("[data-testid='join-line']", text: "Follow, vote and chat on your phone")
+      within("[data-testid='screen-chat']") do
+        expect(page).to have_css("[data-shown-since='photo']", text: "Plenty")
+      end
     end
 
     hunt.reload.present!("submission:#{@photo.id}")
     using_session(:big_screen) do
       expect(page).to have_css("[data-testid='photo-slide']")
       within("[data-testid='screen-chat']") do
-        expect(page).to have_text("Plenty")
+        expect(page).to have_css("[data-shown-since='photo']", text: "Plenty")
         expect(page).not_to have_text("Any left?")
       end
     end

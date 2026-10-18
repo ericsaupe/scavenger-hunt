@@ -84,7 +84,7 @@ class HuntsController < ApplicationController
     @big_screen = params[:screen] == "big"
     @browsing = !@big_screen && @presentation.include?(params[:slide])
     @slide = @browsing ? @presentation.slide(params[:slide]) : @presentation.current
-    @screen_chat = @big_screen && @slide.chat_column? && @hunt.screen_chat_visible?
+    @screen_chat = @big_screen && @hunt.screen_chat_visible?
     @presenter_mode = true
   end
 

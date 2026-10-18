@@ -183,17 +183,19 @@ RSpec.describe "Presenter" do
         expect(response.body).not_to include("Hello from the floor", %(id="message_#{first_filler.id}"))
       end
 
-      it "stays off the title card, the finale, watchers' phones and screens with the chat off" do
+      it "stays beside the title card and the finale too" do
         hunt.update!(presentation_slide: "item:#{items.first.id}")
         get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
-        expect(response.body).not_to include(%(data-testid="screen-chat"), "Hello from the floor")
-        expect(response.body).to include("Follow and vote on your phone")
+        expect(response.body).to include(%(data-testid="title-card"), %(data-testid="screen-chat"), "Hello from the floor")
+        expect(response.body).to include("Follow, vote and chat on your phone")
 
         hunt.update!(presentation_slide: "finale")
         get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
-        expect(response.body).not_to include(%(data-testid="screen-chat"))
+        expect(response.body).to include(%(data-testid="finale"), %(data-testid="screen-chat"), "Hello from the floor")
+        expect(response.body).to include("Follow, vote and chat on your phone")
+      end
 
-        hunt.update!(presentation_slide: "submission:#{first.id}")
+      it "stays off watchers' phones and screens with the chat off" do
         get "/scavenger_hunts/#{hunt.code}/presenter"
         expect(response.body).not_to include(%(data-testid="screen-chat"))
         expect(response.body).not_to include("Follow and vote on your phone")
