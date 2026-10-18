@@ -5,5 +5,6 @@ class HuntTemplatesController < ApplicationController
 
   def show
     @template = Templater.find!(params[:slug])
+    redirect_to hunt_template_path(@template) if params[:slug] != @template.slug
   end
 end

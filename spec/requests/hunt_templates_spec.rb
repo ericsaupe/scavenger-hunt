@@ -18,6 +18,12 @@ RSpec.describe "Hunt templates" do
     expect(response.body).not_to match(/victory/i)
   end
 
+  it "sends other spellings of a slug to the one address it caches under" do
+    get "/scavenger_hunts/lists/Christmas-Light-SPECTACLE"
+
+    expect(response).to redirect_to("/scavenger_hunts/lists/christmas-light-spectacle")
+  end
+
   it "404s for a list that does not exist" do
     get "/scavenger_hunts/lists/not-a-list"
 
