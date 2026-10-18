@@ -68,6 +68,26 @@ RSpec.describe "Party chat" do
     rect["top"] >= 0 && rect["bottom"] <= rect["viewport"]
   end
 
+  def settle(selector)
+    page.evaluate_async_script(<<~JS, selector)
+      const done = arguments[arguments.length - 1]
+      const animations = document.querySelector(arguments[0]).getAnimations({subtree: true})
+      Promise.all(animations.map((animation) => animation.finished)).then(() => done())
+    JS
+  end
+
+  # Headless Chrome has no on-screen keyboard, so the visual viewport is made to
+  # shrink and scroll the way it does on iOS Safari and Chrome for Android.
+  def keyboard(height, scrolled: 0)
+    page.execute_script(<<~JS, height, scrolled)
+      const viewport = window.visualViewport
+      Object.defineProperty(viewport, "height", {configurable: true, value: window.innerHeight - arguments[0]})
+      Object.defineProperty(viewport, "offsetTop", {configurable: true, value: arguments[1]})
+      viewport.dispatchEvent(new Event("resize"))
+      viewport.dispatchEvent(new Event("scroll"))
+    JS
+  end
+
   it "sends a named, team-coloured message that another viewer sees with an unread badge" do
     visit checklist_path(team)
     using_session(:other) do
@@ -110,6 +130,33 @@ RSpec.describe "Party chat" do
 
     find("[data-testid='chat-sheet'] button[aria-label='Close chat']", match: :first).click
     expect(page).not_to have_css("[data-testid='chat-sheet'].modal-open")
+  end
+
+  it "keeps the name and message fields above a phone's keyboard" do
+    emulate_viewport(390, 844)
+    visit checklist_path(team)
+    open_chat
+    expect(page).to have_field("What should we call you?")
+    settle("[data-testid='chat-sheet']")
+
+    keyboard(336)
+    name_field = box("#chat_name_#{hunt.id}")
+    expect(name_field["bottom"]).to be <= 508
+    expect(box("[data-chat-target='box']")["top"]).to be >= 0
+    set_name("Eric")
+
+    message_field = box("#message_content")
+    expect(message_field["bottom"]).to be <= 508
+
+    keyboard(336, scrolled: 120)
+    message_field = box("#message_content")
+    expect(message_field["top"]).to be >= 120
+    expect(message_field["bottom"]).to be <= 628
+    expect(box("[data-chat-target='box']")["top"]).to be >= 120
+
+    keyboard(0)
+    expect(box("#message_content")["bottom"]).to be > 750
+    expect(box("[data-chat-target='box']")["bottom"]).to eq(844)
   end
 
   it "keeps the team count in the header current as teams join" do
