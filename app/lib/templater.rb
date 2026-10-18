@@ -1,40 +1,37 @@
 # frozen_string_literal: true
 
 class Templater
-  TEMPLATES = [] # rubocop:disable Style/MutableConstant
-
-  def self.load_hunts
-    Rails.root.glob("app/templates/*.yml") do |filename|
-      TEMPLATES << YAML.safe_load_file(filename, symbolize_names: true)
+  def self.templates
+    @templates ||= Rails.root.glob("app/templates/*.yml").map do |filename|
+      HuntTemplate.new(**YAML.safe_load_file(filename, symbolize_names: true))
     end
   end
 
-  def self.create_hunt!(name)
-    hunt_config = TEMPLATES.find { |template| template[:name].parameterize == name.to_s.parameterize }
-    raise ActiveRecord::RecordNotFound, "There is no #{name.inspect} template" unless hunt_config
+  def self.find!(slug)
+    templates.find { |template| template.slug == slug.to_s.parameterize } or
+      raise ActiveRecord::RecordNotFound, "There is no #{slug.inspect} template"
+  end
 
+  def self.create_hunt!(name)
+    template = find!(name)
     hunt = Hunt.create!(
-      name: hunt_config[:name],
-      categories: hunt_config[:categories].map do |category|
+      name: template.name,
+      categories: template.categories.map do |category|
         Category.new(
-          name: category[:name],
-          points: category[:points],
-          items: category[:items].map { |item| Item.new(name: item) }
+          name: category.name,
+          points: category.points,
+          items: category.items.map { |item| Item.new(name: item) }
         )
       end
     )
-    if hunt_config.dig(:victory_item_name)
-      hunt.update!(victory_item: hunt.items.find_by!(name: hunt_config[:victory_item_name]))
+    if template.victory_item_name
+      hunt.update!(victory_item: hunt.items.find_by!(name: template.victory_item_name))
     end
     hunt
   end
 
-  def self.templates
-    TEMPLATES
-  end
-
   def self.supported_hunts
-    TEMPLATES.pluck(:name).sort
+    templates.map(&:name).sort
   end
 
   def self.popular_templates

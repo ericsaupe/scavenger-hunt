@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   get "my_hunt", to: "my_hunt#show", as: :my_hunt
   get "avatars/:kind/:digest", to: "avatars#show", as: :avatar, constraints: {kind: /team|person/, digest: /\h{64}/}, defaults: {format: :svg}
 
+  get "scavenger_hunts/lists/:slug", to: "hunt_templates#show", as: :hunt_template
   resources :hunts, only: %i[index new create show], param: :code, path: "scavenger_hunts" do
     get :join, on: :collection
     resources :teams, only: %i[create show] do

@@ -1,26 +1,32 @@
 <% description "Premade photo scavenger hunts for every everyone." %>
 <% title "Start Your Photo Scavenger Hunt" %>
 
-<%= render(PageHeaderComponent.new(title: "Pick a list", subtitle: "Every hunt starts from one of these. You'll name it and set a timer on the next screen.")) %>
+<%= render(PageHeaderComponent.new(title: "Pick a list", subtitle: "Every hunt starts from one of these. Open any list to see exactly what is on it before you set anything up.")) %>
 
-<div class="mx-auto max-w-5xl sm:px-5">
-  <ul class="divide-y divide-base-300 border-y border-base-300 sm:grid sm:grid-cols-2 sm:gap-4 sm:divide-y-0 sm:border-0 lg:grid-cols-3">
+<div class="mx-auto max-w-5xl px-5">
+  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     <% @templates.each do |template| %>
-      <li>
-        <%= link_to new_hunt_path(template: template[:name]), class: "row-tap gap-4 py-3 sm:h-full sm:rounded-2xl sm:border sm:border-base-300 sm:px-4 sm:py-4 sm:hover:border-base-content", data: {testid: "template"} do %>
-          <%= image_tag(asset_path(template[:image_path] || "templates/scavenger.jpg"), class: "size-20 shrink-0 rounded-xl object-cover", alt: "", loading: "lazy") %>
-          <div class="min-w-0 grow">
+      <li class="flex flex-col overflow-hidden rounded-2xl border border-base-300 bg-base-100 transition hover:border-base-content" data-testid="template">
+        <%= link_to hunt_template_path(template), class: "flex grow flex-col" do %>
+          <%= image_tag(asset_path(template.image_path), class: "h-36 w-full object-cover", alt: "", loading: "lazy") %>
+          <div class="flex flex-col gap-1 px-4 pt-3.5">
             <h2 class="text-lg font-bold leading-tight">
-              <%= template[:name] %>
-              <% if @popular_templates.include?(template[:name]) %>
+              <%= template.name %>
+              <% if @popular_templates.include?(template.name) %>
                 <span class="ml-1 rounded-full bg-marigold px-2 py-0.5 align-middle text-xs font-bold text-marigold-content">Popular</span>
               <% end %>
             </h2>
-            <p class="mt-0.5 line-clamp-2 text-sm text-ink-soft"><%= template[:description] %></p>
-            <p class="mt-1 text-xs font-semibold text-ink-soft"><%= pluralize(template_item_count(template), "item") %></p>
+            <p class="line-clamp-2 text-sm text-ink-soft"><%= template.description %></p>
+            <p class="text-xs font-semibold text-ink-soft"><%= template_summary(template) %></p>
           </div>
-          <%= icon :chevron_right, class: "size-5 shrink-0 text-ink-soft" %>
         <% end %>
+        <div class="flex items-center justify-between gap-3 px-4 pb-4 pt-3">
+          <%= link_to hunt_template_path(template), class: "inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline" do %>
+            <%= icon :eye, class: "size-4" %>
+            See the list
+          <% end %>
+          <%= link_to "Use this list", new_hunt_path(template: template.name), class: "btn btn-outline btn-sm rounded-full" %>
+        </div>
       </li>
     <% end %>
   </ul>
