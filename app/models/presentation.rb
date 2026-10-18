@@ -166,10 +166,6 @@ class Presentation
       nil
     end
 
-    def chat_column?
-      false
-    end
-
     def team
       nil
     end
@@ -214,10 +210,6 @@ class Presentation
 
     def team
       submission.team
-    end
-
-    def chat_column?
-      true
     end
   end
 
