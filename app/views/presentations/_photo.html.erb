@@ -1,18 +1,19 @@
 <% submission = slide.submission %>
-<div id="current_slide" class="flex grow flex-col items-center justify-center px-4 pb-6 pt-14 sm:px-10 sm:py-10" data-testid="photo-slide">
+<% media_box = big_screen ? {class: "relative overflow-hidden bg-black sm:h-[60dvh] sm:w-auto sm:max-w-full", style: "aspect-ratio: #{submission.media_aspect_ratio}", data: {fit_target: "media"}} : {class: "relative grid place-items-center overflow-hidden bg-black"} %>
+<div id="current_slide" class="<%= class_names("flex grow flex-col items-center justify-center px-4 pb-6 pt-14 sm:px-10", big_screen ? "sm:min-h-0 sm:pb-16" : "sm:py-10") %>" data-testid="photo-slide">
   <figure id="submission_<%= submission.id %>_print"
-    class="polaroid-lg relative w-full max-w-md pb-5! sm:w-auto sm:max-w-[min(92vw,calc((100dvh-10rem)*0.9))]"
+    class="<%= class_names("polaroid-lg relative w-full max-w-md pb-5! sm:w-auto", big_screen ? "sm:flex sm:max-h-full sm:max-w-full sm:flex-col sm:items-center" : "sm:max-w-[min(92vw,calc((100dvh-10rem)*0.9))]") %>"
     style="--tilt: <%= print_tilt(submission) %>deg"
     data-print
-    data-controller="playback"
+    data-controller="<%= big_screen ? "playback fit" : "playback" %>"
     data-playback-follow-value="<%= big_screen %>"
     data-playback-state-value="<%= hunt.presentation_playback %>"
     data-playback-muted-value="<%= hunt.presentation_muted %>"
     data-playback-version-value="<%= hunt.playback_version %>">
     <% media_url = submission_attachment_url(submission, variant_size: :large) %>
-    <div class="relative grid place-items-center overflow-hidden bg-black">
+    <%= tag.div(**media_box) do %>
       <% if submission.video? %>
-        <%= video_tag(submission.media_url, id: "submission_#{submission.id}_video", preload: "metadata", playsinline: true, muted: true, controls: !big_screen, poster: submission.poster_url, class: "max-h-[64dvh] min-h-48 w-full", data: {playback_target: "video"}) %>
+        <%= video_tag(submission.media_url, id: "submission_#{submission.id}_video", preload: "metadata", playsinline: true, muted: true, controls: !big_screen, poster: submission.poster_url, class: big_screen ? "absolute inset-0 size-full object-contain" : "max-h-[64dvh] min-h-48 w-full", data: {playback_target: "video"}) %>
         <% if big_screen %>
           <button type="button" id="submission_<%= submission.id %>_sound_button" class="btn btn-sm absolute bottom-3 right-3 bg-white/90 text-[#1b1f24]" hidden data-turbo-permanent data-action="playback#enableSound" data-playback-target="soundButton">Tap to enable sound</button>
         <% else %>
@@ -21,19 +22,25 @@
           </button>
         <% end %>
       <% else %>
-        <%= image_tag(media_url, id: "submission_#{submission.id}_photo", class: "max-h-[64dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
+        <%= image_tag(media_url, id: "submission_#{submission.id}_photo", class: big_screen ? "absolute inset-0 size-full object-contain" : "max-h-[64dvh] w-full object-contain", alt: "#{submission.team.name} found #{submission.item.name}") %>
       <% end %>
-    </div>
-    <figcaption class="mt-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-1">
-      <div class="min-w-0 grow basis-48">
-        <p class="display text-3xl text-ink sm:text-4xl"><%= submission.item.name %></p>
-        <p class="mt-1 text-lg font-semibold text-ink-soft"><%= submission.team.name %></p>
-      </div>
-      <% if big_screen %>
-        <%= render(partial: "presentations/reaction_counts", locals: {submission:}) %>
-      <% else %>
+    <% end %>
+    <% if big_screen %>
+      <figcaption class="mt-4 w-full shrink-0 px-1" data-fit-target="caption">
+        <p class="display wrap-anywhere text-3xl text-ink sm:text-4xl"><%= submission.item.name %></p>
+        <div class="mt-1 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <p class="min-w-0 wrap-anywhere text-lg font-semibold text-ink-soft"><%= submission.team.name %></p>
+          <%= render(partial: "presentations/reaction_counts", locals: {submission:}) %>
+        </div>
+      </figcaption>
+    <% else %>
+      <figcaption class="mt-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 px-1">
+        <div class="min-w-0 grow basis-48">
+          <p class="display text-3xl text-ink sm:text-4xl"><%= submission.item.name %></p>
+          <p class="mt-1 text-lg font-semibold text-ink-soft"><%= submission.team.name %></p>
+        </div>
         <%= render(partial: "items/vote_menu", locals: {vote: submission.vote_for(cookies[:user_id])}) %>
-      <% end %>
-    </figcaption>
+      </figcaption>
+    <% end %>
   </figure>
 </div>

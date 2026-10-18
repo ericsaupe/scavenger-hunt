@@ -28,6 +28,9 @@ application.register("download", DownloadController)
 import FinaleController from "./finale_controller"
 application.register("finale", FinaleController)
 
+import FitController from "./fit_controller"
+application.register("fit", FitController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
