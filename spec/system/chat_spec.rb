@@ -512,7 +512,7 @@ RSpec.describe "Party chat" do
   it "can be switched off when creating a hunt" do
     visit "/"
     click_on "Start a hunt", match: :first
-    first("[data-testid='template']").click
+    within(first("[data-testid='template']")) { click_on "Use this list" }
     fill_in("Hunt name", with: "Quiet Hunt")
     find("input#hunt_chat_enabled", visible: false).execute_script("this.checked = false")
     click_on "Create hunt"
