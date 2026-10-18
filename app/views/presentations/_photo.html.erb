@@ -29,7 +29,7 @@
       <figcaption class="mt-4 w-full shrink-0 px-1" data-fit-target="caption">
         <p class="display wrap-anywhere text-3xl text-ink sm:text-4xl"><%= submission.item.name %></p>
         <div class="mt-1 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <p class="text-lg font-semibold text-ink-soft"><%= submission.team.name %></p>
+          <p class="min-w-0 wrap-anywhere text-lg font-semibold text-ink-soft"><%= submission.team.name %></p>
           <%= render(partial: "presentations/reaction_counts", locals: {submission:}) %>
         </div>
       </figcaption>
