@@ -72,3 +72,87 @@
     </ol>
   </div>
 </section>
+
+<section class="border-t border-base-300">
+  <div class="mx-auto max-w-5xl px-5 py-14">
+    <p class="text-sm font-semibold uppercase tracking-[0.14em] text-ink-soft">For organizers</p>
+    <h2 class="display mt-2 text-3xl sm:text-4xl">Running a hunt, start to finish</h2>
+    <p class="mt-3 max-w-2xl text-lg text-ink-soft">Everything below is in the app already. Screens are from a real hunt, the Maple Street Block Party.</p>
+
+    <div class="mt-12 space-y-16 sm:space-y-20">
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div>
+          <p class="text-sm font-semibold text-marigold">Set up</p>
+          <h3 class="display mt-1 text-2xl">Ready in about a minute</h3>
+          <p class="mt-3 text-ink-soft">Pick a template, give the hunt a name and you are done. Everything else is optional: a start and end time, hiding results until the end, a results password, party chat, and how many flags it takes to throw out a photo that does not count.</p>
+        </div>
+        <%= image_tag "guide/create.jpg", class: "w-full rounded-2xl border border-base-300 shadow-lg", alt: "The create hunt form with a timer, results settings, party chat and a results password", loading: "lazy" %>
+      </div>
+
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div class="lg:order-2">
+          <p class="text-sm font-semibold text-marigold">Invite</p>
+          <h3 class="display mt-1 text-2xl">One code, a QR, or a printed list</h3>
+          <p class="mt-3 text-ink-soft">Every hunt gets a five-letter code and a QR that opens it. Copy the link into a group chat, or print the list for anyone who would rather hunt on paper. People pick a team, or start one and shuffle until they like its critter.</p>
+        </div>
+        <%= image_tag "guide/invite.jpg", class: "w-full rounded-2xl border border-base-300 shadow-lg lg:order-1", alt: "A hunt page with its five-letter code, QR code, copy link and print list buttons", loading: "lazy" %>
+      </div>
+
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div>
+          <p class="text-sm font-semibold text-marigold">During the hunt</p>
+          <h3 class="display mt-1 text-2xl">One list for the whole team</h3>
+          <p class="mt-3 text-ink-soft">Each item opens the camera for a photo or a short video, or the saved photos. When a teammate finds something, it ticks off on everyone's phone right away, with the score and the countdown at the top. Lost signal? Photos queue up and send themselves when it comes back. Add the hunt to the home screen and it opens like an app.</p>
+        </div>
+        <%= image_tag "guide/checklist.jpg", class: "mx-auto w-64 rounded-[2rem] border border-base-300 shadow-lg sm:w-72", alt: "A team's checklist with found items ticked off, a score, a countdown and a pinned note from the organizer", loading: "lazy" %>
+      </div>
+
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div class="lg:order-2">
+          <p class="text-sm font-semibold text-marigold">Party chat</p>
+          <h3 class="display mt-1 text-2xl">Trash talk, and a megaphone for you</h3>
+          <p class="mt-3 text-ink-soft">Everyone in the hunt shares one chat with their team and a name next to each message. As the organizer you can send any message as an announcement: it pins to the top of every phone and goes out as a notification. Phones that opt in also hear when the hunt is about to start, when a team takes the lead, when results are up and when the show begins.</p>
+        </div>
+        <%= image_tag "guide/chat.jpg", class: "mx-auto w-64 rounded-[2rem] border border-base-300 shadow-lg sm:w-72 lg:order-1", alt: "The party chat sheet with team messages and an organizer announcement pinned at the top", loading: "lazy" %>
+      </div>
+
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div>
+          <p class="text-sm font-semibold text-marigold">Results</p>
+          <h3 class="display mt-1 text-2xl">A leaderboard that moves as photos land</h3>
+          <p class="mt-3 text-ink-soft">Scores update the moment a photo arrives, so you can watch the race from the results page. Keep it hidden until the end or behind a password if you would rather have a reveal. Every photo and video is there to browse and vote on, and one button downloads the whole hunt as a zip, sorted by team and item.</p>
+        </div>
+        <%= image_tag "guide/results.jpg", class: "w-full rounded-2xl border border-base-300 shadow-lg", alt: "The results page with the winning team's photo and the leaderboard", loading: "lazy" %>
+      </div>
+
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div class="lg:order-2">
+          <p class="text-sm font-semibold text-marigold">The show</p>
+          <h3 class="display mt-1 text-2xl">Put it on the big screen, drive it from your phone</h3>
+          <p class="mt-3 text-ink-soft">Open the presenter on a TV or projector and take the remote on your phone. Step through every photo, jump to any item, and play, pause or replay the videos. Flip the party chat on beside the photos, stream-style, or show announcements only. Everyone else follows along on their phones and votes: loves float up the big screen, and enough flags take a photo out of the score.</p>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] items-end gap-4 lg:order-1">
+          <%= image_tag "guide/big-screen.jpg", class: "w-full rounded-2xl border border-base-300 shadow-lg", alt: "The big screen showing a photo with its loves and flags beside the party chat column", loading: "lazy" %>
+          <%= image_tag "guide/remote.jpg", class: "w-24 rounded-2xl border border-base-300 shadow-lg sm:w-32", alt: "The remote on a phone with Previous and Next, the chat switches and the up next list", loading: "lazy" %>
+        </div>
+      </div>
+
+      <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div>
+          <p class="text-sm font-semibold text-marigold">Finale</p>
+          <h3 class="display mt-1 text-2xl">A winner, confetti, and the most loved photo</h3>
+          <p class="mt-3 text-ink-soft">The last slide reveals the winning team with the full standings and the photo the room loved most. Hand the remote to someone else at any point; the results password keeps it from wandering.</p>
+        </div>
+        <%= image_tag "guide/finale.jpg", class: "w-full rounded-2xl border border-base-300 shadow-lg", alt: "The finale on the big screen: first place, the standings and the most loved photo under confetti", loading: "lazy" %>
+      </div>
+    </div>
+
+    <div class="mt-14 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+      <%= link_to hunts_path, class: "btn btn-primary btn-lg" do %>
+        <%= icon :flag, class: "size-5" %>
+        Start a hunt
+      <% end %>
+      <p class="text-sm text-ink-soft">Free, no accounts, nothing to install.</p>
+    </div>
+  </div>
+</section>
