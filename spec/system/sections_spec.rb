@@ -25,6 +25,14 @@ RSpec.describe "Checklist sections" do
     page.evaluate_script("document.querySelector(#{selector.to_json}).getBoundingClientRect().top")
   end
 
+  def under_sticky_header
+    page.evaluate_script("document.querySelector('[data-sticky-header]').getBoundingClientRect().bottom")
+  end
+
+  def scroll_to_put(selector, at:)
+    page.execute_script("scrollTo(0, scrollY + document.querySelector(arguments[0]).getBoundingClientRect().top - arguments[1])", selector, at)
+  end
+
   it "folds a section from its header and remembers it after a reload" do
     visit team_path
     expect(page).to have_button(category.items.first.name)
@@ -101,9 +109,8 @@ RSpec.describe "Checklist sections" do
     visit team_path
     expect(page).to have_css("[data-testid='preview']", count: 11)
 
+    scroll_to_put("section:nth-of-type(2)", at: under_sticky_header)
     later_items = "#section_#{later.id}_items"
-    page.execute_script("scrollTo(0, scrollY + document.querySelector(arguments[0]).getBoundingClientRect().top - 300)", later_items)
-    expect(top_of("section")).to be < 0
     before = top_of(later_items)
     wait_for_live_updates
 
@@ -111,5 +118,24 @@ RSpec.describe "Checklist sections" do
     expect(page).to have_css("section[data-folded]", text: "All 12 found")
     expect(top_of(later_items)).to be_within(1).of(before)
     expect(section(later)).to have_button(later.items.first.name)
+  end
+
+  it "shows a long section's card when it folds while the team is partway down it" do
+    create_list(:item, 17, category:)
+    later = create(:category, hunt:, name: "Five Points")
+    create_list(:item, 10, category: later)
+    items = category.items.order(:id).to_a
+    items.first(19).each { |item| find_item(item) }
+    emulate_viewport(390, 844)
+    visit team_path
+    expect(page).to have_css("[data-testid='preview']", count: 19)
+
+    scroll_to_put("section", at: -300)
+    expect(top_of("section")).to be_within(1).of(-300)
+    wait_for_live_updates
+
+    find_item(items.last)
+    expect(page).to have_css("section[data-folded]", text: "All 20 found")
+    expect(top_of("section")).to be_within(1).of(under_sticky_header)
   end
 end

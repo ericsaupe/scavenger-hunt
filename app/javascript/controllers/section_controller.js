@@ -47,14 +47,18 @@ export default class extends Controller {
     this.foldTimer = setTimeout(() => this.fold(this.wantsFolded), FOLD_DELAY_MS)
   }
 
-  // A section folding above the screen would drag everything below it upwards,
-  // so it folds at once and the scroll position takes up the difference.
+  // A section folding while its header is out of sight, above the screen or under
+  // the sticky header, would drag everything below it upwards, so it folds at once
+  // and the scroll position takes up the difference. The correction stops once the
+  // card sits just under the sticky header, so folding a long section the team is
+  // partway down shows its card rather than the sections before it.
   fold(folded, { animate = true } = {}) {
     if (folded === this.folded) {
       return
     }
+    const covered = document.querySelector("[data-sticky-header]")?.getBoundingClientRect().bottom ?? 0
     const { top, bottom } = this.element.getBoundingClientRect()
-    const offscreen = top < 0
+    const offscreen = top < covered
     const animated = [this.toggleTarget, this.bodyTarget]
     if (offscreen || !animate) {
       animated.forEach((element) => { element.style.transition = "none" })
@@ -62,9 +66,9 @@ export default class extends Controller {
     this.element.toggleAttribute("data-folded", folded)
     this.toggleTarget.setAttribute("aria-expanded", !folded)
     this.bodyTarget.inert = folded
-    const shift = this.element.getBoundingClientRect().bottom - bottom
+    const after = this.element.getBoundingClientRect()
     if (offscreen) {
-      window.scrollBy(0, shift)
+      window.scrollBy(0, Math.max(after.bottom - bottom, after.top - covered))
     }
     requestAnimationFrame(() => animated.forEach((element) => { element.style.transition = "" }))
   }
