@@ -78,9 +78,9 @@
 
     <% unless @hunt.time_locked? %>
       <% leader, runner_up = @slide.results.first(2) %>
-      <dialog class="modal modal-bottom sm:modal-middle" data-remote-target="reveal" data-testid="reveal-sheet">
+      <dialog class="modal modal-bottom sm:modal-middle" aria-labelledby="reveal_title" data-remote-target="reveal" data-testid="reveal-sheet">
         <div class="modal-box bg-[#1b1f24] text-white sm:max-w-md">
-          <h3 class="display text-2xl">Reveal the winners?</h3>
+          <h3 id="reveal_title" class="display text-2xl">Reveal the winners?</h3>
           <% if leader %>
             <div class="mt-4 flex items-center gap-3 rounded-2xl bg-white/5 px-3.5 py-3">
               <%= team_avatar(leader[:team], size: 44) %>

@@ -59,10 +59,11 @@ export default class extends Controller {
   // fire early, and a morph that still reports a lock reschedules with the new value.
   refreshInValueChanged() {
     clearTimeout(this.deadlineTimer)
-    if (!this.hasRefreshInValue || this.refreshInValue > MAX_TIMEOUT_MS) {
+    if (!this.hasRefreshInValue) {
       return
     }
-    this.deadlineTimer = setTimeout(() => this.refresh(), Math.max(this.refreshInValue, 0) + DEADLINE_SLACK_MS)
+    const delay = Math.min(Math.max(this.refreshInValue, 0) + DEADLINE_SLACK_MS, MAX_TIMEOUT_MS)
+    this.deadlineTimer = setTimeout(() => this.refresh(), delay)
   }
 
   catchUp() {

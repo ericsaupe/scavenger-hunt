@@ -277,7 +277,7 @@ RSpec.describe "Presentations" do
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"
 
       expect(response.body).to include("Finale 7 of 7", "Winner reveal", "Sealed", "Reveal the winners", "Reveal now", "Not yet")
-      expect(response.body).to include(%(data-testid="reveal-panel"), %(data-remote-reveal-url-value="/scavenger_hunts/#{hunt.code}/presentation/reveal"))
+      expect(response.body).to include(%(data-testid="reveal-panel"), %(data-remote-reveal-url-value="/scavenger_hunts/#{hunt.code}/presentation/reveal"), %(aria-labelledby="reveal_title"), %(id="reveal_title"))
       expect(response.body).to include("#{ERB::Util.html_escape(team.name)}, #{team.score} points")
       expect(response.body).not_to include("First place")
 
