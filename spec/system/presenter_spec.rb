@@ -200,6 +200,51 @@ RSpec.describe "Presenter" do
     expect(page).to have_css("[data-testid='progress']", text: "Item 1 of 5")
   end
 
+  it "lets the remote holder reveal the sealed winners with one tap" do
+    hunt.update!(lock_password: "hunter2", presentation_slide: "submission:#{@photo.id}")
+
+    using_session(:big_screen) do
+      visit "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+      expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+      expect(page).to have_css("[data-testid='progress']", text: "Photo 4 of 5")
+    end
+
+    visit "/scavenger_hunts/#{hunt.code}/presenter"
+    find("summary", text: "Take the remote").click
+    fill_in "Results password", with: "hunter2"
+    click_on "Take it"
+    expect(page).to have_current_path("/scavenger_hunts/#{hunt.code}/presenter/remote")
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+    expect(page).to have_css("[data-testid='up-next']", text: "Winner reveal, sealed")
+
+    click_on "Next"
+    expect(page).to have_css("[data-testid='progress']", text: "Finale 5 of 5")
+    expect(page).to have_css("[data-testid='current-item']", text: "Winner reveal")
+    expect(page).to have_css("[data-testid='reveal-panel']", text: "sealed envelope")
+    expect(page).to have_no_text(team.name)
+    using_session(:big_screen) do
+      expect(page).to have_css("#finale_sealed_card.print-enter", text: /and the winner is/i)
+      expect(page).to have_css("[data-testid='confetti'] .confetti", visible: :all, minimum: 10)
+      expect(page).to have_no_text(team.name)
+    end
+
+    click_on "Reveal the winners"
+    within("[data-testid='reveal-sheet']") do
+      expect(page).to have_text("#{team.name}, #{team.score} #{"point".pluralize(team.score)}")
+      click_on "Reveal now"
+    end
+
+    expect(page).to have_css("[data-testid='current-item']", text: "First place")
+    expect(page).to have_no_css("[data-testid='reveal-panel']")
+    expect(page).to have_no_css("[data-testid='reveal-sheet']", visible: :visible)
+    expect(hunt.reload).to have_attributes(password_entered: true, password_entered_for_leaderboard: true, presentation_slide: "finale")
+    using_session(:big_screen) do
+      expect(page).to have_css("#finale_card.print-enter", text: /first place/i)
+      expect(page).to have_css("[data-testid='winner-name']", text: team.name)
+      expect(page).to have_no_css("[data-testid='sealed-finale']")
+    end
+  end
+
   it "fits a long team name in the title card captions on the big screen and on a phone" do
     team.update!(name: "Green Machine")
     hunt.update!(presentation_slide: "item:#{hunt.items.first.id}")

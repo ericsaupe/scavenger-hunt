@@ -21,7 +21,7 @@ class Presentation
   def keys
     @keys ||= found.chunk_while { |(_, item_a), (_, item_b)| item_a == item_b }.flat_map do |group|
       [self.class.item_key(group.first.last), *group.map { |id, _| self.class.submission_key(id) }]
-    end.tap { |keys| keys << FINALE unless keys.empty? || !hunt.leaderboard_visible? }
+    end.tap { |keys| keys << FINALE unless keys.empty? }
   end
 
   def empty?
@@ -130,6 +130,10 @@ class Presentation
 
   def team_count
     @team_count ||= hunt.teams.count
+  end
+
+  def find_count
+    found.size
   end
 
   private
@@ -264,15 +268,19 @@ class Presentation
     end
 
     def title
-      "First place"
+      sealed? ? "Winner reveal" : "First place"
     end
 
     def subtitle
-      winner&.fetch(:name)
+      sealed? ? "Sealed" : winner&.fetch(:name)
     end
 
     def team
       winner&.fetch(:team)
+    end
+
+    def sealed?
+      !presentation.hunt.leaderboard_visible?
     end
 
     def results
@@ -280,14 +288,23 @@ class Presentation
     end
 
     def winner
-      results.first
+      results.first unless sealed?
     end
 
     def runners_up
-      results.drop(1).first(4)
+      sealed? ? [] : results.drop(1).first(4)
+    end
+
+    def team_count
+      presentation.team_count
+    end
+
+    def find_count
+      presentation.find_count
     end
 
     def most_loved
+      return nil if sealed?
       return @most_loved if defined?(@most_loved)
 
       loves = Vote.loved.where(submission_id: presentation.hunt.submissions.found.select(:id)).group(:submission_id).count

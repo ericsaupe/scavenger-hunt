@@ -105,8 +105,12 @@ class Hunt < ApplicationRecord
     [teams.find(top[:team_id]), top[:score]]
   end
 
+  def time_locked?
+    lock_results && ends_at.present? && ends_at > Time.current
+  end
+
   def results_locked?
-    (lock_results && ends_at && ends_at > Time.current) || (lock_password.present? && !password_entered)
+    time_locked? || (lock_password.present? && !password_entered)
   end
 
   def leaderboard_visible?
@@ -212,6 +216,14 @@ class Hunt < ApplicationRecord
     update!(presentation_slide: slide_key, presentation_playback: "paused", playback_started_at: nil)
     broadcast_presentation_update
     announce_show!
+  end
+
+  def reveal_results!
+    return false if time_locked?
+
+    update!(password_entered: true, password_entered_for_leaderboard: true)
+    present!(Presentation::FINALE)
+    true
   end
 
   def playback!(command)

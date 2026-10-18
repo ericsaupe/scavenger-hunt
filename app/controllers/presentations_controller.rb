@@ -36,6 +36,12 @@ class PresentationsController < ApplicationController
     head :no_content
   end
 
+  def reveal
+    return head :unprocessable_content unless @hunt.reveal_results!
+
+    head :no_content
+  end
+
   def screen_chat
     mode = params[:screen_chat]
     return head :unprocessable_content unless Hunt.screen_chats.key?(mode)
