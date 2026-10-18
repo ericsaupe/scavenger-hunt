@@ -17,8 +17,12 @@ module PresentationHelper
       remote_reveal_url_value: reveal_hunt_presentation_path(code),
       remote_playing_value: hunt.playing?,
       remote_video_value: slide.video?,
-      live_refresh_at_value: (hunt.ends_at.iso8601 if hunt.time_locked?)
+      live_refresh_in_value: refresh_in(hunt)
     }
+  end
+
+  def refresh_in(hunt)
+    ((hunt.ends_at - Time.current) * 1000).ceil if hunt.time_locked?
   end
 
   def static_confetti(count: 60)

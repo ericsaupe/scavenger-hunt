@@ -4,9 +4,10 @@ import { Turbo } from "@hotwired/turbo-rails"
 const CAPTURE_GRACE_MS = 3000
 const CATCH_UP_RETRY_MS = 1000
 const MAX_TIMEOUT_MS = 2147483647
+const DEADLINE_SLACK_MS = 1000
 
 export default class extends Controller {
-  static values = { interval: Number, refreshAt: String }
+  static values = { interval: Number, refreshIn: Number }
 
   connect() {
     this.lostConnection = false
@@ -32,7 +33,6 @@ export default class extends Controller {
     if (this.intervalValue > 0) {
       this.timer = setInterval(() => this.refresh(), this.intervalValue)
     }
-    this.scheduleRefresh()
   }
 
   disconnect() {
@@ -55,15 +55,14 @@ export default class extends Controller {
     }
   }
 
-  scheduleRefresh() {
-    if (!this.refreshAtValue) {
+  // The server sends how long its lock has left, so a skewed client clock cannot
+  // fire early, and a morph that still reports a lock reschedules with the new value.
+  refreshInValueChanged() {
+    clearTimeout(this.deadlineTimer)
+    if (!this.hasRefreshInValue || this.refreshInValue > MAX_TIMEOUT_MS) {
       return
     }
-    const delay = Date.parse(this.refreshAtValue) - Date.now() + 1000
-    if (delay > MAX_TIMEOUT_MS) {
-      return
-    }
-    this.deadlineTimer = setTimeout(() => this.refresh(), Math.max(delay, 0))
+    this.deadlineTimer = setTimeout(() => this.refresh(), Math.max(this.refreshInValue, 0) + DEADLINE_SLACK_MS)
   }
 
   catchUp() {

@@ -133,16 +133,16 @@ RSpec.describe "Presenter" do
 
       travel_to Time.zone.local(2026, 10, 18, 20, 0) do
         get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
-        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-at-value="2026-10-18T21:30:00-07:00"))
+        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-in-value="5400000"))
 
         get "/scavenger_hunts/#{hunt.code}/presenter"
-        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-at-value="2026-10-18T21:30:00-07:00"))
+        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-in-value="5400000"))
       end
 
       travel_to Time.zone.local(2026, 10, 18, 21, 31) do
         get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
         expect(response.body).to include(%(data-testid="winner-name"))
-        expect(response.body).not_to include("data-live-refresh-at-value")
+        expect(response.body).not_to include("data-live-refresh-in-value")
       end
     end
 
