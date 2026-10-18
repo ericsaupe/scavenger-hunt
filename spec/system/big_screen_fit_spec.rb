@@ -42,7 +42,10 @@ RSpec.describe "Big screen fit" do
         const barTop = document.querySelector("[data-testid='join-line']").parentElement.getBoundingClientRect().top
         const pillBottom = document.querySelector("[data-testid='progress']").getBoundingClientRect().bottom
         const chat = document.querySelector("[data-testid='screen-chat']")
+        const footer = document.querySelector("[data-fit-footer]")
         return {
+          stagePaddingBottom: parseFloat(getComputedStyle(stage).paddingBottom),
+          footerHeight: footer.offsetHeight,
           width: media.offsetWidth,
           height: media.offsetHeight,
           natural: media.naturalWidth ? media.naturalWidth / media.naturalHeight : media.videoWidth / media.videoHeight,
@@ -63,6 +66,7 @@ RSpec.describe "Big screen fit" do
     expect(layout["bottom"]).to be <= layout["barTop"]
     expect(layout["left"]).to be >= 0
     expect(layout["scrollable"]).to be(false)
+    expect(layout["stagePaddingBottom"]).to eq(layout["footerHeight"] + 16)
     expect(layout["height"]).to be > 0.5 * viewport_height
   end
 

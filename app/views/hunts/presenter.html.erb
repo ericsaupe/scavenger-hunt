@@ -40,7 +40,7 @@
 
     <%= render(partial: @slide.partial, locals: {slide: @slide, hunt: @hunt, big_screen: @big_screen}) %>
 
-    <div class="<%= class_names("z-10 flex flex-col items-center gap-2 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-sm text-white/70 sm:absolute sm:inset-x-0 sm:bottom-0", @big_screen && "sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6") %>">
+    <div class="<%= class_names("z-10 flex flex-col items-center gap-2 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-sm text-white/70 sm:absolute sm:inset-x-0 sm:bottom-0", @big_screen && "sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6") %>" data-fit-footer>
       <% if @browsing %>
         <%= link_to hunt_presenter_path(@hunt.code.upcase), class: "btn btn-primary btn-block max-w-md sticky bottom-4", data: {turbo_action: "replace", testid: "back-to-live"} do %>
           Back to live, now on <%= @presentation.position %> of <%= @presentation.count %>

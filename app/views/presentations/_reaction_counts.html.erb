@@ -1,4 +1,4 @@
-<div id="submission_<%= submission.id %>_reactions" class="flex shrink-0 flex-wrap items-center gap-3" data-testid="reaction-counts">
+<div id="submission_<%= submission.id %>_reactions" class="flex max-w-full flex-wrap items-center gap-3" data-testid="reaction-counts">
   <span class="inline-flex items-center gap-1.5 text-xl font-extrabold tabular-nums text-love" data-testid="love-count">
     <%= icon :heart, solid: true, class: "size-6" %>
     <%= pluralize(submission.votes.count(&:loved?), "love") %>

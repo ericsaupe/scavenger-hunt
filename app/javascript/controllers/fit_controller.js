@@ -2,38 +2,43 @@ import { Controller } from "@hotwired/stimulus"
 
 const FIT = "(min-width: 640px)"
 const PASSES = 3
+const FOOTER_GAP = 16
 
 export default class extends Controller {
   static targets = ["media", "caption"]
 
   connect() {
     this.refit = () => this.fit()
+    this.footer = document.querySelector("[data-fit-footer]")
     this.observer = new ResizeObserver(this.refit)
     this.observer.observe(this.element.parentElement)
     this.observer.observe(this.captionTarget)
-    this.media = this.mediaTarget.querySelector("img, video")
-    this.media?.addEventListener("load", this.refit)
-    this.media?.addEventListener("loadedmetadata", this.refit)
+    if (this.footer) {
+      this.observer.observe(this.footer)
+    }
     document.addEventListener("turbo:morph", this.refit)
     this.fit()
   }
 
   disconnect() {
     this.observer.disconnect()
-    this.media?.removeEventListener("load", this.refit)
-    this.media?.removeEventListener("loadedmetadata", this.refit)
+    this.bindMedia(null)
     document.removeEventListener("turbo:morph", this.refit)
   }
 
   fit() {
     const card = this.element
     const box = this.mediaTarget
+    const stage = card.parentElement
+    this.bindMedia(box.querySelector("img, video"))
     if (!window.matchMedia(FIT).matches) {
-      card.style.width = box.style.width = box.style.height = ""
+      card.style.width = box.style.width = box.style.height = stage.style.paddingBottom = ""
       return
     }
 
-    const stage = card.parentElement
+    if (this.footer) {
+      stage.style.paddingBottom = `${this.footer.offsetHeight + FOOTER_GAP}px`
+    }
     const stageStyle = getComputedStyle(stage)
     const cardStyle = getComputedStyle(card)
     const frameX = parseFloat(cardStyle.paddingLeft) + parseFloat(cardStyle.paddingRight)
@@ -61,6 +66,17 @@ export default class extends Controller {
       box.style.height = `${height}px`
       card.style.width = `${width + frameX}px`
     }
+  }
+
+  bindMedia(media) {
+    if (media === this.media) {
+      return
+    }
+    this.media?.removeEventListener("load", this.refit)
+    this.media?.removeEventListener("loadedmetadata", this.refit)
+    this.media = media
+    this.media?.addEventListener("load", this.refit)
+    this.media?.addEventListener("loadedmetadata", this.refit)
   }
 
   ratio() {
