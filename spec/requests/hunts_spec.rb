@@ -31,6 +31,16 @@ RSpec.describe "Hunts" do
     expect(many).to eq(few)
   end
 
+  it "lists every template with a way to preview it and a way to set it up" do
+    get "/scavenger_hunts"
+
+    expect(response).to have_http_status(:ok)
+    Templater.templates.each do |template|
+      expect(response.body).to include(hunt_template_path(template))
+      expect(response.body).to include(new_hunt_path(template: template.name))
+    end
+  end
+
   it "creates a hunt from a template" do
     post "/scavenger_hunts", params: {hunt: {template: "Neighborhood Navigator", name: "Maple Street"}}
 

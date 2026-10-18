@@ -35,7 +35,23 @@ module HuntHelper
     }
   end
 
-  def template_item_count(template)
-    template[:categories].sum { |category| category[:items].size }
+  def template_summary(template)
+    [
+      pluralize(template.item_count, "item"),
+      pluralize(template.categories.size, "group"),
+      template_points_summary(template)
+    ].join(" · ")
+  end
+
+  def template_points_summary(template)
+    range = template.points_range
+    return "#{pluralize(range.min, "point")} each" if range.min == range.max
+
+    "#{range.min} to #{range.max} points"
+  end
+
+  def template_points_each(template)
+    range = template.points_range
+    (range.min == range.max) ? "#{range.min} each" : "#{range.min} to #{range.max} each"
   end
 end

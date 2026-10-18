@@ -4,11 +4,23 @@ require "rails_helper"
 
 RSpec.describe "Hunts" do
   context "creating a hunt" do
+    it "shows what is on a list before setting it up" do
+      visit hunts_path
+      within("[data-testid='template']", text: "Christmas Light Spectacle") { click_on "See the list" }
+      expect(page).to have_current_path("/scavenger_hunts/lists/christmas-light-spectacle")
+      expect(page).to have_text("Icicle Lights")
+      expect(page).to have_text("Challenges - Hard")
+      expect(page).not_to have_text(/victory/i)
+      click_on "Use this list", match: :first
+      expect(page).to have_current_path(new_hunt_path(template: "Christmas Light Spectacle"))
+      expect(page).to have_field("Hunt name", with: "Christmas Light Spectacle")
+    end
+
     it "creates a new hunt" do
       visit "/"
       click_on "Start a hunt", match: :first
       expect(page).to have_current_path(hunts_path)
-      first("[data-testid='template']").click
+      within(first("[data-testid='template']")) { click_on "Use this list" }
       fill_in("Hunt name", with: "My Fun Scavenger Hunt")
       find("input#hunt_starts_at", visible: false).execute_script("this.value = '2030-01-01 12:00'")
       find("input#hunt_ends_at", visible: false).execute_script("this.value = '2030-02-01 12:00'")
@@ -22,7 +34,7 @@ RSpec.describe "Hunts" do
       visit "/"
       click_on "Start a hunt", match: :first
       expect(page).to have_current_path(hunts_path)
-      first("[data-testid='template']").click
+      within(first("[data-testid='template']")) { click_on "Use this list" }
       fill_in("Hunt name", with: "My Fun Scavenger Hunt")
       find("input#hunt_starts_at", visible: false).execute_script("this.value = '2030-01-01 12:00'")
       find("input#hunt_ends_at", visible: false).execute_script("this.value = '2030-02-01 12:00'")
