@@ -70,6 +70,9 @@ application.register("remote", RemoteController)
 import ScreenChatController from "./screen_chat_controller"
 application.register("screen-chat", ScreenChatController)
 
+import SectionController from "./section_controller"
+application.register("section", SectionController)
+
 import SubmissionController from "./submission_controller"
 application.register("submission", SubmissionController)
 

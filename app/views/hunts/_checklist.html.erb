@@ -1,17 +1,47 @@
 <div data-controller="hunt">
+  <% folds = checklist_folds(@team) %>
   <% @hunt.categories.each do |category| %>
-    <section class="mx-auto max-w-2xl pt-8">
-      <div class="flex items-baseline justify-between gap-3 px-5">
-        <h2 class="text-xl font-bold"><%= category.name %></h2>
-        <span class="shrink-0 text-sm font-semibold text-ink-soft"><%= pluralize(category.points, "point") %> each</span>
-      </div>
-      <ul class="mt-3 divide-y divide-base-300 border-y border-base-300 sm:overflow-hidden sm:rounded-2xl sm:border">
-        <% category.items.each do |item| %>
-          <% submission = @submissions[item.id] || item.submissions.new %>
-          <%= render partial: "submissions/submission", locals: {submission:, animate: false} %>
+    <% total = category.items.size %>
+    <% found = category.items.count { |item| @submissions[item.id]&.photo&.attached? } %>
+    <% complete = total.positive? && found == total %>
+    <% folded = folds.fetch(category.id.to_s, complete ? "closed" : "open") == "closed" %>
+    <%= tag.section class: "group mx-auto max-w-2xl pt-4 first:pt-8",
+          data: {controller: "section", section_key_value: category.id, section_cookie_value: "checklist_#{@team.id}", folded: (true if folded), complete: (true if complete)} do %>
+      <h2 class="group-data-folded:px-3 sm:group-data-folded:px-0">
+        <%= tag.button type: "button",
+              class: "block w-full cursor-pointer rounded-2xl px-5 text-left transition-[background-color,padding] duration-300 group-data-folded:bg-base-200 group-data-folded:px-4 group-data-folded:py-3",
+              aria: {expanded: !folded, controls: "section_#{category.id}_items"},
+              data: {action: "section#toggle", section_target: "toggle"} do %>
+          <span class="flex items-center gap-2">
+            <%= icon :chevron_down, class: "size-4 shrink-0 text-ink-soft transition-transform duration-300 group-data-folded:-rotate-90" %>
+            <span class="grow text-xl font-bold group-data-folded:text-lg"><%= category.name %></span>
+            <span class="shrink-0 text-sm font-semibold text-ink-soft group-data-folded:hidden"><%= pluralize(category.points, "point") %> each</span>
+            <span class="hidden shrink-0 items-center gap-1 text-sm font-semibold text-ink-soft group-data-folded:flex group-data-complete:text-field">
+              <%= icon :check_circle, solid: true, class: "hidden size-4 group-data-complete:block" %>
+              <span data-section-target="count"><%= found_count(found, total) %></span>
+            </span>
+          </span>
+          <span class="mt-2 hidden h-1.5 overflow-hidden rounded-full bg-base-300 group-data-folded:block">
+            <%= tag.span class: "block h-full rounded-full bg-marigold transition-[width] duration-500 group-data-complete:bg-field",
+                  style: "width: #{total.positive? ? (found * 100.0 / total).round : 0}%",
+                  data: {section_target: "bar"} %>
+          </span>
         <% end %>
-      </ul>
-    </section>
+      </h2>
+      <%= tag.div id: "section_#{category.id}_items",
+            class: "grid grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out group-data-folded:grid-rows-[0fr]",
+            inert: folded,
+            data: {section_target: "body"} do %>
+        <div class="min-h-0 overflow-hidden">
+          <ul class="mb-4 mt-3 divide-y divide-base-300 border-y border-base-300 sm:overflow-hidden sm:rounded-2xl sm:border" data-section-target="list">
+            <% category.items.each do |item| %>
+              <% submission = @submissions[item.id] || item.submissions.new %>
+              <%= render partial: "submissions/submission", locals: {submission:, animate: false} %>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    <% end %>
   <% end %>
 
   <%= render partial: "submissions/modal" %>

@@ -54,4 +54,15 @@ module HuntHelper
     range = template.points_range
     (range.min == range.max) ? "#{range.min} each" : "#{range.min} to #{range.max} each"
   end
+
+  def checklist_folds(team)
+    folds = JSON.parse(cookies["checklist_#{team.id}"].to_s)
+    folds.is_a?(Hash) ? folds : {}
+  rescue JSON::ParserError
+    {}
+  end
+
+  def found_count(found, total)
+    (total.positive? && found == total) ? "All #{total} found" : "#{found} of #{total} found"
+  end
 end
