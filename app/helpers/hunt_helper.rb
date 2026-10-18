@@ -38,4 +38,15 @@ module HuntHelper
   def template_item_count(template)
     template[:categories].sum { |category| category[:items].size }
   end
+
+  def checklist_folds(team)
+    folds = JSON.parse(cookies["checklist_#{team.id}"].to_s)
+    folds.is_a?(Hash) ? folds : {}
+  rescue JSON::ParserError
+    {}
+  end
+
+  def found_count(found, total)
+    (total.positive? && found == total) ? "All #{total} found" : "#{found} of #{total} found"
+  end
 end
