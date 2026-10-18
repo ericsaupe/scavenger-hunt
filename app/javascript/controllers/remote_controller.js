@@ -14,7 +14,7 @@ export default class extends Controller {
   connect() {
     this.inFlight = false
     this.onKeydown = (event) => {
-      if (event.target.closest("input, textarea") || document.querySelector(".modal-open")) {
+      if (event.target.closest("input, textarea") || document.querySelector(".modal-open, dialog[open]")) {
         return
       }
       if (event.key === "ArrowRight") {

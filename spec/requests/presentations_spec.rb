@@ -295,8 +295,13 @@ RSpec.describe "Presentations" do
         get "/scavenger_hunts/#{hunt.code}/presenter/remote"
       end
 
-      expect(response.body).to include("Sealed", "Results open at", "9:30 PM")
+      expect(response.body).to include("Sealed", "Results open at 9:30 PM PDT", %(data-live-refresh-at-value="2026-10-18T21:30:00-07:00"))
       expect(response.body).not_to include("Reveal the winners")
+
+      hunt.update!(lock_results: false)
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).not_to include("data-live-refresh-at-value")
     end
 
     it "offers the big screen chat switches, reflecting the current mode" do

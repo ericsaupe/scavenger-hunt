@@ -1,14 +1,7 @@
 <% title "#{@hunt.name} remote" %>
 <%= render partial: "hunts/presenter_head" %>
 
-<div class="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-5 pt-4 <%= @hunt.chat_available? ? "pb-[calc(4.5rem_+_max(1rem,env(safe-area-inset-bottom)))]" : "pb-[max(1.5rem,env(safe-area-inset-bottom))]" %>"
-  data-controller="remote live"
-  data-remote-url-value="<%= hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-playback-url-value="<%= playback_hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-screen-chat-url-value="<%= screen_chat_hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-reveal-url-value="<%= reveal_hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-playing-value="<%= @hunt.playing? %>"
-  data-remote-video-value="<%= @slide.video? %>">
+<%= tag.div class: class_names("mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-5 pt-4", @hunt.chat_available? ? "pb-[calc(4.5rem_+_max(1rem,env(safe-area-inset-bottom)))]" : "pb-[max(1.5rem,env(safe-area-inset-bottom))]"), data: remote_data(@hunt, @slide) do %>
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
 
   <div class="flex items-center justify-between">
@@ -73,7 +66,7 @@
     <div class="rounded-3xl border-[1.5px] border-flag/50 bg-white/5 p-4" data-testid="reveal-panel">
       <p class="text-sm font-semibold text-white/60">The big screen is showing a sealed envelope</p>
       <% if @hunt.time_locked? %>
-        <p class="mt-2 leading-snug">Results open at <%= @hunt.ends_at.strftime("%l:%M %p").strip %>, when the hunt ends. Until then the envelope stays sealed.</p>
+        <p class="mt-2 leading-snug">Results open at <%= @hunt.ends_at.strftime("%l:%M %p %Z").strip %>, when the hunt ends. Until then the envelope stays sealed.</p>
       <% else %>
         <p class="mt-2 leading-snug">When everyone is watching, reveal the winners. Scores open on the results page at the same time.</p>
         <button type="button" class="btn btn-lg btn-block mt-3 border-0 bg-flag text-flag-content hover:bg-flag/90" data-action="remote#openReveal" data-remote-target="button" data-testid="reveal">
@@ -153,7 +146,7 @@
   <%= render partial: "presentations/up_next", locals: {presentation: @presentation} %>
 
   <p class="text-center text-xs text-white/40">Arrow keys change the slide. Space plays and pauses.</p>
-</div>
+<% end %>
 
 <% if @hunt.chat_available? %>
   <%= render partial: "messages/chat", locals: {hunt: @hunt, position: "fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))]"} %>

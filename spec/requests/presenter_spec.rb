@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Presenter" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:hunt) { create(:hunt, owner_id: "owner") }
   let(:items) { hunt.items.order(:id).to_a }
   let(:first_team) { create(:team, hunt:) }
@@ -123,6 +125,25 @@ RSpec.describe "Presenter" do
 
       expect(response.body).to include(%(data-testid="winner-name"), %(id="finale_card"), ERB::Util.html_escape(first_team.name))
       expect(response.body).not_to include(%(data-testid="sealed-finale"))
+    end
+
+    it "refreshes a time-locked show on its own once the hunt ends" do
+      found(first_team, items.first)
+      hunt.update!(lock_results: true, starts_at: 1.hour.ago, ends_at: Time.zone.local(2026, 10, 18, 21, 30), presentation_slide: "finale")
+
+      travel_to Time.zone.local(2026, 10, 18, 20, 0) do
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-at-value="2026-10-18T21:30:00-07:00"))
+
+        get "/scavenger_hunts/#{hunt.code}/presenter"
+        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-at-value="2026-10-18T21:30:00-07:00"))
+      end
+
+      travel_to Time.zone.local(2026, 10, 18, 21, 31) do
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).to include(%(data-testid="winner-name"))
+        expect(response.body).not_to include("data-live-refresh-at-value")
+      end
     end
 
     it "shows the item title card with who found it" do

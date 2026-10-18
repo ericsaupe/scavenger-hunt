@@ -3,9 +3,10 @@ import { Turbo } from "@hotwired/turbo-rails"
 
 const CAPTURE_GRACE_MS = 3000
 const CATCH_UP_RETRY_MS = 1000
+const MAX_TIMEOUT_MS = 2147483647
 
 export default class extends Controller {
-  static values = { interval: Number }
+  static values = { interval: Number, refreshAt: String }
 
   connect() {
     this.lostConnection = false
@@ -31,6 +32,7 @@ export default class extends Controller {
     if (this.intervalValue > 0) {
       this.timer = setInterval(() => this.refresh(), this.intervalValue)
     }
+    this.scheduleRefresh()
   }
 
   disconnect() {
@@ -39,6 +41,7 @@ export default class extends Controller {
     document.removeEventListener("turbo:submit-end", this.onSubmitEnd)
     document.removeEventListener("uploads:landed", this.onUploadLanded)
     clearInterval(this.timer)
+    clearTimeout(this.deadlineTimer)
     clearTimeout(this.captureTimer)
     clearTimeout(this.catchUpTimer)
   }
@@ -50,6 +53,17 @@ export default class extends Controller {
       this.lostConnection = false
       this.refresh()
     }
+  }
+
+  scheduleRefresh() {
+    if (!this.refreshAtValue) {
+      return
+    }
+    const delay = Date.parse(this.refreshAtValue) - Date.now() + 1000
+    if (delay > MAX_TIMEOUT_MS) {
+      return
+    }
+    this.deadlineTimer = setTimeout(() => this.refresh(), Math.max(delay, 0))
   }
 
   catchUp() {
