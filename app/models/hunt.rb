@@ -80,32 +80,38 @@ class Hunt < ApplicationRecord
   end
 
   def reopen!(duration, by: nil)
-    return false unless ended? && duration.positive? && duration <= REOPEN_LIMIT
+    return false unless duration.positive? && duration <= REOPEN_LIMIT
+    return false unless with_lock { ended? && update!(reopened_at: Time.current, ends_at: Time.current + duration) }
 
-    update!(reopened_at: Time.current, ends_at: Time.current + duration)
     broadcast_timer_update
     SubmissionsReopenedJob.perform_later(self, by)
     true
   end
 
   def add_reopened_time!(duration)
-    return false unless reopened?
+    return false unless with_lock { reopened? && update!(ends_at: ends_at + duration) }
 
-    update!(ends_at: ends_at + duration)
     broadcast_timer_update
     true
   end
 
   def close_reopened!
-    return false unless reopened?
+    return false unless with_lock { reopened? && update!(ends_at: Time.current) }
 
-    update!(ends_at: Time.current)
     broadcast_timer_update
     true
   end
 
   def reopened_photo_count
     submissions.found.where(active_storage_attachments: {created_at: reopened_at..}).count
+  end
+
+  def closed_to_new_teams?
+    ended? || reopened?
+  end
+
+  def archive_current?
+    archive.attached? && submissions.found.where.not(active_storage_attachments: {created_at: ..archive.created_at}).none?
   end
 
   def pending_upload_count

@@ -104,6 +104,40 @@ RSpec.describe "Reopening submissions" do
     end
   end
 
+  describe "the photo download" do
+    let(:download_path) { "/scavenger_hunts/#{hunt.code}/download_results" }
+
+    def attach_photo(submission)
+      submission.photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
+    end
+
+    def archive_blob
+      hunt.reload.archive.blob
+    end
+
+    it "builds a fresh download once a photo or retake comes in after the last one" do
+      first, second = create(:team, hunt:).submissions.order(:id).to_a
+      attach_photo(first)
+      get download_path
+      before_reopening = archive_blob
+      get download_path
+      expect(archive_blob).to eq(before_reopening)
+
+      travel 1.minute
+      hunt.reopen!(10.minutes)
+      attach_photo(second)
+      get download_path
+      during_reopening = archive_blob
+      expect(during_reopening).not_to eq(before_reopening)
+      expect(hunt.archive.open { |file| Zip::File.open(file.path, &:size) }).to eq(2)
+
+      travel 1.minute
+      attach_photo(first)
+      get download_path
+      expect(archive_blob).not_to eq(during_reopening)
+    end
+  end
+
   describe "the results page" do
     it "offers the organizer a reopen once the hunt is over" do
       get results_path

@@ -234,6 +234,25 @@ RSpec.describe Hunt, "reopening submissions" do
     expect(hunt).not_to be_reopened
   end
 
+  it "works from the saved deadline when two organizers tap at once", :test_queue_adapter do
+    first, second = 2.times.map { Hunt.find(hunt.id) }
+    expect(first.reopen!(10.minutes)).to be(true)
+    expect(second.reopen!(15.minutes)).to be(false)
+    expect(SubmissionsReopenedJob).to have_been_enqueued.once
+
+    first, second = 2.times.map { Hunt.find(hunt.id) }
+    expect(first.add_reopened_time!(5.minutes)).to be(true)
+    expect(second.add_reopened_time!(5.minutes)).to be(true)
+    expect(hunt.reload.ends_at).to eq(Time.zone.local(2026, 10, 30, 20, 50))
+
+    closing, extending = 2.times.map { Hunt.find(hunt.id) }
+    expect(closing.close_reopened!).to be(true)
+    travel 1.second
+    expect(extending.add_reopened_time!(5.minutes)).to be(false)
+    expect(extending.close_reopened!).to be(false)
+    expect(hunt.reload.ends_at).to eq(Time.zone.local(2026, 10, 30, 20, 30))
+  end
+
   it "gives photos still uploading the usual grace from the reopened close" do
     hunt.reopen!(10.minutes)
     travel_to Time.zone.local(2026, 10, 30, 20, 50)

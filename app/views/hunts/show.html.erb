@@ -22,8 +22,8 @@
     <p class="page py-3 text-sm text-ink-soft [#teams:empty+&]:block hidden">No teams yet. Start the first one below.</p>
   </div>
 
-  <% unless @hunt.ended? || @hunt.reopened? %>
-    <div class="page mt-8">
+  <% unless @hunt.closed_to_new_teams? %>
+    <div class="page mt-8" data-timer-while="open">
       <%= f.label :name, "Or start a new team", class: "mb-1.5 block text-lg font-bold" %>
       <%= f.text_field :name, class: "input input-lg w-full", placeholder: "Team name", autocomplete: "off", autocapitalize: "words" %>
       <div class="mt-3 flex items-center justify-between gap-3">
