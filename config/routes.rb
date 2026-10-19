@@ -28,6 +28,7 @@ Rails.application.routes.draw do
       patch :screen_chat
     end
     resource :push_subscription, only: %i[create update destroy]
+    resource :reopening, only: %i[create update destroy]
     get :print
     get :download_results, on: :member
     post :unlock_leaderboard, on: :member

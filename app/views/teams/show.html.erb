@@ -12,6 +12,7 @@
 <div data-controller="checklist live queue" data-queue-team-id-value="<%= @team.id %>" data-queue-report-url-value="<%= pending_uploads_hunt_team_path(@hunt.code, @team) %>">
   <%= turbo_stream_from "submissions_#{@team.id}" %>
   <%= turbo_stream_from @team %>
+  <%= turbo_stream_from @hunt, :timer if @hunt.ends_at %>
 
   <div class="sticky top-14 z-20 border-b border-base-300 bg-base-100/95 backdrop-blur" data-sticky-header>
     <div class="page flex items-end justify-between gap-4 pt-3">
@@ -46,8 +47,9 @@
     </div>
   </div>
 
-  <p class="page pt-5 text-sm text-ink-soft" data-timer-while="open" <%= "hidden" if @hunt.ended? %>>Tap an item to take a photo or a video up to <%= Submission::MAX_VIDEO_SECONDS %> seconds. Found items tick off for the whole team.</p>
-  <p class="page pt-5 text-sm text-ink-soft" data-timer-while="ended" <%= "hidden" unless @hunt.ended? %>>The hunt is over. Everything your team found is in, so get ready for the show and the results.</p>
+  <%= tag.p "Tap an item to take a photo or a video up to #{Submission::MAX_VIDEO_SECONDS} seconds. Found items tick off for the whole team.", class: "page pt-5 text-sm text-ink-soft", hidden: timer_phase(@hunt) != "open", data: {timer_while: "open"} %>
+  <%= tag.p "The organizer reopened submissions for a few minutes. Add or retake anything that didn't make it in.", class: "page pt-5 text-sm text-ink-soft", hidden: timer_phase(@hunt) != "reopened", data: {timer_while: "reopened"} %>
+  <%= tag.p "The hunt is over. Everything your team found is in, so get ready for the show and the results.", class: "page pt-5 text-sm text-ink-soft", hidden: timer_phase(@hunt) != "ended", data: {timer_while: "ended"} %>
 
   <% if @hunt.chat_available? %>
     <%= render partial: "messages/organizer_card", locals: {hunt: @hunt, message: @hunt.latest_announcement} %>

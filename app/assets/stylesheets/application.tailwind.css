@@ -383,6 +383,7 @@
   .status-pill[data-state="upcoming"] { @apply bg-info/10 text-info; }
   .status-pill[data-state="live"] { @apply bg-success/10 text-success; }
   .status-pill[data-state="ended"] { @apply bg-error/10 text-error; }
+  .status-pill[data-state="reopened"] { @apply bg-secondary text-secondary-content; }
 
   .stage {
     @apply bg-[#111317] text-white;

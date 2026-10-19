@@ -4,7 +4,9 @@ module HuntHelper
   def hunt_status(hunt)
     return if hunt.starts_at.nil? && hunt.ends_at.nil?
 
-    text = if hunt.in_progress? && hunt.ends_at
+    text = if hunt.reopened?
+      "Reopened · #{distance_of_time_in_words(Time.current, hunt.ends_at)} left"
+    elsif hunt.in_progress? && hunt.ends_at
       "Ends in #{distance_of_time_in_words(Time.current, hunt.ends_at)}"
     elsif hunt.upcoming?
       "Starts in #{distance_of_time_in_words(Time.current, hunt.starts_at)}"
@@ -21,8 +23,15 @@ module HuntHelper
 
   def timer_state(hunt)
     return "ended" if hunt.ended?
+    return "reopened" if hunt.reopened?
     return "upcoming" if hunt.upcoming?
     "live"
+  end
+
+  def timer_phase(hunt)
+    return "ended" if hunt.ended?
+    return "reopened" if hunt.reopened?
+    "open"
   end
 
   def push_preference_options
@@ -64,5 +73,24 @@ module HuntHelper
 
   def found_count(found, total)
     (total.positive? && found == total) ? "All #{total} found" : "#{found} of #{total} found"
+  end
+
+  def time_left(hunt)
+    seconds = [(hunt.ends_at - Time.current).ceil, 0].max
+    format("%d:%02d", seconds / 60, seconds % 60)
+  end
+
+  def clock_time(time)
+    tag.time(time.strftime("%-l:%M %p"), datetime: time.iso8601, data: {reopen_target: "time"})
+  end
+
+  def reopen_data(hunt)
+    {
+      controller: "live reopen",
+      live_interval_value: 30_000,
+      reopen_ends_at_value: (hunt.ends_at.to_f * 1000).round,
+      reopen_opened_at_value: (hunt.reopened_at.to_f * 1000).round,
+      reopen_now_value: (Time.current.to_f * 1000).round
+    }
   end
 end

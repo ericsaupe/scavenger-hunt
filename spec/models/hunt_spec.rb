@@ -177,6 +177,103 @@ RSpec.describe Hunt do
   end
 end
 
+RSpec.describe Hunt, "reopening submissions" do
+  include ActiveSupport::Testing::TimeHelpers
+
+  let(:hunt) { create(:hunt, ends_at: Time.zone.local(2026, 10, 30, 20, 0)) }
+
+  before { travel_to Time.zone.local(2026, 10, 30, 20, 30) }
+
+  def attach_photo(submission)
+    submission.photo.attach(io: Rails.root.join("spec/fixtures/test.jpg").open, filename: "test.jpg")
+  end
+
+  it "opens an ended hunt back up for the chosen time" do
+    expect(hunt.reopen!(10.minutes)).to be(true)
+
+    expect(hunt.reload).to have_attributes(reopened_at: Time.zone.local(2026, 10, 30, 20, 30), ends_at: Time.zone.local(2026, 10, 30, 20, 40))
+    expect(hunt).to be_reopened
+    expect(hunt).to be_in_progress
+    expect(hunt.accepts_photo_captured_at?(nil)).to be(true)
+  end
+
+  it "only reopens a hunt that has ended" do
+    running = create(:hunt, ends_at: 1.hour.from_now)
+    endless = create(:hunt)
+
+    expect(running.reopen!(10.minutes)).to be(false)
+    expect(endless.reopen!(10.minutes)).to be(false)
+    expect(running.reload).to have_attributes(reopened_at: nil, ends_at: Time.zone.local(2026, 10, 30, 21, 30))
+    expect(endless.reload).to have_attributes(reopened_at: nil, ends_at: nil)
+    expect(running).not_to be_reopened
+  end
+
+  it "keeps the length between a minute and two hours" do
+    expect(hunt.reopen!(0.minutes)).to be(false)
+    expect(hunt.reopen!(121.minutes)).to be(false)
+    expect(hunt.reload).to be_ended
+
+    expect(hunt.reopen!(2.hours)).to be(true)
+    expect(hunt.reload.ends_at).to eq(Time.zone.local(2026, 10, 30, 22, 30))
+  end
+
+  it "adds time and closes early only while reopened" do
+    expect(hunt.add_reopened_time!(5.minutes)).to be(false)
+    expect(hunt.close_reopened!).to be(false)
+    expect(hunt.reload.ends_at).to eq(Time.zone.local(2026, 10, 30, 20, 0))
+
+    hunt.reopen!(10.minutes)
+    expect(hunt.add_reopened_time!(5.minutes)).to be(true)
+    expect(hunt.reload.ends_at).to eq(Time.zone.local(2026, 10, 30, 20, 45))
+
+    travel 2.minutes
+    expect(hunt.close_reopened!).to be(true)
+    expect(hunt.reload.ends_at).to eq(Time.zone.local(2026, 10, 30, 20, 32))
+    travel 1.second
+    expect(hunt).to be_ended
+    expect(hunt).not_to be_reopened
+  end
+
+  it "gives photos still uploading the usual grace from the reopened close" do
+    hunt.reopen!(10.minutes)
+    travel_to Time.zone.local(2026, 10, 30, 20, 50)
+
+    expect(hunt).not_to be_reopened
+    expect(hunt.accepts_photo_captured_at?(Time.zone.local(2026, 10, 30, 20, 39))).to be(true)
+    expect(hunt.accepts_photo_captured_at?(Time.zone.local(2026, 10, 30, 20, 41))).to be(false)
+  end
+
+  it "hides locked results again until the reopened time closes" do
+    hunt.update!(lock_results: true)
+    expect(hunt).not_to be_results_locked
+
+    hunt.reopen!(10.minutes)
+
+    expect(hunt).to be_results_locked
+  end
+
+  it "counts the photos and retakes that came in since it reopened" do
+    first, second, third = create(:team, hunt:).submissions.order(:id).to_a
+    attach_photo(first)
+    attach_photo(second)
+
+    travel 1.minute
+    hunt.reopen!(10.minutes)
+    travel 1.minute
+    attach_photo(second)
+    attach_photo(third)
+
+    expect(hunt.reopened_photo_count).to eq(2)
+  end
+
+  it "tells phones submissions are open again and sends the results alert after the new close", :test_queue_adapter do
+    hunt.reopen!(10.minutes, by: "organizer")
+
+    expect(SubmissionsReopenedJob).to have_been_enqueued.with(hunt, "organizer")
+    expect(HuntResultsReadyJob).to have_been_enqueued.with(hunt, Time.zone.local(2026, 10, 30, 20, 40)).at(Time.zone.local(2026, 10, 30, 20, 55))
+  end
+end
+
 RSpec.describe Hunt, "notifications", :test_queue_adapter do
   include ActiveSupport::Testing::TimeHelpers
 

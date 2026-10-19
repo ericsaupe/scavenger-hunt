@@ -4,7 +4,8 @@ export default class extends Controller {
   static targets = [ "container", "countdown" ]
   static values = {
     startsAt: Number,
-    endsAt: Number
+    endsAt: Number,
+    reopened: Boolean
   }
 
   connect() {
@@ -25,6 +26,10 @@ export default class extends Controller {
       this.setState("upcoming")
       this.countdownTarget.textContent = `Starts in ${this.format(target - now)}`
       this.toggleFieldsets(true)
+    } else if (target && target > now && this.reopenedValue) {
+      this.setState("reopened")
+      this.countdownTarget.textContent = `Reopened · ${this.format(target - now)} left`
+      this.toggleFieldsets(false)
     } else if (target && target > now) {
       this.setState("live")
       this.countdownTarget.textContent = `Ends in ${this.format(target - now)}`
@@ -54,8 +59,9 @@ export default class extends Controller {
 
   setState(state) {
     this.containerTarget.dataset.state = state
+    const phase = state === "ended" || state === "reopened" ? state : "open"
     document.querySelectorAll("[data-timer-while]").forEach(element => {
-      element.hidden = (element.dataset.timerWhile === "ended") !== (state === "ended")
+      element.hidden = !element.dataset.timerWhile.split(" ").includes(phase)
     })
   }
 
