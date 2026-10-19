@@ -47,9 +47,9 @@
     <p class="mt-1 text-sm text-ink-soft">Tap a found item to see each team's photo and vote on it.</p>
   </div>
   <%= render partial: "hunts/results_items" %>
-
-  <p class="page mt-12 text-center text-xs text-ink-soft" data-testid="avatar-credit">Team and chat avatars by <a href="https://www.dicebear.com" class="link" target="_blank" rel="noopener">DiceBear</a>, in the Critters and Thumbs styles (CC0).</p>
 <% end %>
+
+<%= render partial: "shared/footer", locals: {avatar_credit: !@hunt.results_locked?} %>
 
 <% if @hunt.chat_available? %>
   <%= render partial: "messages/chat", locals: {hunt: @hunt} %>
