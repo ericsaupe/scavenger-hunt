@@ -8,6 +8,17 @@
       back_label: "Hunt"
     )) %>
 
+<% if @hunt.organizer?(cookies[:user_id]) %>
+  <%= render partial: "reopen", locals: {hunt: @hunt} %>
+<% elsif @hunt.reopened? %>
+  <div class="page mb-6 mt-4" data-controller="reopen">
+    <div class="flex items-start gap-3 rounded-2xl bg-base-200 px-4 py-3 text-sm" role="status" data-testid="reopened-note">
+      <%= icon :clock, class: "mt-0.5 size-5 shrink-0 text-ink-soft" %>
+      <span>Submissions are open again until <%= clock_time(@hunt.ends_at) %>, so results can still change.</span>
+    </div>
+  </div>
+<% end %>
+
 <% if @hunt.results_locked? %>
   <%= render partial: "locked_results", locals: {hunt: @hunt} %>
 <% else %>

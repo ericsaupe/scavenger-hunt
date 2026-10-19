@@ -70,6 +70,9 @@ application.register("reaction", ReactionController)
 import RemoteController from "./remote_controller"
 application.register("remote", RemoteController)
 
+import ReopenController from "./reopen_controller"
+application.register("reopen", ReopenController)
+
 import ScreenChatController from "./screen_chat_controller"
 application.register("screen-chat", ScreenChatController)
 

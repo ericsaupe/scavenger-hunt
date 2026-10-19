@@ -6,6 +6,9 @@ class Hunt < ApplicationRecord
   include BCrypt
 
   LATE_UPLOAD_GRACE = 15.minutes
+  REOPEN_LIMIT = 2.hours
+  REOPEN_CHOICES = [5, 10, 15].freeze
+  REOPEN_EXTRA = 5.minutes
   STARTING_SOON_LEAD = 5.minutes
   LEAD_CHANGE_INTERVAL = 5.minutes
   PLAYBACK_COMMANDS = %w[play pause replay mute unmute].freeze
@@ -70,6 +73,54 @@ class Hunt < ApplicationRecord
 
   def in_grace_window?
     ended? && Time.current <= ends_at + LATE_UPLOAD_GRACE
+  end
+
+  def reopened?
+    reopened_at.present? && ends_at.present? && !ended?
+  end
+
+  def reopen!(duration, by: nil)
+    return false unless duration.positive? && duration <= REOPEN_LIMIT
+    return false unless with_lock { ended? && update!(reopened_at: Time.current, ends_at: Time.current + duration) }
+
+    broadcast_timer_update
+    SubmissionsReopenedJob.perform_later(self, by)
+    true
+  end
+
+  def add_reopened_time!(duration)
+    return false unless with_lock { reopened? && update!(ends_at: ends_at + duration) }
+
+    broadcast_timer_update
+    true
+  end
+
+  def close_reopened!
+    return false unless with_lock { reopened? && update!(ends_at: Time.current) }
+
+    broadcast_timer_update
+    true
+  end
+
+  def reopened_photo_count
+    submissions.found.where(active_storage_attachments: {created_at: reopened_at..}).count
+  end
+
+  def closed_to_new_teams?
+    ended? || reopened?
+  end
+
+  def archive_current?
+    archive.attached? && submissions.found.where.not(active_storage_attachments: {created_at: ..archive.created_at}).none?
+  end
+
+  def refresh_archive
+    return if archive_current?
+
+    with_archive_lock(wait: !archive.attached?) do
+      reload
+      create_archive_file unless archive_current?
+    end
   end
 
   def pending_upload_count
@@ -274,6 +325,10 @@ class Hunt < ApplicationRecord
     broadcast_refresh_to(presenter_stream)
   end
 
+  def broadcast_timer_update
+    broadcast_replace_to(self, :timer, target: ActionView::RecordIdentifier.dom_id(self, :timer), partial: "hunts/timer", locals: {hunt: self})
+  end
+
   def owner_password_matches?(candidate)
     lock_password.blank? || password == candidate
   end
@@ -322,5 +377,22 @@ class Hunt < ApplicationRecord
 
   def archive_path_segment(name)
     name.tr('"', "'").gsub(/[\/\\:*?<>|[:cntrl:]]/, "-").strip
+  end
+
+  # One build at a time per hunt. While one runs, everyone else gets the last
+  # download, and only waits for the build when there is no download yet.
+  def with_archive_lock(wait:)
+    self.class.connection_pool.with_connection do |connection|
+      key = "hashtextextended(#{connection.quote("hunt_archive:#{id}")}, 0)"
+      if wait
+        connection.select_value("SELECT pg_advisory_lock(#{key})")
+        locked = true
+      else
+        locked = connection.select_value("SELECT pg_try_advisory_lock(#{key})")
+      end
+      connection.uncached { yield } if locked
+    ensure
+      connection.select_value("SELECT pg_advisory_unlock(#{key})") if locked
+    end
   end
 end

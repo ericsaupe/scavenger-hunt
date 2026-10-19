@@ -1,9 +1,10 @@
-<div class="status-pill whitespace-nowrap"
+<div id="<%= dom_id(hunt, :timer) %>" class="status-pill whitespace-nowrap"
   data-controller="timer"
   data-timer-target="container"
   data-state="<%= timer_state(hunt) %>"
   data-timer-starts-at-value="<%= hunt.starts_at ? hunt.starts_at.to_i * 1000 : nil %>"
-  data-timer-ends-at-value="<%= hunt.ends_at ? hunt.ends_at.to_i * 1000 : nil %>">
+  data-timer-ends-at-value="<%= hunt.ends_at ? hunt.ends_at.to_i * 1000 : nil %>"
+  data-timer-reopened-value="<%= hunt.reopened? %>">
   <%= icon :clock, class: "size-4" %>
   <span data-timer-target="countdown"><%= hunt_status(hunt) %></span>
 </div>

@@ -53,6 +53,23 @@ RSpec.describe "Teams" do
     expect(response.body).to include(%(src="#{team.avatar_url}" width="48" height="48" loading="lazy" alt="" data-testid="team-avatar" class="avatar-img"))
   end
 
+  it "keeps new teams out once the hunt has ended, even while it's reopened, but still lets people join a team" do
+    hunt = create(:hunt, ends_at: 10.minutes.ago)
+    team = create(:team, hunt:)
+
+    post "/scavenger_hunts/#{hunt.code}/teams", params: {name: "Latecomers"}
+    expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}")
+    expect(flash[:error]).to eq("The hunt is over, so new teams can't join. Pick a team to join instead.")
+
+    hunt.reopen!(10.minutes)
+    post "/scavenger_hunts/#{hunt.code}/teams", params: {name: "Latecomers"}
+    expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}")
+    expect(hunt.teams.where(name: "Latecomers")).to be_none
+
+    post "/scavenger_hunts/#{hunt.code}/teams", params: {team_id: team.id, name: "Latecomers"}
+    expect(response).to redirect_to("/scavenger_hunts/#{hunt.code}/teams/#{team.id}")
+  end
+
   it "renders the checklist with the same number of queries however many items there are" do
     hunt = create(:hunt)
     team = create(:team, hunt:)

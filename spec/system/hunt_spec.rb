@@ -324,6 +324,17 @@ RSpec.describe "Hunts" do
       end
     end
 
+    describe "when the end passes while the hunt page is open" do
+      it "takes the new team field away without a reload" do
+        hunt.update(ends_at: 3.seconds.from_now)
+        visit "/scavenger_hunts/#{hunt.code.upcase}"
+        expect(page).to have_field("Or start a new team")
+
+        expect(page).to have_text("Hunt over. No more submissions.", wait: 6)
+        expect(page).not_to have_field("Or start a new team")
+      end
+    end
+
     describe "when ended" do
       before do
         hunt.update(ends_at: 1.hour.ago)

@@ -1,0 +1,48 @@
+<% if hunt.reopened? %>
+  <%= tag.div class: "page mb-6 mt-4", data: reopen_data(hunt) do %>
+    <section class="rounded-3xl border-2 border-secondary bg-secondary/10 p-5" data-testid="reopened-card">
+      <p class="text-xs font-bold uppercase tracking-wide text-ink-soft">Submissions reopened</p>
+      <p class="mt-1 flex flex-wrap items-baseline gap-x-2">
+        <span class="display text-4xl tabular-nums" data-reopen-target="remaining"><%= time_left(hunt) %></span>
+        <span class="font-semibold text-ink-soft">left, closes at <%= clock_time(hunt.ends_at) %></span>
+      </p>
+      <div class="mt-3 h-2 overflow-hidden rounded-full bg-base-300">
+        <div class="h-full w-full rounded-full bg-secondary" data-reopen-target="bar"></div>
+      </div>
+      <p class="mt-3 text-sm text-ink-soft"><%= pluralize(hunt.reopened_photo_count, "photo") %> in since you reopened</p>
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <%= button_to "+ #{Hunt::REOPEN_EXTRA.in_minutes.to_i} min", hunt_reopening_path(hunt.code), method: :patch, class: "btn btn-block" %>
+        <%= button_to "Close now", hunt_reopening_path(hunt.code), method: :delete, class: "btn btn-block" %>
+      </div>
+    </section>
+  <% end %>
+<% elsif hunt.ended? %>
+  <% chip = "inline-flex cursor-pointer items-center justify-center rounded-full border-2 border-base-300 bg-base-100 px-2 py-2 text-sm font-bold has-checked:border-primary has-checked:bg-primary has-checked:text-primary-content has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary" %>
+  <div class="page mb-6 mt-4">
+    <section class="rounded-3xl bg-base-200 p-5" data-controller="reopen" data-testid="reopen-card">
+      <p class="text-xs font-bold uppercase tracking-wide text-primary">Only organizers see this</p>
+      <h2 class="mt-1 text-lg font-bold">Submissions closed at <%= clock_time(hunt.ends_at) %></h2>
+      <p class="mt-1 text-sm text-ink-soft">Reopen so teams can add photos that didn't make it in.</p>
+      <%= form_with url: hunt_reopening_path(hunt.code), method: :post, class: "group mt-4" do %>
+        <fieldset class="grid grid-cols-4 gap-2">
+          <legend class="sr-only">How long to reopen</legend>
+          <% Hunt::REOPEN_CHOICES.each do |minutes| %>
+            <label class="<%= chip %>">
+              <%= radio_button_tag :minutes, minutes, minutes == 10, class: "sr-only", data: {reopen_target: "choice", action: "reopen#choose"} %>
+              <%= minutes %> min
+            </label>
+          <% end %>
+          <label class="<%= chip %>">
+            <%= radio_button_tag :minutes, "", false, id: "reopen-other", class: "sr-only", data: {reopen_target: "choice other", action: "reopen#choose"} %>
+            Other
+          </label>
+        </fieldset>
+        <label class="mt-3 hidden items-center gap-3 group-has-[#reopen-other:checked]:flex">
+          <span class="text-sm font-semibold">Minutes</span>
+          <%= tag.input type: "number", min: 1, max: Hunt::REOPEN_LIMIT.in_minutes.to_i, inputmode: "numeric", required: true, disabled: true, class: "input w-28", data: {reopen_target: "minutes", action: "reopen#type"} %>
+        </label>
+        <button class="btn btn-primary btn-block mt-4" data-reopen-target="submit">Reopen for 10 minutes</button>
+      <% end %>
+    </section>
+  </div>
+<% end %>

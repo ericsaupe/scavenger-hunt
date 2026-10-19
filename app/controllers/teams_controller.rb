@@ -12,6 +12,9 @@ class TeamsController < ApplicationController
   def create
     team = if params[:team_id].present?
       hunt.teams.find(params[:team_id])
+    elsif params[:name].present? && hunt.closed_to_new_teams?
+      flash[:error] = "The hunt is over, so new teams can't join. Pick a team to join instead."
+      redirect_to hunt_path(hunt.code) and return
     elsif params[:name].present?
       hunt.start_a_new_team(params[:name], avatar_seed: params[:avatar_seed])
     else
