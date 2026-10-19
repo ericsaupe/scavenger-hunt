@@ -47,7 +47,9 @@ class HuntsController < ApplicationController
 
   def download_results
     @hunt = Hunt.find_by!(code: params[:code].upcase)
-    @hunt.create_archive_file unless @hunt.archive_current?
+    return head :forbidden if @hunt.results_locked?
+
+    @hunt.refresh_archive
     redirect_to rails_blob_path(@hunt.archive, disposition: "attachment")
   end
 

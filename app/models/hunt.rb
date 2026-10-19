@@ -114,6 +114,15 @@ class Hunt < ApplicationRecord
     archive.attached? && submissions.found.where.not(active_storage_attachments: {created_at: ..archive.created_at}).none?
   end
 
+  def refresh_archive
+    return if archive_current?
+
+    with_archive_lock(wait: !archive.attached?) do
+      reload
+      create_archive_file unless archive_current?
+    end
+  end
+
   def pending_upload_count
     Team.pending_uploads_for(teams)
   end
@@ -356,5 +365,22 @@ class Hunt < ApplicationRecord
 
   def archive_path_segment(name)
     name.tr('"', "'").gsub(/[\/\\:*?<>|[:cntrl:]]/, "-").strip
+  end
+
+  # One build at a time per hunt. While one runs, everyone else gets the last
+  # download, and only waits for the build when there is no download yet.
+  def with_archive_lock(wait:)
+    self.class.connection_pool.with_connection do |connection|
+      key = "hashtextextended(#{connection.quote("hunt_archive:#{id}")}, 0)"
+      if wait
+        connection.select_value("SELECT pg_advisory_lock(#{key})")
+        locked = true
+      else
+        locked = connection.select_value("SELECT pg_try_advisory_lock(#{key})")
+      end
+      connection.uncached { yield } if locked
+    ensure
+      connection.select_value("SELECT pg_advisory_unlock(#{key})") if locked
+    end
   end
 end

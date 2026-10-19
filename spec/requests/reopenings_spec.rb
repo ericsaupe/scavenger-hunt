@@ -136,6 +136,17 @@ RSpec.describe "Reopening submissions" do
       get download_path
       expect(archive_blob).not_to eq(during_reopening)
     end
+
+    it "keeps the download shut while reopening hides the results again" do
+      hunt.update!(lock_results: true)
+      get download_path
+      expect(response).to have_http_status(:redirect)
+
+      hunt.reopen!(10.minutes)
+      get download_path
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe "the results page" do
