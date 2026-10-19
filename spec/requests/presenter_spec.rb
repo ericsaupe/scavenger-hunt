@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Presenter" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:hunt) { create(:hunt, owner_id: "owner") }
   let(:items) { hunt.items.order(:id).to_a }
   let(:first_team) { create(:team, hunt:) }
@@ -98,19 +100,50 @@ RSpec.describe "Presenter" do
       expect(response.body).to include(%(<link rel="preload" as="image" href="#{first.large_variant_url}"), %(id="item_#{items.first.id}_card"))
     end
 
-    it "leaves the finale out while the leaderboard is locked" do
+    it "seals the finale while the leaderboard is locked, on the big screen and on watchers' phones" do
       found(first_team, items.first)
-      hunt.update!(lock_password: "hunter2")
+      found(second_team, items.second)
+      hunt.update!(lock_password: "hunter2", presentation_slide: "finale")
 
-      expect(hunt.presentation.keys).not_to include("finale")
+      expect(hunt.presentation.keys.last).to eq("finale")
 
-      get "/scavenger_hunts/#{hunt.code}/presenter?slide=finale"
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
 
-      expect(response.body).to include("Live", "Item 1 of 2")
-      expect(response.body).not_to include("First place", "Browsing")
+      expect(response.body).to include("Finale 5 of 5", "First place", "And the winner is", "Sealed", "Final scores", "2 teams, 2 finds", "opens them from the remote")
+      expect(response.body).to include(%(data-testid="finale"), %(data-testid="sealed-finale"), %(data-testid="confetti"), %(id="finale_sealed_card"))
+      expect(response.body).not_to include(ERB::Util.html_escape(first_team.name), ERB::Util.html_escape(second_team.name), %(data-testid="winner-name"), %(data-testid="runners-up"), %(data-testid="most-loved"))
+      expect(response.body).not_to match(/\d+ points?/)
 
-      hunt.update!(password_entered: true, password_entered_for_leaderboard: true)
-      expect(Presentation.new(hunt.reload).keys).to include("finale")
+      get "/scavenger_hunts/#{hunt.code}/presenter"
+
+      expect(response.body).to include("Live", "Finale 5 of 5", "And the winner is", %(data-testid="sealed-finale"))
+      expect(response.body).not_to include(ERB::Util.html_escape(first_team.name), ERB::Util.html_escape(second_team.name))
+      expect(response.body).not_to match(/\d+ points?/)
+
+      hunt.reveal_results!
+      get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+
+      expect(response.body).to include(%(data-testid="winner-name"), %(id="finale_card"), ERB::Util.html_escape(first_team.name))
+      expect(response.body).not_to include(%(data-testid="sealed-finale"))
+    end
+
+    it "refreshes a time-locked show on its own once the hunt ends" do
+      found(first_team, items.first)
+      hunt.update!(lock_results: true, starts_at: 1.hour.ago, ends_at: Time.zone.local(2026, 10, 18, 21, 30), presentation_slide: "finale")
+
+      travel_to Time.zone.local(2026, 10, 18, 20, 0) do
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-in-value="5400000"))
+
+        get "/scavenger_hunts/#{hunt.code}/presenter"
+        expect(response.body).to include(%(data-testid="sealed-finale"), %(data-live-refresh-in-value="5400000"))
+      end
+
+      travel_to Time.zone.local(2026, 10, 18, 21, 31) do
+        get "/scavenger_hunts/#{hunt.code}/presenter?screen=big"
+        expect(response.body).to include(%(data-testid="winner-name"))
+        expect(response.body).not_to include("data-live-refresh-in-value")
+      end
     end
 
     it "shows the item title card with who found it" do

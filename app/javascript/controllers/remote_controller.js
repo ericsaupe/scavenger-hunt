@@ -1,11 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "button", "items" ]
+  static targets = [ "button", "items", "reveal" ]
   static values = {
     url: String,
     playbackUrl: String,
     screenChatUrl: String,
+    revealUrl: String,
     playing: Boolean,
     video: Boolean,
   }
@@ -13,7 +14,7 @@ export default class extends Controller {
   connect() {
     this.inFlight = false
     this.onKeydown = (event) => {
-      if (event.target.closest("input, textarea") || document.querySelector(".modal-open")) {
+      if (event.target.closest("input, textarea") || document.querySelector(".modal-open, dialog[open]")) {
         return
       }
       if (event.key === "ArrowRight") {
@@ -59,6 +60,23 @@ export default class extends Controller {
     }
   }
 
+  openReveal() {
+    if (this.hasRevealTarget && !this.revealTarget.open) {
+      this.revealTarget.showModal()
+    }
+  }
+
+  closeReveal() {
+    if (this.hasRevealTarget && this.revealTarget.open) {
+      this.revealTarget.close()
+    }
+  }
+
+  reveal() {
+    this.closeReveal()
+    this.send(this.revealUrlValue, {}, "POST")
+  }
+
   play() {
     this.playback("play")
   }
@@ -95,7 +113,7 @@ export default class extends Controller {
     }
   }
 
-  async send(url, body) {
+  async send(url, body, method = "PATCH") {
     if (this.inFlight) {
       return false
     }
@@ -104,7 +122,7 @@ export default class extends Controller {
     this.buttonTargets.forEach(button => button.disabled = true)
     try {
       const response = await fetch(url, {
-        method: "PATCH",
+        method,
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",

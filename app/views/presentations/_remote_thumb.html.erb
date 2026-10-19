@@ -10,6 +10,8 @@
     <% else %>
       <%= image_tag submission_attachment_url(submission), class: "size-full object-cover", alt: "", loading: "lazy" %>
     <% end %>
+  <% elsif slide.is_a?(Presentation::Finale) && slide.sealed? %>
+    <span class="grid size-full place-items-center bg-[#f3e9d2] text-flag-content"><%= icon :lock, class: "size-5" %></span>
   <% elsif slide.is_a?(Presentation::Finale) %>
     <span class="grid size-full place-items-center bg-flag text-flag-content"><%= icon :trophy, class: "size-5" %></span>
   <% else %>

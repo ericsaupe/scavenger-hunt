@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Presentations" do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:hunt) { create(:hunt, owner_id: "owner", remote_holder_id: "owner") }
   let(:items) { hunt.items.order(:id).to_a }
   let(:team) { create(:team, hunt:) }
@@ -92,14 +94,15 @@ RSpec.describe "Presentations" do
       expect(hunt.reload).to have_attributes(presentation_slide: "item:#{items.second.id}", presentation_playback: "paused", playback_started_at: nil)
     end
 
-    it "refuses the finale while the leaderboard is locked" do
+    it "keeps the finale in the show while the leaderboard is locked" do
       hunt.update!(lock_password: "hunter2", presentation_slide: "submission:#{third.id}")
 
-      patch "/scavenger_hunts/#{hunt.code}/presentation", params: {slide: "finale"}, as: :json
-      expect(response).to have_http_status(:unprocessable_content)
+      expect(hunt.presentation.keys.last).to eq("finale")
 
       patch "/scavenger_hunts/#{hunt.code}/presentation", params: {direction: "next"}, as: :json
-      expect(hunt.reload.presentation_slide).to eq("item:#{items.first.id}")
+
+      expect(response).to have_http_status(:no_content)
+      expect(hunt.reload.presentation_slide).to eq("finale")
     end
 
     it "ignores a slide that is not part of the show" do
@@ -107,6 +110,43 @@ RSpec.describe "Presentations" do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(hunt.reload.presentation_slide).to be_nil
+    end
+  end
+
+  describe "POST /presentation/reveal" do
+    before { hunt.update!(lock_password: "hunter2", presentation_slide: "submission:#{third.id}") }
+
+    def reveal
+      post "/scavenger_hunts/#{hunt.code}/presentation/reveal", as: :json
+    end
+
+    it "refuses anyone without the remote" do
+      cookies[:user_id] = "viewer"
+
+      reveal
+
+      expect(response).to have_http_status(:forbidden)
+      expect(hunt.reload).to have_attributes(password_entered: false, password_entered_for_leaderboard: false, presentation_slide: "submission:#{third.id}")
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
+    end
+
+    it "refuses while the hunt is still locked by its timer" do
+      hunt.update!(lock_results: true, starts_at: 1.hour.ago, ends_at: 1.hour.from_now)
+
+      reveal
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(hunt.reload).to have_attributes(password_entered: false, password_entered_for_leaderboard: false, presentation_slide: "submission:#{third.id}")
+      expect(Turbo::StreamsChannel).not_to have_received(:broadcast_refresh_to)
+    end
+
+    it "unlocks the results and the leaderboard, shows the finale and refreshes the screen once" do
+      reveal
+
+      expect(response).to have_http_status(:no_content)
+      expect(hunt.reload).to have_attributes(password_entered: true, password_entered_for_leaderboard: true, presentation_slide: "finale")
+      expect(hunt).to be_leaderboard_visible
+      expect(Turbo::StreamsChannel).to have_received(:broadcast_refresh_to).with("hunt_presenter_#{hunt.id}").once
     end
   end
 
@@ -223,6 +263,45 @@ RSpec.describe "Presentations" do
       get "/scavenger_hunts/#{hunt.code}/presenter/remote"
 
       expect(response.body).to include("Finale 7 of 7", "First place", ERB::Util.html_escape(team.name))
+    end
+
+    it "offers to reveal the winners on the sealed finale, and only there" do
+      hunt.update!(lock_password: "hunter2", presentation_slide: "submission:#{third.id}")
+
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).to include("Winner reveal, sealed")
+      expect(response.body).not_to include("Reveal the winners")
+
+      hunt.update!(presentation_slide: "finale")
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).to include("Finale 7 of 7", "Winner reveal", "Sealed", "Reveal the winners", "Reveal now", "Not yet")
+      expect(response.body).to include(%(data-testid="reveal-panel"), %(data-remote-reveal-url-value="/scavenger_hunts/#{hunt.code}/presentation/reveal"), %(aria-labelledby="reveal_title"), %(id="reveal_title"))
+      expect(response.body).to include("#{ERB::Util.html_escape(team.name)}, #{team.score} points")
+      expect(response.body).not_to include("First place")
+
+      hunt.update!(password_entered: true, password_entered_for_leaderboard: true)
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).to include("First place", ERB::Util.html_escape(team.name))
+      expect(response.body).not_to include("Reveal the winners", %(data-testid="reveal-panel"))
+    end
+
+    it "says when the results open instead while the hunt is still locked by its timer" do
+      hunt.update!(lock_results: true, starts_at: 1.hour.ago, ends_at: Time.zone.local(2026, 10, 18, 21, 30), presentation_slide: "finale")
+
+      travel_to Time.zone.local(2026, 10, 18, 20, 0) do
+        get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+      end
+
+      expect(response.body).to include("Sealed", "Results open at 9:30 PM PDT", %(data-live-refresh-in-value="5400000"))
+      expect(response.body).not_to include("Reveal the winners")
+
+      hunt.update!(lock_results: false)
+      get "/scavenger_hunts/#{hunt.code}/presenter/remote"
+
+      expect(response.body).not_to include("data-live-refresh-in-value")
     end
 
     it "offers the big screen chat switches, reflecting the current mode" do

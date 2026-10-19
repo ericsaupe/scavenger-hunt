@@ -1,3 +1,30 @@
+<% if slide.sealed? %>
+  <div id="current_slide" class="relative flex grow flex-col items-center justify-center overflow-hidden px-6 pb-6 pt-16 sm:px-10 sm:py-10" data-testid="finale">
+    <div class="pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" data-testid="confetti"><%= static_confetti %></div>
+    <div id="finale_sealed_card" class="relative z-10 flex w-full max-w-6xl flex-col items-center gap-10 @3xl:flex-row @3xl:justify-center @5xl:gap-16" style="--tilt: 0deg" data-print data-testid="sealed-finale">
+      <div class="min-w-0 max-w-2xl text-center @3xl:text-left">
+        <p class="text-sm font-extrabold uppercase tracking-[0.3em] text-flag @2xl:text-lg">First place</p>
+        <h2 class="display mt-4 text-5xl text-white @2xl:text-6xl @5xl:text-8xl">And the winner is&hellip;</h2>
+        <p class="mt-4 text-xl font-semibold text-white/70 @2xl:text-2xl">Scores are sealed. The organizer opens them from the remote.</p>
+      </div>
+      <figure class="polaroid-lg w-full max-w-sm shrink-0 pb-5! @3xl:max-w-xs @5xl:max-w-sm" style="transform: rotate(3deg)">
+        <div class="relative grid aspect-[4/3] place-items-center overflow-hidden border border-[#e3d6b8] bg-[#f3e9d2]">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent to-55%" aria-hidden="true"></div>
+          <svg class="absolute inset-0 size-full text-[#c9b98c]" viewBox="0 0 300 225" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 36h276v152H12z" />
+            <path d="M12 36l138 96 138-96" />
+          </svg>
+          <span class="relative grid size-20 place-items-center rounded-full bg-flag text-flag-content shadow-[0_8px_20px_-6px_rgba(0,0,0,0.4)] @5xl:size-24"><%= icon :lock, class: "size-10 @5xl:size-12" %></span>
+        </div>
+        <figcaption class="mt-4 px-1">
+          <p class="text-sm font-semibold text-ink-soft">Sealed</p>
+          <p class="display text-2xl text-ink">Final scores</p>
+          <p class="font-semibold text-ink-soft"><%= pluralize(slide.team_count, "team") %>, <%= pluralize(slide.find_count, "find") %></p>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+<% else %>
 <% winner = slide.winner %>
 <div id="current_slide" class="relative flex grow flex-col items-center justify-center overflow-hidden px-6 pb-6 pt-16 sm:px-10 sm:py-10" data-testid="finale">
   <div class="pointer-events-none absolute inset-0" aria-hidden="true" data-testid="confetti"><%= static_confetti %></div>
@@ -48,3 +75,4 @@
     <% end %>
   </div>
 </div>
+<% end %>

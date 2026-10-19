@@ -7,6 +7,24 @@ module PresentationHelper
     (((submission.id * 7919) % 31) / 10.0 - 1.5).round(1)
   end
 
+  def remote_data(hunt, slide)
+    code = hunt.code.upcase
+    {
+      controller: "remote live",
+      remote_url_value: hunt_presentation_path(code),
+      remote_playback_url_value: playback_hunt_presentation_path(code),
+      remote_screen_chat_url_value: screen_chat_hunt_presentation_path(code),
+      remote_reveal_url_value: reveal_hunt_presentation_path(code),
+      remote_playing_value: hunt.playing?,
+      remote_video_value: slide.video?,
+      live_refresh_in_value: refresh_in(hunt)
+    }
+  end
+
+  def refresh_in(hunt)
+    ((hunt.ends_at - Time.current) * 1000).ceil if hunt.time_locked?
+  end
+
   def static_confetti(count: 60)
     random = Random.new(count)
     safe_join(Array.new(count) do |i|

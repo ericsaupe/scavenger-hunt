@@ -18,7 +18,7 @@
                 <% if slide.is_a?(Presentation::TitleCard) %>
                   Item, <%= pluralize(slide.found_count, "team") %>
                 <% elsif slide.is_a?(Presentation::Finale) %>
-                  Winner reveal
+                  Winner reveal<%= ", sealed" if slide.sealed? %>
                 <% else %>
                   <%= slide.subtitle %>, <%= slide.label.downcase %> <%= slide.position %> of <%= slide.count %>
                 <% end %>

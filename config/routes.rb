@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     get "presenter/remote", to: "presentations#remote", as: :presenter_remote
     resource :presentation, only: %i[update] do
       post :claim
+      post :reveal
       patch :playback
       patch :screen_chat
     end

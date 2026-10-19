@@ -6,7 +6,7 @@
   <% end %>
 <% end %>
 
-<div class="flex min-h-dvh flex-col sm:h-dvh sm:flex-row" data-controller="live">
+<%= tag.div class: "flex min-h-dvh flex-col sm:h-dvh sm:flex-row", data: {controller: "live", live_refresh_in_value: refresh_in(@hunt)} do %>
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
   <% stage = {controller: "transition"} %>
   <% stage = stage.merge(controller: "browse transition", browse_next_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.next_key), browse_previous_url_value: hunt_presenter_path(@hunt.code.upcase, slide: @slide.previous_key)) unless @big_screen %>
@@ -83,4 +83,4 @@
   <% end %>
 
   <%= render partial: "presentations/screen_chat", locals: {hunt: @hunt} if @screen_chat %>
-</div>
+<% end %>

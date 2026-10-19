@@ -1,13 +1,7 @@
 <% title "#{@hunt.name} remote" %>
 <%= render partial: "hunts/presenter_head" %>
 
-<div class="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-5 pt-4 <%= @hunt.chat_available? ? "pb-[calc(4.5rem_+_max(1rem,env(safe-area-inset-bottom)))]" : "pb-[max(1.5rem,env(safe-area-inset-bottom))]" %>"
-  data-controller="remote live"
-  data-remote-url-value="<%= hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-playback-url-value="<%= playback_hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-screen-chat-url-value="<%= screen_chat_hunt_presentation_path(@hunt.code.upcase) %>"
-  data-remote-playing-value="<%= @hunt.playing? %>"
-  data-remote-video-value="<%= @slide.video? %>">
+<%= tag.div class: class_names("mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-5 pt-4", @hunt.chat_available? ? "pb-[calc(4.5rem_+_max(1rem,env(safe-area-inset-bottom)))]" : "pb-[max(1.5rem,env(safe-area-inset-bottom))]"), data: remote_data(@hunt, @slide) do %>
   <%= turbo_stream_from @hunt.presenter_stream, id: "presenter_stream", data: {turbo_permanent: true} %>
 
   <div class="flex items-center justify-between">
@@ -34,6 +28,8 @@
           <% else %>
             <%= image_tag submission_attachment_url(submission), class: "size-full object-cover", alt: "" %>
           <% end %>
+        <% elsif @slide.is_a?(Presentation::Finale) && @slide.sealed? %>
+          <span class="grid size-full place-items-center bg-[#f3e9d2] text-flag-content"><%= icon :lock, class: "size-8" %></span>
         <% elsif @slide.is_a?(Presentation::Finale) %>
           <span class="grid size-full place-items-center bg-flag text-flag-content"><%= icon :trophy, class: "size-8" %></span>
         <% else %>
@@ -44,9 +40,11 @@
     <div class="min-w-0">
       <p class="text-sm font-semibold text-white/60" data-testid="progress"><%= @slide.label %> <%= @slide.position %> of <%= @slide.count %></p>
       <p class="display mt-1 truncate text-2xl" data-testid="current-item"><%= @slide.title %></p>
-      <p class="mt-1 flex items-center gap-1.5 font-semibold text-white/70">
+      <p class="mt-1 flex items-center gap-1.5 font-semibold <%= (@slide.is_a?(Presentation::Finale) && @slide.sealed?) ? "text-flag" : "text-white/70" %>">
         <% if @slide.team %>
           <%= team_avatar(@slide.team, size: 20) %>
+        <% elsif @slide.is_a?(Presentation::Finale) && @slide.sealed? %>
+          <%= icon :lock, class: "size-4" %>
         <% end %>
         <span class="truncate"><%= @slide.subtitle %></span>
       </p>
@@ -63,6 +61,46 @@
       <%= icon :chevron_right, class: "size-5" %>
     </button>
   </div>
+
+  <% if @slide.is_a?(Presentation::Finale) && @slide.sealed? %>
+    <div class="rounded-3xl border-[1.5px] border-flag/50 bg-white/5 p-4" data-testid="reveal-panel">
+      <p class="text-sm font-semibold text-white/60">The big screen is showing a sealed envelope</p>
+      <% if @hunt.time_locked? %>
+        <p class="mt-2 leading-snug">Results open at <%= @hunt.ends_at.strftime("%l:%M %p %Z").strip %>, when the hunt ends. Until then the envelope stays sealed.</p>
+      <% else %>
+        <p class="mt-2 leading-snug">When everyone is watching, reveal the winners. Scores open on the results page at the same time.</p>
+        <button type="button" class="btn btn-lg btn-block mt-3 border-0 bg-flag text-flag-content hover:bg-flag/90" data-action="remote#openReveal" data-remote-target="button" data-testid="reveal">
+          <%= icon :trophy, class: "size-5" %>
+          Reveal the winners
+        </button>
+      <% end %>
+    </div>
+
+    <% unless @hunt.time_locked? %>
+      <% leader, runner_up = @slide.results.first(2) %>
+      <dialog class="modal modal-bottom sm:modal-middle" aria-labelledby="reveal_title" data-remote-target="reveal" data-testid="reveal-sheet">
+        <div class="modal-box bg-[#1b1f24] text-white sm:max-w-md">
+          <h3 id="reveal_title" class="display text-2xl">Reveal the winners?</h3>
+          <% if leader %>
+            <div class="mt-4 flex items-center gap-3 rounded-2xl bg-white/5 px-3.5 py-3">
+              <%= team_avatar(leader[:team], size: 44) %>
+              <div class="min-w-0">
+                <p class="truncate font-extrabold"><%= leader[:name] %>, <%= pluralize(leader[:score], "point") %></p>
+                <% if runner_up %>
+                  <% lead = leader[:score] - runner_up[:score] %>
+                  <p class="truncate text-sm text-white/60"><%= lead.zero? ? "Tied with #{runner_up[:name]}" : "#{pluralize(lead, "point")} ahead of #{runner_up[:name]}" %></p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+          <p class="mt-4 text-sm leading-snug text-white/60">Only you can see this. Revealing opens the scores on the big screen, on every phone watching, and on the results page.</p>
+          <button type="button" class="btn btn-lg btn-block mt-4 border-0 bg-flag text-flag-content hover:bg-flag/90" data-action="remote#reveal" data-remote-target="button" data-testid="reveal-now">Reveal now</button>
+          <button type="button" class="btn btn-ghost btn-block mt-2 text-white/80" data-action="remote#closeReveal">Not yet</button>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button type="submit" aria-label="Close">close</button></form>
+      </dialog>
+    <% end %>
+  <% end %>
 
   <% if @slide.video? %>
     <div class="rounded-3xl bg-white/5 p-4">
@@ -108,7 +146,7 @@
   <%= render partial: "presentations/up_next", locals: {presentation: @presentation} %>
 
   <p class="text-center text-xs text-white/40">Arrow keys change the slide. Space plays and pauses.</p>
-</div>
+<% end %>
 
 <% if @hunt.chat_available? %>
   <%= render partial: "messages/chat", locals: {hunt: @hunt, position: "fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))]"} %>
